@@ -1,0 +1,111 @@
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Custom Leaflet Map styling */
+.leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e7e5e4;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: 1.5;
+}
+
+.leaflet-container {
+  font-family: inherit;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Custom animated pulse indicator */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f5f5f4;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
+
+/* Custom Agricultural Marker Cluster Badges */
+.custom-cluster-icon {
+  background: transparent;
+  border: none;
+}
+
+.cluster-bubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(255, 255, 255, 0.9);
+  transition: transform 0.15s ease;
+}
+
+.cluster-bubble:hover {
+  transform: scale(1.08);
+}
+
+.cluster-small {
+  width: 32px;
+  height: 32px;
+  font-size: 11px;
+  background: linear-gradient(135deg, #15803d, #16a34a);
+}
+
+.cluster-medium {
+  width: 40px;
+  height: 40px;
+  font-size: 12px;
+  background: linear-gradient(135deg, #0369a1, #0284c7);
+}
+
+.cluster-large {
+  width: 48px;
+  height: 48px;
+  font-size: 13px;
+  background: linear-gradient(135deg, #b45309, #d97706);
+}
+
+.cluster-xlarge {
+  width: 56px;
+  height: 56px;
+  font-size: 14px;
+  background: linear-gradient(135deg, #be123c, #e11d48);
+}
