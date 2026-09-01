@@ -87,10 +87,13 @@ Ensure single-page application routing is configured so direct links like `https
 
 ### Step C: Deploy Backend (Render / Railway / AWS App Runner / GCP / Docker)
 
-#### Option 1: Native Python Runner (Render / Railway / Heroku)
-- **Build Command:** `pip install -r backend/requirements.txt`
-- **Start Command:** `python backend/run.py` or `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4`
-- **Root Working Directory:** Project Root directory
+#### Option 1: Native Python Runner (Render Cloud Web Service)
+- **Language:** Python 3
+- **Branch:** `main`
+- **Root Directory:** `backend`
+- **Build Command:** `pip install -r requirements.txt`
+- **Start Command:** `python run.py`
+- **Host Binding:** Server automatically binds to `0.0.0.0` and reads Render's dynamic `PORT` environment variable (`PORT=10000`).
 
 #### Option 2: Docker Container Deployment
 ```dockerfile

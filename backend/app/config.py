@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     )
     
     # Server & Execution Settings
-    HOST: str = "127.0.0.1"
+    HOST: str = "0.0.0.0"
     PORT: int = 8000
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
