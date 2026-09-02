@@ -970,3 +970,32 @@ class StationInsightResponse(BaseModel):
     confidence_level: str = "HIGH"
     data_mode: str = "DEMO_SIMULATION"
     disclaimer: str = "Demo Simulation Mode: Station intelligence generated deterministically."
+
+
+# ==========================================
+# 11. Authentication & Security Schemas
+# ==========================================
+
+class LoginRequest(BaseModel):
+    username_or_email: str = Field(..., description="Email address or username")
+    password: str = Field(..., description="User password")
+    role: Optional[str] = Field("hydrogeologist", description="Role selection")
+
+
+class UserProfile(BaseModel):
+    id: str
+    name: str
+    email: str
+    role: str
+    organization: str
+    department: str
+    assigned_state: Optional[str] = "All India"
+    avatar_initials: str = "JA"
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserProfile
+    data_mode: str = "DEMO_SIMULATION"
+    disclaimer: str = "Demo Simulation Mode: Authenticated session established under JalKrishi AI security policy."

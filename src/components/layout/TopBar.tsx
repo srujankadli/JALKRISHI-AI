@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { APP_CONFIG } from '../../utils/constants';
 import { BackendStatusBadge } from '../common/BackendStatusBadge';
+import { UserMenu } from './UserMenu';
 
 interface TopBarProps {
   onToggleMobileNav: () => void;
@@ -81,7 +82,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Alert Bell Button */}
         <button
           onClick={onOpenNotifications}
-          className="relative rounded-xl border border-stone-200 bg-stone-50 p-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900 transition-colors"
+          className="relative rounded-xl border border-stone-200 bg-stone-50 p-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900 transition-colors cursor-pointer"
           aria-label={`View notifications (${unreadAlertCount} critical warnings)`}
         >
           <Bell className="h-5 w-5" />
@@ -91,6 +92,9 @@ export const TopBar: React.FC<TopBarProps> = ({
             </span>
           )}
         </button>
+
+        {/* User Profile & Sign In / Out Menu */}
+        <UserMenu />
 
         {/* Problem ID Tag */}
         <div className="hidden md:flex items-center rounded-lg bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700 border border-stone-200">

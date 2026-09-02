@@ -19,6 +19,7 @@ from app.routers.crops import router as crops_router
 from app.routers.whatsapp import router as whatsapp_router
 from app.routers.data_pipeline import router as data_pipeline_router
 from app.routers.insights import router as insights_router
+from app.routers.auth import router as auth_router
 
 # Initialize Logging
 setup_logging()
@@ -140,6 +141,8 @@ app.include_router(anomalies_router)
 app.include_router(crops_router)
 app.include_router(insights_router, prefix=settings.API_V1_STR)
 app.include_router(insights_router, prefix="/api")
+app.include_router(auth_router, prefix=settings.API_V1_STR)
+app.include_router(auth_router, prefix="/api")
 app.include_router(whatsapp_router, prefix=settings.API_V1_STR)
 app.include_router(whatsapp_router, prefix="/api")
 app.include_router(data_pipeline_router, prefix=settings.API_V1_STR)

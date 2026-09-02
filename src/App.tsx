@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { AppShell } from './components/layout/AppShell';
+import { LoginPage } from './pages/LoginPage';
 import { Dashboard } from './pages/Dashboard';
 import { GroundwaterMapPage } from './pages/GroundwaterMapPage';
 import { ForecastPage } from './pages/ForecastPage';
@@ -12,23 +14,29 @@ import { DemoPage } from './pages/DemoPage';
 
 export function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/map" element={<GroundwaterMapPage />} />
-          <Route path="/forecast" element={<ForecastPage />} />
-          <Route path="/anomalies" element={<AnomaliesPage />} />
-          <Route path="/crops" element={<CropAdvisorPage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/whatsapp" element={<WhatsAppPage />} />
-          <Route path="/help" element={<HelpPage />} />
-          <Route path="/demo" element={<DemoPage />} />
-          {/* Catch-all redirect */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Standalone Login Route */}
+          <Route path="/login" element={<LoginPage />} />
+
+          {/* Main Platform Shell Routes */}
+          <Route element={<AppShell />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/map" element={<GroundwaterMapPage />} />
+            <Route path="/forecast" element={<ForecastPage />} />
+            <Route path="/anomalies" element={<AnomaliesPage />} />
+            <Route path="/crops" element={<CropAdvisorPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/whatsapp" element={<WhatsAppPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/demo" element={<DemoPage />} />
+            {/* Catch-all redirect */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

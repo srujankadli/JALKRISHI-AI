@@ -11,6 +11,7 @@ import {
   Droplets,
   MessageSquare,
   Sparkles,
+  LogIn,
 } from 'lucide-react';
 import { APP_CONFIG } from '../../utils/constants';
 
@@ -85,6 +86,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Help & Knowledge',
       sublabel: 'सहायता व स्रोत',
       emoji: '📚',
+    },
+    {
+      to: '/login',
+      icon: LogIn,
+      label: 'Officer Login Portal',
+      sublabel: 'लॉगइन पोर्टल',
+      emoji: '🔐',
     },
     {
       to: '/demo',
