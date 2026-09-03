@@ -1,3 +1,5 @@
+import { apiClient } from './apiClient';
+
 export interface LanguageConfig {
   language_code: string;
   display_name: string;
@@ -30,8 +32,6 @@ export interface TranscribeResponse {
   message: string;
 }
 
-const API_BASE_URL = '/api/v1/voice';
-
 export const LANGUAGE_TO_BCP47: Record<string, string> = {
   en: 'en-IN',
   hi: 'hi-IN',
@@ -54,31 +54,11 @@ export function getBcp47Locale(langCode: string): string {
 
 export class VoiceAssistantService {
   /**
-   * Safe helper to parse JSON response without throwing raw JSON syntax errors.
-   */
-  private static async parseResponseJson<T>(res: Response, fallbackErrorMessage: string): Promise<T> {
-    const text = await res.text();
-    if (!text || !text.trim()) {
-      throw new Error(fallbackErrorMessage);
-    }
-    try {
-      return JSON.parse(text);
-    } catch {
-      throw new Error(fallbackErrorMessage);
-    }
-  }
-
-  /**
-   * Fetches supported language configuration from backend.
+   * Fetches supported language configuration from backend via apiClient.
    */
   static async getSupportedLanguages(): Promise<LanguageConfig[]> {
     try {
-      const res = await fetch(`${API_BASE_URL}/languages`);
-      if (!res.ok) throw new Error('Failed to fetch languages');
-      return await this.parseResponseJson<LanguageConfig[]>(
-        res,
-        'Failed to parse language configurations.'
-      );
+      return await apiClient.get<LanguageConfig[]>('/voice/languages');
     } catch {
       // Offline / fallback static array for all 13 supported languages
       return [
@@ -100,7 +80,7 @@ export class VoiceAssistantService {
   }
 
   /**
-   * Transcribes audio stream via cloud STT endpoint.
+   * Transcribes audio stream via cloud STT endpoint using apiClient base URL.
    * Gracefully handles NOT_CONFIGURED status.
    */
   static async transcribeAudio(file?: File | Blob): Promise<TranscribeResponse> {
@@ -110,7 +90,8 @@ export class VoiceAssistantService {
         formData.append('file', file);
       }
 
-      const res = await fetch(`${API_BASE_URL}/transcribe`, {
+      const url = `${apiClient.getBaseUrl()}/voice/transcribe`;
+      const res = await fetch(url, {
         method: 'POST',
         body: formData,
       });
@@ -120,32 +101,33 @@ export class VoiceAssistantService {
           query_text: '',
           detected_language: 'en',
           stt_provider_status: 'NOT_CONFIGURED',
-          message: 'Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.',
+          message: 'Cloud speech-to-text is not configured.',
         };
       }
 
-      const data = await this.parseResponseJson<TranscribeResponse>(
-        res,
-        'Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.'
-      );
-
-      if (data.stt_provider_status === 'NOT_CONFIGURED') {
-        data.message = 'Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.';
+      const text = await res.text();
+      if (!text || !text.trim()) {
+        return {
+          query_text: '',
+          detected_language: 'en',
+          stt_provider_status: 'NOT_CONFIGURED',
+          message: 'Cloud speech-to-text is not configured.',
+        };
       }
 
-      return data;
+      return JSON.parse(text);
     } catch {
       return {
         query_text: '',
         detected_language: 'en',
         stt_provider_status: 'NOT_CONFIGURED',
-        message: 'Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.',
+        message: 'Cloud speech-to-text is not configured.',
       };
     }
   }
 
   /**
-   * Sends voice query or text query to Unified Farmer Intelligence pipeline.
+   * Sends voice query or text query to Unified Farmer Intelligence pipeline via apiClient.
    */
   static async sendVoiceQuery(
     queryText: string,
@@ -154,41 +136,13 @@ export class VoiceAssistantService {
     language: string = 'en',
     audioBase64?: string
   ): Promise<VoiceQueryResponse> {
-    let res: Response;
-    try {
-      res = await fetch(`${API_BASE_URL}/respond`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: queryText,
-          latitude,
-          longitude,
-          language,
-          audio_base64: audioBase64 || null,
-        }),
-      });
-    } catch {
-      throw new Error('Failed to connect to JalKrishi AI voice service. Please check your network connection.');
-    }
-
-    if (!res.ok) {
-      let detailMessage = 'Voice assistant query failed.';
-      try {
-        const text = await res.text();
-        if (text && text.trim()) {
-          const parsed = JSON.parse(text);
-          detailMessage = parsed.detail || parsed.message || detailMessage;
-        }
-      } catch {
-        detailMessage = `HTTP ${res.status}: ${res.statusText}`;
-      }
-      throw new Error(detailMessage);
-    }
-
-    return await this.parseResponseJson<VoiceQueryResponse>(
-      res,
-      'Failed to parse response from JalKrishi AI voice service.'
-    );
+    return await apiClient.post<VoiceQueryResponse>('/voice/respond', {
+      query: queryText,
+      latitude,
+      longitude,
+      language,
+      audio_base64: audioBase64 || null,
+    });
   }
 
   /**
@@ -232,5 +186,6 @@ export class VoiceAssistantService {
     }
   }
 }
+
 
 
