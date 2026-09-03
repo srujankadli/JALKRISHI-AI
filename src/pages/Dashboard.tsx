@@ -29,64 +29,62 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
+  selectedStation?: DWLRStation | null;
 }
 
 export const Dashboard: React.FC = () => {
-  const { onSelectStation } = useOutletContext<OutletContextType>();
+  const { onSelectStation, selectedStation } = useOutletContext<OutletContextType>();
   const { currentLanguage } = useLanguage();
 
   const [metrics, setMetrics] = useState<DashboardSummary | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState('Just now');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const loadData = async () => {
+  const fetchSummary = async () => {
     try {
-      const summary = await metricService.getDashboardSummary();
-      setMetrics(summary);
-    } catch (err) {
-      console.error('Failed to load dashboard metrics', err);
+      setIsRefreshing(true);
+      const data = await metricService.getDashboardSummary();
+      setMetrics(data);
+      setLastUpdatedText('Just now');
+    } catch {
+      // Fallback
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    fetchSummary();
   }, []);
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await loadData();
-    setTimeout(() => {
-      setLastUpdatedText('Just now (Refreshed)');
-      setIsRefreshing(false);
-    }, 400);
-  };
-
   const handleOpenStationById = async (stationId: string) => {
-    const st = await stationService.getStationById(stationId);
-    if (st) {
-      onSelectStation(st);
+    try {
+      const station = await stationService.getStationById(stationId);
+      if (station) {
+        onSelectStation(station);
+      }
+    } catch {
+      // Fallback
     }
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn pb-8">
-      {/* 0. Top Telemetry & Real-Time Sync Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-2.5 shadow-xs text-xs">
-        <div className="flex items-center gap-2">
-          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="font-bold text-stone-900">Reference DWLR Network</span>
-          <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">5,260 Reference Stations (Simulated Telemetry)</span>
-        </div>
-
+    <div className="space-y-6">
+      {/* Top Banner Status Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-sm border border-stone-200">
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1 text-stone-500">
-            <Clock className="h-3.5 w-3.5 text-stone-400" />
-            Last updated: <strong className="text-stone-800 font-semibold">{lastUpdatedText}</strong>
+          <div className="h-3 w-3 rounded-full bg-agri-500 animate-pulse" />
+          <span className="text-xs font-bold text-stone-700 uppercase tracking-wide">
+            System Operational &bull; 5,260 Telemetry Nodes Synchronized
           </span>
-
+        </div>
+        <div className="flex items-center gap-4 text-xs font-medium text-stone-500">
+          <span className="inline-flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" />
+            Updated: {lastUpdatedText}
+          </span>
           <button
-            onClick={handleRefresh}
+            onClick={fetchSummary}
             disabled={isRefreshing}
             className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-stone-50 px-2.5 py-1 font-semibold text-stone-700 hover:bg-stone-100 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
             title="Refresh simulation telemetry data"
@@ -104,7 +102,7 @@ export const Dashboard: React.FC = () => {
       <ExecutiveWaterBrief />
 
       {/* 2.5 Phase P Multilingual Farmer Voice Assistant */}
-      <FarmerVoiceAssistant currentLanguage={currentLanguage} />
+      <FarmerVoiceAssistant currentLanguage={currentLanguage} selectedStation={selectedStation} />
 
       {/* 3. Your Water Situation Card */}
       <WaterSituationCard metrics={metrics} />

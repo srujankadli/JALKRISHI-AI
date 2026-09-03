@@ -373,6 +373,12 @@ class HydroAgronomicTranslator:
         Formats structured GroundwaterIntelligenceSchema into concise farmer natural language response in target language.
         Preserves data-honesty disclaimers and satellite-assisted terms across all languages.
         """
+        st_header = ""
+        if intel.nearest_station_name and intel.nearest_station_id:
+            st_header = f" — {intel.nearest_station_name} [{intel.nearest_station_id}]"
+        elif intel.nearest_station_id:
+            st_header = f" — DWLR Station {intel.nearest_station_id}"
+
         if target_lang not in cls.TRANSLATED_TERMS:
             # English Default
             cov_label = intel.coverage_type
@@ -383,7 +389,7 @@ class HydroAgronomicTranslator:
             irrigation_str = intel.irrigation_implications
 
             lines = [
-                f"🌾 JalKrishi Farmer Advice ({cov_label}):",
+                f"🌾 JalKrishi Farmer Advice{st_header} ({cov_label}):",
                 f"• Groundwater Condition: {cond_label} (Stress Score: {intel.stress_score:.2f})",
                 f"• Trajectory Trend: {trend_label}",
                 f"• Recharge Outlook: {recharge_label}",
@@ -409,7 +415,7 @@ class HydroAgronomicTranslator:
         crops_str = ", ".join(intel.recommended_crops[:3])
 
         lines = [
-            f"🌾 {terms['title']} ({cov_label}):",
+            f"🌾 {terms['title']}{st_header} ({cov_label}):",
             f"• {terms['condition']}: {cond_label} (Stress Index: {intel.stress_score:.2f})",
             f"• {terms['trend']}: {trend_label}",
             f"• {terms['recharge']}: {intel.recharge_outlook}",

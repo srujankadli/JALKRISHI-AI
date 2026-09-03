@@ -13,6 +13,7 @@ import {
   Info,
   X,
 } from 'lucide-react';
+import type { DWLRStation } from '../../types';
 import {
   VoiceAssistantService,
   type VoiceQueryResponse,
@@ -24,6 +25,7 @@ type AssistantState = 'IDLE' | 'LISTENING' | 'PROCESSING' | 'RESPONDING' | 'ERRO
 
 interface FarmerVoiceAssistantProps {
   currentLanguage: string;
+  selectedStation?: DWLRStation | null;
   selectedLat?: number;
   selectedLng?: number;
   locationName?: string;
@@ -32,9 +34,10 @@ interface FarmerVoiceAssistantProps {
 
 export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
   currentLanguage,
-  selectedLat = 13.1367,
-  selectedLng = 78.1291,
-  locationName = 'Selected Farm Location',
+  selectedStation,
+  selectedLat,
+  selectedLng,
+  locationName,
 }) => {
   const [state, setState] = useState<AssistantState>('IDLE');
   const [queryText, setQueryText] = useState('');
@@ -167,12 +170,18 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     setState('PROCESSING');
     setErrorMessage('');
 
+    const activeLat = selectedStation?.latitude ?? selectedLat ?? 13.1367;
+    const activeLng = selectedStation?.longitude ?? selectedLng ?? 78.1291;
+    const activeStationId = selectedStation?.id || undefined;
+
     try {
       const res = await VoiceAssistantService.sendVoiceQuery(
         text,
-        selectedLat,
-        selectedLng,
-        responseLang
+        activeLat,
+        activeLng,
+        responseLang,
+        undefined,
+        activeStationId
       );
       setResponse(res);
       setState('RESPONDING');
@@ -211,6 +220,10 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     setErrorMessage('');
   };
 
+  const currentStationDisplay = selectedStation
+    ? `${selectedStation.stationName} (${selectedStation.district}, ${selectedStation.state})`
+    : locationName || 'Select a DWLR station for station-specific advice';
+
   return (
     <div className="rounded-3xl border border-stone-200 bg-white p-6 shadow-lg space-y-6">
       {/* Header */}
@@ -230,7 +243,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
               </span>
             </div>
             <p className="text-xs text-stone-500 font-medium">
-              Ask groundwater, crop, or irrigation advice for {locationName} in 13 Indian regional languages
+              Ask groundwater, crop, or irrigation advice for {currentStationDisplay} in 13 Indian regional languages
             </p>
           </div>
         </div>
@@ -260,16 +273,16 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-teal-500" />
           <span>
-            Input Mode:{' '}
+            Target Context:{' '}
             <strong className="text-stone-800 font-bold">
-              {hasBrowserSpeechSupport
-                ? 'Browser Voice Input & Manual Text'
-                : 'Manual Text Input Active'}
+              {selectedStation
+                ? `DWLR Well: ${selectedStation.stationName} (${selectedStation.district}, ${selectedStation.state}) [${selectedStation.id}]`
+                : 'General Reference Guidance (Select DWLR station on map for station-specific advice)'}
             </strong>
           </span>
         </div>
         <div className="flex items-center gap-3 font-mono text-[10px] text-stone-500">
-          <span>STT: {hasBrowserSpeechSupport ? 'Browser Voice' : 'Text Input'} (Cloud STT: Not Configured)</span>
+          <span>STT: {hasBrowserSpeechSupport ? 'Browser Voice' : 'Text Input'}</span>
           <span>&bull;</span>
           <span>Locale: {getBcp47Locale(responseLang)}</span>
         </div>

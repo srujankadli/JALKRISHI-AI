@@ -134,10 +134,12 @@ export class VoiceAssistantService {
     latitude?: number,
     longitude?: number,
     language: string = 'en',
-    audioBase64?: string
+    audioBase64?: string,
+    stationId?: string
   ): Promise<VoiceQueryResponse> {
     return await apiClient.post<VoiceQueryResponse>('/voice/respond', {
       query: queryText,
+      station_id: stationId || null,
       latitude,
       longitude,
       language,

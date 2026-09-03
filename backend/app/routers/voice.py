@@ -75,7 +75,9 @@ def respond_to_voice_query(request: VoiceQueryRequest):
     lon = request.longitude if request.longitude is not None else 78.1291
 
     # 3. Invoke Existing Unified Farmer Intelligence Engine
-    intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(lat, lon, radius_km=15.0)
+    intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(
+        lat, lon, radius_km=15.0, station_id=request.station_id
+    )
 
     # 4. Multilingual Response Formatting & Translation
     formatted_text = hydro_translator.format_farmer_response(intel, target_lang)

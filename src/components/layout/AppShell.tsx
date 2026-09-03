@@ -33,7 +33,7 @@ export const AppShell: React.FC = () => {
         {/* Main Content Area with consistent container padding */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {/* React Router Child Routes Render Here */}
-          <Outlet context={{ onSelectStation: setSelectedStation }} />
+          <Outlet context={{ onSelectStation: setSelectedStation, selectedStation }} />
         </main>
       </div>
 

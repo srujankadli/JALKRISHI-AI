@@ -1185,6 +1185,7 @@ class LanguageConfigSchema(BaseModel):
 
 class VoiceQueryRequest(BaseModel):
     query: str = Field(..., description="Spoken or typed farmer query string")
+    station_id: Optional[str] = Field(None, description="Selected DWLR station code if available")
     latitude: Optional[float] = Field(None, description="Farm latitude coordinate")
     longitude: Optional[float] = Field(None, description="Farm longitude coordinate")
     language: str = Field("en", description="Farmer requested/interface language code")

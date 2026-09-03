@@ -25,11 +25,20 @@ class FarmerIntelligenceEngine:
     """Unified Engine orchestrating Mode A (Direct DWLR) and Mode B (Satellite-Assisted)."""
 
     def get_unified_groundwater_intelligence(
-        self, lat: float, lon: float, radius_km: Optional[float] = None
+        self, lat: float, lon: float, radius_km: Optional[float] = None, station_id: Optional[str] = None
     ) -> GroundwaterIntelligenceSchema:
         r = radius_km if radius_km is not None else settings.DWLR_COVERAGE_RADIUS_KM
 
-        # 1. Coverage Check
+        # 0. Direct Station ID Resolution (Prioritize explicit station context)
+        if station_id and station_id.strip():
+            st_schema = station_repo.get_by_id(station_id.strip())
+            if st_schema:
+                st_dict = st_schema.model_dump()
+                st_lat = st_schema.latitude
+                st_lon = st_schema.longitude
+                return self._build_mode_a_direct_dwlr(st_lat, st_lon, st_dict, 0.0, r)
+
+        # 1. Coverage Check via Spatial Proximity
         nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(lat, lon)
         dwlr_available = dist <= r if nearest else False
 
