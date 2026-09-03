@@ -157,8 +157,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
             {/* Footer */}
             <div className="border-t border-stone-200 pt-4 text-xs text-stone-500">
-              <p className="font-bold text-stone-700">{APP_CONFIG.teamName}</p>
-              <p className="text-[11px]">{APP_CONFIG.hackathon}</p>
+              <p className="font-bold text-stone-700">{APP_CONFIG.appName} Platform</p>
+              <p className="text-[11px]">Real-Time DWLR Groundwater Intelligence</p>
             </div>
           </div>
         </div>

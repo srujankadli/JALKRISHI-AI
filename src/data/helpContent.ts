@@ -1,6 +1,6 @@
 export interface FAQItem {
   id: string;
-  category: 'General' | 'DWLR & Telemetry' | 'Forecasting' | 'Anomalies' | 'Crop Advisor' | 'Data & Demo';
+  category: 'General' | 'DWLR & Telemetry' | 'Forecasting' | 'Anomalies' | 'Crop Advisor' | 'Data & Telemetry';
   question: string;
   answer: string;
   farmerTakeaway?: string;
@@ -114,11 +114,11 @@ export const FAQ_DATA: FAQItem[] = [
   },
   {
     id: 'faq-12',
-    category: 'Data & Demo',
+    category: 'Data & Telemetry',
     question: '12. Is the current data live government data or simulated?',
     answer:
-      'The current web prototype uses 5,260 deterministic simulated DWLR stations across 28 Indian states to demonstrate full architectural workflows (map clustering, forecasting, anomaly triage, crop advisory, and PDF/XLSX export) for the hackathon evaluation.',
-    farmerTakeaway: 'The app shows realistic simulation data built for the Smart Horizon 2026 hackathon demo.',
+      'The current platform interface uses 5,260 deterministic simulated DWLR stations across 28 Indian states to evaluate complete architectural workflows (map clustering, forecasting, anomaly triage, crop advisory, and PDF/XLSX export).',
+    farmerTakeaway: 'The app shows realistic simulation data representing 5,260 monitoring stations across India.',
   },
   {
     id: 'faq-13',
@@ -130,7 +130,7 @@ export const FAQ_DATA: FAQItem[] = [
   },
   {
     id: 'faq-14',
-    category: 'Data & Demo',
+    category: 'Data & Telemetry',
     question: '14. Can I download analytics reports for my district or state?',
     answer:
       'Yes. On the Regional Analytics page (/analytics), you can export multi-sheet Excel (.xlsx) workbooks or structured printable PDF reports reflecting your active state, district, status, and timeframe filters.',

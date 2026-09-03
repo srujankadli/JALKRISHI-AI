@@ -54,7 +54,7 @@ export const DataQualityCard: React.FC<DataQualityCardProps> = ({
           <span>Methodology & Disclaimer</span>
         </div>
         <p className="text-[11px] leading-relaxed">
-          Demonstration dataset featuring 5,260 simulated DWLR stations across India. Values represent hydrogeologically realistic patterns generated for the Smart Horizon 2026 Hackathon.
+          Simulation dataset featuring 5,260 simulated DWLR observation wells across India. Telemetry values represent hydrogeologically realistic groundwater patterns.
         </p>
       </div>
     </div>

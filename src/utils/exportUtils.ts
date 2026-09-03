@@ -61,7 +61,7 @@ export function exportAnalyticsToXLSX(data: AnalyticsExportData) {
   // 1. Sheet 1: Summary & Filter Metadata
   const summaryRows = [
     { 'JalKrishi AI — Real-Time Groundwater Analytics Report': '' },
-    { 'Report Disclaimer': 'Demo Simulation Dataset • Smart Horizon 2026 (Team HACKSTACK - SH-AGR-005)' },
+    { 'Report Disclaimer': 'Simulated DWLR Telemetry Dataset • JalKrishi AI Groundwater Platform' },
     { 'Generated Timestamp': data.generatedAt },
     { 'Applied Filter - State': data.filters.state },
     { 'Applied Filter - District': data.filters.district },
@@ -185,7 +185,7 @@ export function exportAnalyticsToPDF(data: AnalyticsExportData) {
   doc.rect(14, 30, 182, 10, 'FD');
   doc.setTextColor(153, 27, 27); // Rose-800
   doc.setFontSize(8);
-  doc.text('DEMO SIMULATION REPORT • Smart Horizon 2026 Hackathon • Team HACKSTACK (SH-AGR-005)', 18, 36.5);
+  doc.text('SIMULATION DATA REPORT • JalKrishi AI Groundwater Intelligence Platform', 18, 36.5);
 
   // Section 1: Applied Scope & Executive Summary
   doc.setTextColor(28, 25, 23); // Stone-900
@@ -282,7 +282,7 @@ export function exportAnalyticsToPDF(data: AnalyticsExportData) {
   doc.setFontSize(7.5);
   doc.setTextColor(168, 162, 158);
   doc.text(
-    'JalKrishi AI • "Know Your Water. Grow Smarter." • Problem ID: SH-AGR-005 • Smart Horizon 2026',
+    'JalKrishi AI • "Know Your Water. Grow Smarter." • Groundwater Intelligence Platform',
     14,
     pageHeight - 8
   );

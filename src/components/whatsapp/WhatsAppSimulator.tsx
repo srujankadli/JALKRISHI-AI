@@ -197,7 +197,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
       <div className="bg-[#128c7e]/10 border-b border-stone-200/60 px-3 py-1.5 flex items-center justify-between text-[11px] text-stone-600">
         <div className="flex items-center gap-1.5 font-medium">
           <Radio className="h-3 w-3 text-emerald-600 animate-pulse" />
-          <span>Demo Simulation (5,260 DWLR Nodes)</span>
+          <span>Simulation Data (5,260 DWLR Nodes)</span>
         </div>
         <span className="text-[10px] text-stone-500 hidden sm:inline">
           No real WhatsApp SMS sent
@@ -209,7 +209,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
         {/* Encryption Banner */}
         <div className="text-center my-2">
           <span className="inline-block bg-[#ffeecd] border border-amber-200/80 rounded-lg px-3 py-1 text-[10px] text-amber-900 font-medium shadow-2xs">
-            🔒 Simulated WhatsApp sandbox for demonstration & hackathon review.
+            🔒 Simulated WhatsApp conversational interface for JalKrishi AI.
           </span>
         </div>
 

@@ -20,7 +20,7 @@ export const ForecastMethodologyNote: React.FC = () => {
       </div>
 
       <p className="text-[11px] text-stone-600 leading-relaxed">
-        The prototype demo forecasts combine DWLR time-series drawdown velocity, seasonal precipitation forecasts, and soil-aquifer infiltration parameters to estimate future water table depths and days-to-critical thresholds.
+        The groundwater forecasts combine DWLR time-series drawdown velocity, seasonal precipitation forecasts, and soil-aquifer infiltration parameters to estimate future water table depths and days-to-critical thresholds.
       </p>
 
       {isOpen && (
@@ -38,8 +38,8 @@ export const ForecastMethodologyNote: React.FC = () => {
             Upper and lower bands expand over 30–90 days to transparently reflect variability in monsoon arrival and unmetered pump extraction surges.
           </div>
           <div>
-            <strong className="text-stone-900">4. Demonstration Disclaimer: </strong>
-            All values displayed are simulated demonstration data intended for hackathon evaluation and architectural review. Future phases will integrate live CGWB REST telemetry endpoints and IMD meteorological grids.
+            <strong className="text-stone-900">4. Data Disclaimer: </strong>
+            All values displayed are simulated DWLR data intended for model evaluation and operational planning. Future phases will integrate live CGWB REST telemetry endpoints and IMD meteorological grids.
           </div>
         </div>
       )}

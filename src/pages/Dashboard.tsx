@@ -8,7 +8,7 @@ import type { DWLRStation, DashboardSummary } from '../types';
 import { metricService } from '../services/metricService';
 import { stationService } from '../services/stationService';
 
-// Step 2 Upgraded Dashboard Components
+// Dashboard Components
 import { HeroSection } from '../components/dashboard/HeroSection';
 import { WaterSituationCard } from '../components/dashboard/WaterSituationCard';
 import { StatCardsGrid } from '../components/dashboard/StatCardsGrid';
@@ -20,9 +20,8 @@ import { AreasToWatchTable } from '../components/dashboard/AreasToWatchTable';
 import { MiniMapPreview } from '../components/dashboard/MiniMapPreview';
 import { QuickActionsGrid } from '../components/dashboard/QuickActionsGrid';
 
-// Phase L Executive Intelligence Components
+// Executive Water Brief
 import { ExecutiveWaterBrief } from '../components/intelligence/ExecutiveWaterBrief';
-import { DemoScenarioSelector, type DemoScenario, type DemoScenarioId } from '../components/intelligence/DemoScenarioSelector';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
@@ -34,7 +33,6 @@ export const Dashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<DashboardSummary | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState('Just now');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedScenario, setSelectedScenario] = useState<DemoScenarioId>('baseline');
 
   const loadData = async () => {
     try {
@@ -73,7 +71,7 @@ export const Dashboard: React.FC = () => {
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="font-bold text-stone-900">DWLR Network Active</span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">5,260 Simulated Observation Wells</span>
+          <span className="text-stone-500 font-medium">5,260 Observation Wells (Simulated Telemetry)</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -97,31 +95,25 @@ export const Dashboard: React.FC = () => {
       {/* 1. Hero Section */}
       <HeroSection />
 
-      {/* 1.5 Hackathon Judge Demo Scenario Selector (Phase L) */}
-      <DemoScenarioSelector
-        selectedScenario={selectedScenario}
-        onSelectScenario={(scen: DemoScenario) => setSelectedScenario(scen.id)}
-      />
-
-      {/* 1.8 AI Executive Water Situation Brief (Phase L) */}
+      {/* 2. Executive Water Situation Brief */}
       <ExecutiveWaterBrief />
 
-      {/* 2. Your Water Situation Card */}
+      {/* 3. Your Water Situation Card */}
       <WaterSituationCard metrics={metrics} />
 
-      {/* 3. Four Simplified Stat Cards */}
+      {/* 4. Four Simplified Stat Cards */}
       <StatCardsGrid metrics={metrics} />
 
-      {/* 4. Farmer Action Center (Recommended Actions) */}
+      {/* 5. Farmer Action Center (Recommended Actions) */}
       <FarmerActionCenter />
 
-      {/* 5. Charts Section: Groundwater Trend & Rainfall Correlation */}
+      {/* 6. Charts Section: Groundwater Trend & Rainfall Correlation */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <GroundwaterTrendCard />
         <RainfallRechargeCard />
       </div>
 
-      {/* 6. Decision Support: Groundwater Alerts & Areas to Watch */}
+      {/* 7. Decision Support: Groundwater Alerts & Areas to Watch */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <div className="lg:col-span-6">
           <GroundwaterAlertsFeed onSelectStation={handleOpenStationById} />
@@ -131,10 +123,10 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 7. Mini Map Preview */}
+      {/* 8. Mini Map Preview */}
       <MiniMapPreview onSelectStation={onSelectStation} />
 
-      {/* 8. Quick Actions Launchpad */}
+      {/* 9. Quick Actions Launchpad */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>

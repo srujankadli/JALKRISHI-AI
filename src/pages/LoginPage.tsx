@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Radio,
   ArrowRight,
-  Sparkles,
   UserCheck,
   Building2,
   Sprout,
@@ -65,7 +64,7 @@ export const LoginPage: React.FC = () => {
         navigate(fromPath, { replace: true });
       }, 700);
     } else {
-      setErrorMsg('Authentication failed. Please verify credentials or select a Quick Demo Account.');
+      setErrorMsg('Authentication failed. Please verify credentials or select a Quick Access Account.');
     }
   };
 
@@ -116,7 +115,7 @@ export const LoginPage: React.FC = () => {
             <span className="font-extrabold text-white text-lg tracking-tight flex items-center gap-2">
               {APP_CONFIG.appName}
               <span className="text-[10px] font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded-full">
-                v2.0 Enterprise
+                {APP_CONFIG.version}
               </span>
             </span>
             <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
@@ -130,14 +129,6 @@ export const LoginPage: React.FC = () => {
             <Radio className="h-3.5 w-3.5 text-teal-400 animate-pulse" />
             <span>DWLR Network: <strong>5,260 Stations</strong></span>
           </div>
-
-          <button
-            onClick={() => navigate('/demo')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 text-xs font-bold transition-all cursor-pointer shadow-xs"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>Judge Demo Mode &rarr;</span>
-          </button>
         </div>
       </header>
 
@@ -149,7 +140,7 @@ export const LoginPage: React.FC = () => {
           <div className="lg:col-span-6 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-teal-500/30 text-teal-300 text-xs font-semibold">
               <ShieldCheck className="h-4 w-4 text-emerald-400" />
-              <span>Smart Horizon 2026 Hackathon (SH-AGR-005)</span>
+              <span>National DWLR Hydro-Telemetry Network</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
@@ -354,10 +345,10 @@ export const LoginPage: React.FC = () => {
                 </button>
               </form>
 
-              {/* 1-Click Quick Demo Accounts Launcher */}
+              {/* Quick Role Accounts Launcher */}
               <div className="space-y-2 pt-2 border-t border-slate-800 text-left">
                 <span className="text-[11px] font-bold text-slate-400 block">
-                  ⚡ 1-Click Quick Demo Accounts (Hackathon / Judge Testing):
+                  ⚡ Quick Role Accounts:
                 </span>
                 
                 <div className="grid grid-cols-2 gap-2">
@@ -416,10 +407,10 @@ export const LoginPage: React.FC = () => {
       {/* Footer Branding & Disclaimer */}
       <footer className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-900 text-xs text-slate-500">
         <div>
-          <span>&copy; 2026 {APP_CONFIG.teamName} &bull; {APP_CONFIG.appName}</span>
+          <span>&copy; 2026 {APP_CONFIG.appName} Platform</span>
         </div>
         <div className="flex items-center gap-3 text-[11px]">
-          <span>Data Mode: <strong className="text-teal-400">DEMO_SIMULATION</strong></span>
+          <span>Data Mode: <strong className="text-teal-400">SIMULATED_TELEMETRY</strong></span>
           <span>&bull;</span>
           <span>5,260 Active Observation Wells</span>
         </div>

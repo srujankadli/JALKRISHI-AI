@@ -34,8 +34,8 @@ export const CropMethodologyNote: React.FC = () => {
             When a local DWLR node reports falling water tables (&lt;30 days to critical threshold), high-water crops (such as puddled paddy and sugarcane) receive sharp score penalties, while low-water drought-hardy pulses and millets receive positive preference bonuses.
           </div>
           <div>
-            <strong className="text-stone-900">3. Demonstration Disclaimer: </strong>
-            All recommendations generated are simulated demonstration models intended for hackathon evaluation. Real-world farming decisions should be cross-verified with local Krishi Vigyan Kendras (KVK), state agricultural extension officers, and soil health card laboratory tests.
+            <strong className="text-stone-900">3. Simulation Disclaimer: </strong>
+            All recommendations generated are calculated simulation models intended for decision-support reference. Real-world farming decisions should be cross-verified with local Krishi Vigyan Kendras (KVK), state agricultural extension officers, and soil health card laboratory tests.
           </div>
         </div>
       )}

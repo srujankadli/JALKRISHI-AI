@@ -96,9 +96,9 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* User Profile & Sign In / Out Menu */}
         <UserMenu />
 
-        {/* Problem ID Tag */}
+        {/* Platform Version Tag */}
         <div className="hidden md:flex items-center rounded-lg bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700 border border-stone-200">
-          <span>{APP_CONFIG.problemId}</span>
+          <span>{APP_CONFIG.version}</span>
         </div>
       </div>
     </header>

@@ -10,7 +10,6 @@ import { CropAdvisorPage } from './pages/CropAdvisorPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { WhatsAppPage } from './pages/WhatsAppPage';
 import { HelpPage } from './pages/HelpPage';
-import { DemoPage } from './pages/DemoPage';
 
 export function App() {
   return (
@@ -30,7 +29,6 @@ export function App() {
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/whatsapp" element={<WhatsAppPage />} />
             <Route path="/help" element={<HelpPage />} />
-            <Route path="/demo" element={<DemoPage />} />
             {/* Catch-all redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

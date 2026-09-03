@@ -63,7 +63,7 @@ export const DataSourcesAndTransparency: React.FC = () => {
             <ShieldCheck className="h-4 w-4" />
           </span>
           <h4 className="text-base font-black text-stone-900">
-            About the Demonstration Data (Demo Mode)
+            Simulation Data &amp; Telemetry Transparency
           </h4>
         </div>
 
@@ -78,7 +78,7 @@ export const DataSourcesAndTransparency: React.FC = () => {
           </div>
           <div>
             <strong className="text-stone-900 block font-bold">2. Forecasting &amp; Anomalies:</strong>
-            Simulated hydrogeological algorithms for hackathon validation.
+            Simulated hydrogeological algorithms for model validation.
           </div>
           <div>
             <strong className="text-stone-900 block font-bold">3. Production Path:</strong>

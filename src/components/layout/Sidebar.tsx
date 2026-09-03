@@ -10,7 +10,6 @@ import {
   HelpCircle,
   Droplets,
   MessageSquare,
-  Sparkles,
   LogIn,
 } from 'lucide-react';
 import { APP_CONFIG } from '../../utils/constants';
@@ -93,15 +92,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Officer Login Portal',
       sublabel: 'लॉगइन पोर्टल',
       emoji: '🔐',
-    },
-    {
-      to: '/demo',
-      icon: Sparkles,
-      label: 'Judge Demo Mode',
-      sublabel: 'डेमो प्रेजेंटेशन',
-      badge: 'PRO',
-      badgeColor: 'bg-emerald-700 text-white font-black',
-      emoji: '⭐',
     },
   ];
 
@@ -197,16 +187,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </nav>
 
-      {/* Hackathon Project Footer */}
-      <div className="p-4 border-t border-stone-200 bg-stone-50/50 space-y-2">
+      {/* Platform Product Footer */}
+      <div className="p-4 border-t border-stone-200 bg-stone-50/50 space-y-1">
         <div className="flex items-center justify-between text-xs font-semibold text-stone-600">
-          <span>{APP_CONFIG.teamName}</span>
+          <span>{APP_CONFIG.appName} Platform</span>
           <span className="font-mono text-[10px] bg-stone-200 text-stone-700 px-1.5 py-0.5 rounded">
-            {APP_CONFIG.problemId}
+            {APP_CONFIG.version}
           </span>
         </div>
         <p className="text-[10px] text-stone-500 leading-tight">
-          {APP_CONFIG.hackathon}
+          Real-Time DWLR Groundwater Intelligence
         </p>
       </div>
     </aside>

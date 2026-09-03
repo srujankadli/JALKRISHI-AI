@@ -13,7 +13,7 @@ import { GroundwaterStatusGuide } from '../components/help/GroundwaterStatusGuid
 import { ForecastAndAnomalyGuide } from '../components/help/ForecastAndAnomalyGuide';
 import { DataSourcesAndTransparency } from '../components/help/DataSourcesAndTransparency';
 import { SystemArchitectureCard } from '../components/help/SystemArchitectureCard';
-import { AboutHackstackCard } from '../components/help/AboutHackstackCard';
+import { AboutPlatformCard } from '../components/help/AboutPlatformCard';
 import { FeedbackForm } from '../components/help/FeedbackForm';
 import { DataIssueForm } from '../components/help/DataIssueForm';
 import { SystemDiagnosticsCard } from '../components/common/SystemDiagnosticsCard';
@@ -52,12 +52,12 @@ export const HelpPage: React.FC = () => {
             JalKrishi Knowledge Base &amp; System Documentation
           </span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">Smart Horizon 2026 Hackathon (SH-AGR-005)</span>
+          <span className="text-stone-500 font-medium">National DWLR Telemetry Network</span>
         </div>
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-agri-600" />
-          Demo Simulation
+          Simulated DWLR Data
         </span>
       </div>
 
@@ -108,8 +108,8 @@ export const HelpPage: React.FC = () => {
       {/* 10. System Architecture & Engineering Flow */}
       <SystemArchitectureCard />
 
-      {/* 10. About Project & Team HACKSTACK */}
-      <AboutHackstackCard />
+      {/* 10. About JalKrishi AI Platform */}
+      <AboutPlatformCard />
 
       {/* 11. Interactive Feedback & Report Data Issue Forms */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
