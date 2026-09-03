@@ -1,15 +1,16 @@
 """
-JalKrishi AI — Location-First Groundwater Intelligence Sequential Regression Test Suite
---------------------------------------------------------------------------------------
-Verifies location-first behavior across sequential queries:
+JalKrishi AI — Location-First Groundwater Intelligence Sequential & Multilingual Regression Test Suite
+---------------------------------------------------------------------------------------------------
+Verifies location-first behavior across sequential queries and 13 Indian regional languages:
 Kolar -> Bengaluru -> Thanjavur -> Leh -> Mumbai
 
 Asserts:
 - Requested place is the primary target (location-first, not station-first).
 - Background dashboard station (DWLR-KA-004 / Kolar) NEVER overrides an explicit location query.
 - Mode A (DIRECT_DWLR) is selected when DWLR <= 15 km.
-- Mode B (SATELLITE_ASSISTED) is selected when DWLR > 15 km (nearest_station_id is None, is_direct_measurement=False, model range returned).
-- Multilingual location queries across 6 scripts resolve to requested places.
+- Mode B (SATELLITE_ASSISTED) is selected when DWLR > 15 km (nearest_station_id is None, is_direct_measurement=False).
+- Multilingual location queries across all 13 supported languages resolve to requested places.
+- Unresolvable location queries return UNRESOLVED mode cleanly without falling back to Kolar.
 """
 
 import sys
@@ -52,7 +53,7 @@ def test_location_first_five_city_sequential_flow():
     })
     assert r2.status_code == 200
     d2 = r2.json()
-    assert d2["location"]["name"] == "Bengaluru Urban" or d2["location"]["name"] == "Bengaluru"
+    assert d2["location"]["name"] in ["Bengaluru Urban", "Bengaluru"]
     assert d2["location"]["name"] != "Kolar"
     assert d2["location"]["state"] == "Karnataka"
     assert d2["coverage"]["mode"] == "SATELLITE_ASSISTED"
@@ -118,18 +119,25 @@ def test_location_first_five_city_sequential_flow():
     print("==================================================")
 
 
-def test_bengaluru_multilingual_queries():
-    print("\n=== RUNNING BENGALURU MULTILINGUAL LOCATION-FIRST TEST ===")
+def test_bengaluru_all_13_languages():
+    print("\n=== RUNNING BENGALURU ALL 13 LANGUAGES LOCATION-FIRST TEST ===")
     queries = [
-        ("en", "What is the groundwater level of Bengaluru?", "Bengaluru"),
-        ("hi", "बेंगलुरु में भूजल का स्तर कितना है?", "Bengaluru"),
-        ("kn", "ಬೆಂಗಳೂರಿನಲ್ಲಿ ಅಂತರ್ಜಲ ಮಟ್ಟ ಎಷ್ಟಿದೆ?", "Bengaluru"),
-        ("ta", "பெங்களூரில் நிலத்தடி நீர் மட்டம் என்ன?", "Bengaluru"),
-        ("te", "బెంగళూరులో భూగర్భ జల మట్టం ఎంత?", "Bengaluru"),
-        ("bn", "বেঙ্গালুরুতে ভূগর্ভস্থ জলের স্তর কত?", "Bengaluru"),
+        ("en", "What is the groundwater level of Bengaluru?"),
+        ("hi", "बेंगलुरु का भूजल स्तर क्या है"),
+        ("kn", "ಬೆಂಗಳೂರಿನ ಅಂತರ್ಜಲ ಮಟ್ಟ ಎಷ್ಟು"),
+        ("ta", "பெங்களூரின் நிலத்தடி நீர்மட்டம் எவ்வளவு"),
+        ("te", "బెంగళూరు భూగర్భ జల స్థాయి ఎంత"),
+        ("bn", "বেঙ্গালুরুর ভূগর্ভস্থ জলের স্তর কত"),
+        ("mr", "बेंगळुरूची भूजल पातळी किती आहे"),
+        ("gu", "બેંગલુરુનું ભૂગર્ભજળ સ્તર કેટલું છે"),
+        ("ml", "ബെംഗളൂരുവിലെ ഭൂഗർഭജലനിരപ്പ് എത്രയാണ്"),
+        ("pa", "ਬੈਂਗਲੁਰੂ ਦਾ ਧਰਤੀ ਹੇਠਲੇ ਪਾਣੀ ਦਾ ਪੱਧਰ ਕਿੰਨਾ ਹੈ"),
+        ("or", "ବେଙ୍ଗାଲୁରୁର ଭୂତଳ ଜଳସ୍ତର କେତେ"),
+        ("as", "বেংগালুৰুৰ ভূগৰ্ভস্থ পানীৰ স্তৰ কিমান"),
+        ("ur", "بنگلورو میں زیر زمین پانی کی سطح کتنی ہے"),
     ]
 
-    for lang, q_text, expected in queries:
+    for lang, q_text in queries:
         res = client.post("/api/v1/voice/respond", json={
             "query": q_text,
             "location_query": q_text,
@@ -138,12 +146,29 @@ def test_bengaluru_multilingual_queries():
         })
         assert res.status_code == 200
         data = res.json()
-        assert expected in data["location"]["name"] or data["location"]["name"] in ["Bengaluru Urban", "Bengaluru"]
+        assert data["location"]["name"] in ["Bengaluru Urban", "Bengaluru"]
         assert data["location"]["name"] != "Kolar"
-        msg = f"   [PASS] Multilingual ({lang}): Query resolved '{data['location']['name']}' (Kolar background station overridden!)\n"
+        msg = f"   [PASS] Language ({lang}): Resolved '{data['location']['name']}' (Kolar background station overridden!)\n"
         sys.stdout.buffer.write(msg.encode("utf-8"))
+
+
+def test_unresolved_location_safety():
+    print("\n=== RUNNING UNRESOLVED LOCATION SAFETY TEST ===")
+    res = client.post("/api/v1/voice/respond", json={
+        "query": "What is the groundwater level in Atlantis City?",
+        "location_query": "Atlantis City",
+        "station_id": "DWLR-KA-004",
+        "language": "en"
+    })
+    assert res.status_code == 200
+    data = res.json()
+    assert data["coverage"]["mode"] == "UNRESOLVED"
+    assert data["location"]["name"] != "Kolar"
+    assert "could not be resolved" in data["intelligence"]["forecast_summary"].lower() or "unresolved" in data["intelligence"]["forecast_summary"].lower()
+    print("   [PASS] Unresolved Location: Properly returned UNRESOLVED mode, Kolar false fallback prevented.")
 
 
 if __name__ == "__main__":
     test_location_first_five_city_sequential_flow()
-    test_bengaluru_multilingual_queries()
+    test_bengaluru_all_13_languages()
+    test_unresolved_location_safety()

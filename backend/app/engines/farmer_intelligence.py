@@ -66,7 +66,16 @@ class FarmerIntelligenceEngine:
             else:
                 return self._build_mode_b_satellite_assisted(target_lat, target_lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
 
-        # PRIORITY 2: Explicit station_id supplied from map/station selection (used when query text contains no place)
+        # If explicit location_query was provided by user, but could not be resolved to coordinates:
+        # DO NOT fall back to background station_id! Return UNRESOLVED schema.
+        raw_loc_query = (location_query or "").strip()
+        if raw_loc_query and not any(p in raw_loc_query.lower() for p in ["selected station", "current station", "this station", "my station"]):
+            return self._build_unresolved_location_schema(
+                location_name=raw_loc_query,
+                error_msg=f"Location '{raw_loc_query[:30]}' could not be resolved. Please specify a district, state, or city name (e.g. Bengaluru, Thanjavur, Leh, Mumbai, Kolar)."
+            )
+
+        # PRIORITY 2: Explicit station_id supplied from map/station selection (used when query text contains no place name)
         if station_id and station_id.strip():
             st_schema = station_repo.get_by_id(station_id.strip())
             if st_schema:
@@ -93,6 +102,72 @@ class FarmerIntelligenceEngine:
         default_lat, default_lon = 13.1367, 78.1291
         nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(default_lat, default_lon)
         return self._build_mode_a_direct_dwlr(default_lat, default_lon, nearest, dist, r, loc_name="Reference DWLR Location")
+
+    def _build_unresolved_location_schema(
+        self,
+        location_name: str,
+        error_msg: str
+    ) -> GroundwaterIntelligenceSchema:
+        loc_schema = LocationInfoSchema(
+            name=location_name[:40],
+            district=None,
+            state=None,
+            latitude=0.0,
+            longitude=0.0
+        )
+        cov_schema = CoverageInfoSchema(
+            mode="UNRESOLVED",
+            nearest_station_id=None,
+            nearest_station_name=None,
+            distance_km=0.0
+        )
+        gw_schema = GroundwaterLevelSchema(
+            level_value=None,
+            level_min=None,
+            level_max=None,
+            unit="m bgl",
+            is_direct_measurement=False,
+            confidence="LOW"
+        )
+        prov_schema = ProvenanceInfoSchema(
+            primary_source="LOCATION_RESOLVER",
+            data_mode=settings.DATA_MODE
+        )
+        return GroundwaterIntelligenceSchema(
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            nearest_station_id=None,
+            nearest_station_name=None,
+            nearest_station_distance_km=0.0,
+            latitude=0.0,
+            longitude=0.0,
+            coverage_type="Unresolved Location",
+            estimation_mode="UNRESOLVED",
+            groundwater_condition="LOCATION_UNRESOLVED",
+            current_groundwater_signal=error_msg,
+            trend="UNKNOWN",
+            forecast_summary=error_msg,
+            forecast_30d_water_level=0.0,
+            estimated_depth_range="Location Unresolved",
+            forecast_confidence="LOW",
+            stress_score=0.5,
+            recharge_outlook="MODERATE_RECHARGE",
+            recharge_score=0.5,
+            remote_sensing_indicators={},
+            rainfall_signal="Location Unresolved",
+            risk_alerts=[error_msg],
+            crop_implications="Please provide a recognized district, city, or state name to obtain tailored crop guidance.",
+            irrigation_implications="Please provide a recognized location to obtain irrigation recommendations.",
+            farmer_recommendations=["Provide a district or state name (e.g., Bengaluru, Thanjavur, Leh, Mumbai, Kolar)."],
+            recommended_crops=["Water-Smart Crops"],
+            confidence="LOW",
+            confidence_score=0.0,
+            data_sources=["JALKRISHI_LOCATION_RESOLVER"],
+            disclaimer=error_msg,
+            location_info=loc_schema,
+            coverage_info=cov_schema,
+            groundwater_info=gw_schema,
+            provenance_info=prov_schema,
+        )
 
     def _build_mode_a_direct_dwlr(
         self,

@@ -48,6 +48,8 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
   const recognitionRef = useRef<any>(null);
 
+  const activeRequestIdRef = useRef<number>(0);
+
   const hasBrowserSpeechSupport =
     typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
@@ -167,27 +169,38 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     const text = textToSend || queryText;
     if (!text.trim()) return;
 
+    const currentReqId = ++activeRequestIdRef.current;
+
     // Immediately reset response state to clear previous assessment card!
     setResponse(null);
     setState('PROCESSING');
     setErrorMessage('');
+
+    // Normalize language code (e.g. kn-IN -> kn)
+    const langCode = (responseLang || currentLanguage || 'en').split('-')[0].toLowerCase();
 
     try {
       const res = await VoiceAssistantService.sendVoiceQuery(
         text,
         undefined, // lat
         undefined, // lng
-        responseLang,
+        langCode,
         undefined, // audioBase64
         selectedStation?.id || undefined, // Fallback stationId if text contains no explicit place name
         text // locationQuery candidate
       );
-      setResponse(res);
-      setState('RESPONDING');
+
+      // Race-condition guard: update state ONLY if this is the latest request!
+      if (currentReqId === activeRequestIdRef.current) {
+        setResponse(res);
+        setState('RESPONDING');
+      }
     } catch (err: any) {
-      setState('ERROR');
-      const msg = err?.message || '';
-      setErrorMessage(msg || 'Failed to generate farmer advice. Please try again.');
+      if (currentReqId === activeRequestIdRef.current) {
+        setState('ERROR');
+        const msg = err?.message || '';
+        setErrorMessage(msg || 'Failed to generate farmer advice. Please try again.');
+      }
     }
   };
 

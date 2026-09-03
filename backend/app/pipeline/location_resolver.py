@@ -68,7 +68,24 @@ KNOWN_REFERENCE_LOCATIONS: Dict[str, Tuple[float, float, str, str]] = {
 
 # Multilingual Location Dictionary Mapping across 13 Indian regional scripts
 MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
-    # Kannada
+    # English
+    "bengaluru": "bengaluru",
+    "bangalore": "bengaluru",
+    "thanjavur": "thanjavur",
+    "tanjore": "thanjavur",
+    "kolar": "kolar",
+    "sangrur": "sangrur",
+    "mehsana": "mehsana",
+    "amritsar": "amritsar",
+    "pune": "pune",
+    "mysore": "mysore",
+    "mysuru": "mysore",
+    "mumbai": "mumbai",
+    "bombay": "mumbai",
+    "delhi": "delhi",
+    "leh": "leh",
+    "ladakh": "leh",
+    # Kannada (kn)
     "ಕೋಲಾರ": "kolar",
     "ಕೋಲಾರದಲ್ಲಿ": "kolar",
     "ಸಂಗ್ರೂರು": "sangrur",
@@ -78,13 +95,14 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "ಅಮೃತಸರ": "amritsar",
     "ಬೆಂಗಳೂರು": "bengaluru",
     "ಬೆಂಗಳೂರಿನಲ್ಲಿ": "bengaluru",
+    "ಬೆಂಗಳೂರಿನ": "bengaluru",
     "ಮೈಸೂರು": "mysore",
     "ಮುಂಬೈ": "mumbai",
     "ದೆಹಲಿ": "delhi",
     "ಪುಣೆ": "pune",
     "ಲೇಹ್": "leh",
-    "ಲಡಾಖ್": "ladakh",
-    # Hindi
+    "ಲಡಾಖ್": "leh",
+    # Hindi (hi)
     "कोलार": "kolar",
     "संगरूर": "sangrur",
     "तंजौर": "thanjavur",
@@ -97,22 +115,27 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "मैसूर": "mysore",
     "बेंगलुरु": "bengaluru",
     "बैंगलोर": "bengaluru",
+    "बेंगलोर": "bengaluru",
     "मुंबई": "mumbai",
     "दिल्ली": "delhi",
     "लेह": "leh",
-    "लद्दाख": "ladakh",
-    # Tamil
+    "लद्दाख": "leh",
+    # Tamil (ta)
     "கோலார்": "kolar",
     "கோலாரில்": "kolar",
     "தஞ்சாவூர்": "thanjavur",
     "தஞ்சாவூரில்": "thanjavur",
+    "தஞ்சாவூரின்": "thanjavur",
     "சங்ரூர்": "sangrur",
     "மெஹசானா": "mehsana",
     "பெங்களூர்": "bengaluru",
     "பெங்களூரில்": "bengaluru",
+    "பெங்களூரின்": "bengaluru",
     "மும்பை": "mumbai",
     "டெல்லி": "delhi",
-    # Telugu
+    "லே": "leh",
+    "லடாக்": "leh",
+    # Telugu (te)
     "కోలార్": "kolar",
     "కోలార్లో": "kolar",
     "కోలార్ లో": "kolar",
@@ -124,7 +147,9 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "బెంగళూరులో": "bengaluru",
     "ముంబై": "mumbai",
     "ఢిల్లీ": "delhi",
-    # Bengali
+    "లేహ్": "leh",
+    "లడఖ్": "leh",
+    # Bengali (bn)
     "কোলারে": "kolar",
     "কোলার": "kolar",
     "সংরুর": "sangrur",
@@ -133,41 +158,72 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "মেহসানা": "mehsana",
     "বেঙ্গালুরু": "bengaluru",
     "বেঙ্গালুরুতে": "bengaluru",
+    "বেঙ্গালুরুর": "bengaluru",
     "মুম্বাই": "mumbai",
     "দিল্লি": "delhi",
-    # Gujarati
+    "লেহ": "leh",
+    "লাদাখ": "leh",
+    # Gujarati (gu)
     "કોલાર": "kolar",
     "મહેસાણા": "mehsana",
     "મુંબઈ": "mumbai",
     "દિલ્હી": "delhi",
-    # Marathi
+    "બેંગલુરુ": "bengaluru",
+    "બેંગલુરુનું": "bengaluru",
+    "તંજાવુર": "thanjavur",
+    "લેહ": "leh",
+    # Marathi (mr)
     "कोलार": "kolar",
     "पुणे": "pune",
     "मुंबई": "mumbai",
     "दिल्ली": "delhi",
-    # Punjabi
+    "बेंगळुरू": "bengaluru",
+    "बेंगळुरूची": "bengaluru",
+    "तंजावूर": "thanjavur",
+    "लेह": "leh",
+    # Punjabi (pa)
     "ਸੰਗਰੂਰ": "sangrur",
     "ਅੰਮ੍ਰਿਤਸਰ": "amritsar",
     "ਮੁੰਬਈ": "mumbai",
     "ਦਿੱਲੀ": "delhi",
-    # Malayalam
+    "ਬੈਂਗਲੁਰੂ": "bengaluru",
+    "ਤੰਜਾਵੁਰ": "thanjavur",
+    "ਲੇਹ": "leh",
+    # Malayalam (ml)
     "കോലാർ": "kolar",
     "വയനാട്": "wayanad",
     "മുംബൈ": "mumbai",
     "ദില്ലി": "delhi",
-    # Odia
+    "ബെംഗളൂരു": "bengaluru",
+    "ബെംഗളൂരുവിലെ": "bengaluru",
+    "തഞ്ചാവൂർ": "thanjavur",
+    "ലേ": "leh",
+    # Odia (or)
     "କୋଲାର": "kolar",
     "ମୁମ୍ବାଇ": "mumbai",
     "ଦିଲ୍ଲୀ": "delhi",
-    # Assamese
+    "ବେଙ୍ଗାଲୁରୁ": "bengaluru",
+    "ବେଙ୍ଗାଲୁରୁର": "bengaluru",
+    "ତଞ୍ଜାଭୁର": "thanjavur",
+    "ଲେହ": "leh",
+    # Assamese (as)
     "কোলৰ": "kolar",
-    # Urdu
+    "মুম্বাই": "mumbai",
+    "দিল্লী": "delhi",
+    "বেংগালুৰু": "bengaluru",
+    "বেংগালুৰুৰ": "bengaluru",
+    "তঞ্জাভুৰ": "thanjavur",
+    "লেহ": "leh",
+    # Urdu (ur)
     "کولار": "kolar",
     "سنگرور": "sangrur",
     "تھنجاور": "thanjavur",
     "مہسانا": "mehsana",
     "ممبئی": "mumbai",
     "دہلی": "delhi",
+    "بنگلورو": "bengaluru",
+    "لیہ": "leh",
+    "لداخ": "leh",
 }
 
 
@@ -183,6 +239,9 @@ def resolve_location(
     3. District / Block / State match in DWLR repository
     4. Return is_resolved=False with clean limitation error message.
     """
+    import logging
+    logger = logging.getLogger("app.location_resolver")
+
     raw_input = (location_query or "").strip()
     full_text = (query_text or "").strip()
 
@@ -201,6 +260,8 @@ def resolve_location(
         if lang_key.lower() in clean_text:
             coords = KNOWN_REFERENCE_LOCATIONS.get(target_place)
             if coords:
+                lk_ascii = lang_key.encode('ascii', errors='backslashreplace').decode('ascii')
+                logger.info(f"[LOCATION RESOLVER SUCCESS] Matched '{lk_ascii}' -> '{target_place}' ({coords[2]}, {coords[3]}) at ({coords[0]}, {coords[1]})")
                 return LocationResolution(
                     is_resolved=True,
                     name=coords[2],
@@ -213,6 +274,7 @@ def resolve_location(
     # 2. Check known reference location dictionary
     for place_key, coords in KNOWN_REFERENCE_LOCATIONS.items():
         if place_key in clean_text:
+            logger.info(f"[LOCATION RESOLVER SUCCESS] Matched key '{place_key}' -> ({coords[2]}, {coords[3]}) at ({coords[0]}, {coords[1]})")
             return LocationResolution(
                 is_resolved=True,
                 name=coords[2],
@@ -228,6 +290,7 @@ def resolve_location(
     # Station ID or Code match
     for st in all_stations:
         if st.id.lower() in clean_text or st.stationCode.lower() in clean_text:
+            logger.info(f"[LOCATION RESOLVER SUCCESS] Matched station ID '{st.id}' -> '{st.stationName}'")
             return LocationResolution(
                 is_resolved=True,
                 name=st.stationName,
@@ -238,9 +301,11 @@ def resolve_location(
                 matched_station_id=st.id
             )
 
-    # District or Block match
+    # District or Block match (requiring min length to avoid false substring matches)
     for st in all_stations:
-        if st.district.lower() in clean_text:
+        d_clean = st.district.lower()
+        if len(d_clean) >= 3 and d_clean in clean_text:
+            logger.info(f"[LOCATION RESOLVER SUCCESS] Matched DWLR district '{st.district}'")
             return LocationResolution(
                 is_resolved=True,
                 name=st.district,
@@ -249,7 +314,9 @@ def resolve_location(
                 latitude=st.latitude,
                 longitude=st.longitude
             )
-        if st.block.lower() in clean_text:
+        b_clean = st.block.lower()
+        if len(b_clean) >= 3 and b_clean in clean_text:
+            logger.info(f"[LOCATION RESOLVER SUCCESS] Matched DWLR block '{st.block}'")
             return LocationResolution(
                 is_resolved=True,
                 name=f"{st.block}, {st.district}",
@@ -258,7 +325,9 @@ def resolve_location(
                 latitude=st.latitude,
                 longitude=st.longitude
             )
-        if st.state.lower() in clean_text:
+        s_clean = st.state.lower()
+        if len(s_clean) >= 4 and s_clean in clean_text:
+            logger.info(f"[LOCATION RESOLVER SUCCESS] Matched DWLR state '{st.state}'")
             return LocationResolution(
                 is_resolved=True,
                 name=st.state,
@@ -269,6 +338,7 @@ def resolve_location(
             )
 
     # 4. If unresolvable, return clean limitation message without faking coordinates
+    logger.warning(f"[LOCATION RESOLVER UNRESOLVED] Could not resolve location from text: '{clean_text}'")
     return LocationResolution(
         is_resolved=False,
         name=text_to_search,
