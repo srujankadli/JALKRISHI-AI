@@ -63,7 +63,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
       recognition.onerror = () => {
         setState('ERROR');
-        setErrorMessage('Could not capture audio. Please type your query below.');
+        setErrorMessage('Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.');
       };
 
       recognition.onend = () => {
@@ -72,11 +72,16 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         }
       };
 
-      recognition.start();
+      try {
+        recognition.start();
+      } catch {
+        setState('ERROR');
+        setErrorMessage('Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.');
+      }
     } else {
       // Browser mic speech recognition fallback
-      setState('IDLE');
-      setErrorMessage('Browser voice recognition not supported. You can type your query in any language below.');
+      setState('ERROR');
+      setErrorMessage('Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.');
     }
   };
 
@@ -98,7 +103,12 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
       setState('RESPONDING');
     } catch (err: any) {
       setState('ERROR');
-      setErrorMessage(err.message || 'Failed to generate farmer advice. Please try again.');
+      const msg = err?.message || '';
+      if (msg.includes('JSON') || msg.includes('json') || msg.includes('NOT_CONFIGURED')) {
+        setErrorMessage('Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.');
+      } else {
+        setErrorMessage(msg || 'Failed to generate farmer advice. Please try again.');
+      }
     }
   };
 

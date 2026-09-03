@@ -102,6 +102,29 @@ class ApiClient {
     });
   }
 
+  private async safeParseResponseJson<T>(res: Response, cleanEndpoint: string): Promise<T> {
+    const text = await res.text();
+    if (!text || !text.trim()) {
+      if (res.status === 204) {
+        return {} as T;
+      }
+      throw new ApiClientError({
+        message: `Empty response received from ${cleanEndpoint}`,
+        statusCode: res.status,
+        endpoint: cleanEndpoint,
+      });
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new ApiClientError({
+        message: `Invalid JSON response received from ${cleanEndpoint}`,
+        statusCode: res.status,
+        endpoint: cleanEndpoint,
+      });
+    }
+  }
+
   public async get<T>(
     endpoint: string,
     params?: Record<string, any>,
@@ -156,7 +179,7 @@ class ApiClient {
         });
       }
 
-      const data: T = await res.json();
+      const data: T = await this.safeParseResponseJson<T>(res, cleanEndpoint);
       this.setStatus('connected');
 
       if (options?.useCache) {
@@ -208,7 +231,7 @@ class ApiClient {
         });
       }
 
-      const data: T = await res.json();
+      const data: T = await this.safeParseResponseJson<T>(res, cleanEndpoint);
       this.setStatus('connected');
       return data;
     } catch (err) {
@@ -220,3 +243,4 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
