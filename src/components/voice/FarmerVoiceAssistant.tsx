@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Mic,
   MicOff,
@@ -11,8 +11,13 @@ import {
   Send,
   RefreshCw,
   Info,
+  X,
 } from 'lucide-react';
-import { VoiceAssistantService, type VoiceQueryResponse } from '../../services/voiceAssistantService';
+import {
+  VoiceAssistantService,
+  type VoiceQueryResponse,
+  getBcp47Locale,
+} from '../../services/voiceAssistantService';
 import { t, SUPPORTED_LANGUAGES } from '../../i18n';
 
 type AssistantState = 'IDLE' | 'LISTENING' | 'PROCESSING' | 'RESPONDING' | 'ERROR';
@@ -38,17 +43,67 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [responseLang, setResponseLang] = useState(currentLanguage);
 
+  const recognitionRef = useRef<any>(null);
+
+  const hasBrowserSpeechSupport =
+    typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
   useEffect(() => {
     setResponseLang(currentLanguage);
   }, [currentLanguage]);
 
-  // Web Speech Recognition setup if supported by browser
+  // Clean up browser speech recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
+      VoiceAssistantService.stopBrowserSpeech();
+    };
+  }, []);
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // Ignore stop errors
+      }
+      recognitionRef.current = null;
+    }
+    setState('IDLE');
+  };
+
+  // User-initiated Web Speech Recognition
   const startListening = () => {
-    if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.lang = responseLang;
+    if (state === 'LISTENING') {
+      stopListening();
+      return;
+    }
+
+    if (!hasBrowserSpeechSupport) {
+      setState('ERROR');
+      setErrorMessage(
+        'Voice input is not supported by this browser. Please type your question in any language below.'
+      );
+      return;
+    }
+
+    try {
+      const SpeechRecognitionClass =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognitionClass();
+      recognitionRef.current = recognition;
+
+      const targetLocale = getBcp47Locale(responseLang);
+      recognition.lang = targetLocale;
       recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
       recognition.onstart = () => {
         setState('LISTENING');
@@ -61,27 +116,35 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         handleSendQuery(transcript);
       };
 
-      recognition.onerror = () => {
+      recognition.onerror = (event: any) => {
         setState('ERROR');
-        setErrorMessage('Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.');
-      };
-
-      recognition.onend = () => {
-        if (state === 'LISTENING') {
-          setState('IDLE');
+        recognitionRef.current = null;
+        if (event.error === 'not-allowed') {
+          setErrorMessage(
+            'Microphone access was denied. Please check your browser microphone permissions or type your question below.'
+          );
+        } else if (event.error === 'no-speech') {
+          setErrorMessage(
+            'No speech was detected. Please tap the microphone and speak again, or type your question below.'
+          );
+        } else {
+          setErrorMessage(
+            'Voice recognition encountered an issue. You can speak again or type your question in any language below.'
+          );
         }
       };
 
-      try {
-        recognition.start();
-      } catch {
-        setState('ERROR');
-        setErrorMessage('Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.');
-      }
-    } else {
-      // Browser mic speech recognition fallback
+      recognition.onend = () => {
+        recognitionRef.current = null;
+        setState((prevState) => (prevState === 'LISTENING' ? 'IDLE' : prevState));
+      };
+
+      recognition.start();
+    } catch {
       setState('ERROR');
-      setErrorMessage('Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.');
+      setErrorMessage(
+        'Could not initialize browser voice recognition. You can type your question in any language below.'
+      );
     }
   };
 
@@ -105,7 +168,9 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
       setState('ERROR');
       const msg = err?.message || '';
       if (msg.includes('JSON') || msg.includes('json') || msg.includes('NOT_CONFIGURED')) {
-        setErrorMessage('Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.');
+        setErrorMessage(
+          'Cloud speech recognition service is unconfigured. Manual text queries and browser voice input remain active.'
+        );
       } else {
         setErrorMessage(msg || 'Failed to generate farmer advice. Please try again.');
       }
@@ -126,7 +191,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
       if (success) {
         setIsSpeaking(true);
       } else {
-        alert('Browser text-to-speech is unavailable on this device.');
+        setErrorMessage('Speech playback is unavailable for this language on this device.');
       }
     }
   };
@@ -181,10 +246,30 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         </div>
       </div>
 
+      {/* Capabilities & Provider Status Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-stone-50 border border-stone-200 px-4 py-2 text-[11px] font-medium text-stone-600">
+        <div className="flex items-center gap-2">
+          <span className="flex h-2 w-2 rounded-full bg-teal-500" />
+          <span>
+            Input Mode:{' '}
+            <strong className="text-stone-800 font-bold">
+              {hasBrowserSpeechSupport
+                ? 'Browser Voice Input & Manual Text'
+                : 'Manual Text Input Active'}
+            </strong>
+          </span>
+        </div>
+        <div className="flex items-center gap-3 font-mono text-[10px] text-stone-500">
+          <span>STT: NOT_CONFIGURED (Cloud)</span>
+          <span>&bull;</span>
+          <span>Locale: {getBcp47Locale(responseLang)}</span>
+        </div>
+      </div>
+
       {/* Main Microphone Interaction Circle */}
       <div className="flex flex-col items-center justify-center py-6 space-y-4 text-center bg-stone-50/70 rounded-3xl border border-stone-200/80 p-6">
         <button
-          onClick={state === 'LISTENING' ? () => setState('IDLE') : startListening}
+          onClick={state === 'LISTENING' ? stopListening : startListening}
           disabled={state === 'PROCESSING'}
           className={`h-24 w-24 rounded-full flex items-center justify-center transition-all shadow-md cursor-pointer ${
             state === 'LISTENING'
@@ -210,13 +295,14 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
             {state === 'LISTENING' && t('listening', currentLanguage)}
             {state === 'PROCESSING' && t('preparing_advice', currentLanguage)}
             {state === 'RESPONDING' && 'Advice Ready'}
-            {state === 'ERROR' && 'Voice Error'}
+            {state === 'ERROR' && 'Voice Assistant Ready'}
           </h4>
           <p className="text-xs text-stone-500 font-medium max-w-sm mt-0.5">
-            {state === 'IDLE' && 'Speak naturally e.g. "मेरे खेत के पास भूजल कैसा है?"'}
+            {state === 'IDLE' && 'Tap microphone to speak or type your query in any language below.'}
             {state === 'LISTENING' && 'Listening to your voice query... Speak now.'}
-            {state === 'PROCESSING' && 'Routing query to Unified Farmer Intelligence Engine...'}
+            {state === 'PROCESSING' && 'Routing query to JalKrishi Unified Farmer Intelligence Engine...'}
             {state === 'RESPONDING' && 'Voice advice generated based on hydrogeological assessment.'}
+            {state === 'ERROR' && 'You can tap the microphone to try speaking again or use manual text input.'}
           </p>
         </div>
       </div>
@@ -228,7 +314,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
           value={queryText}
           onChange={(e) => setQueryText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSendQuery()}
-          placeholder="Or type your query in any language..."
+          placeholder={`Type query in ${SUPPORTED_LANGUAGES.find((l) => l.code === responseLang)?.name || 'any language'} (e.g. "ನನ್ನ ಪ್ರದೇಶದಲ್ಲಿ ಅಂತರ್ಜಲ ಮಟ್ಟ ಎಷ್ಟಿದೆ?")...`}
           className="flex-1 text-xs font-medium bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
         <button
@@ -241,16 +327,25 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         </button>
       </div>
 
-      {/* Error Banner */}
+      {/* Dismissable Informational / Error Banner */}
       {errorMessage && (
-        <div className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium">
-          <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <p>{errorMessage}</p>
-            <p className="text-[11px] text-amber-700">
-              Provider Status: STT is NOT_CONFIGURED. Manual text queries execute normally.
-            </p>
+        <div className="flex items-start justify-between gap-2.5 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium animate-in fade-in duration-150">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p>{errorMessage}</p>
+              <p className="text-[11px] text-amber-700">
+                Manual text queries in all 13 languages operate normally.
+              </p>
+            </div>
           </div>
+          <button
+            onClick={() => setErrorMessage('')}
+            className="text-amber-700 hover:text-amber-950 p-1 rounded-lg hover:bg-amber-100 transition-colors"
+            title="Dismiss message"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
@@ -311,3 +406,4 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     </div>
   );
 };
+

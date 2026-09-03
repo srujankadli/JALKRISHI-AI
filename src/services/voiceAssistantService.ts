@@ -32,6 +32,26 @@ export interface TranscribeResponse {
 
 const API_BASE_URL = '/api/v1/voice';
 
+export const LANGUAGE_TO_BCP47: Record<string, string> = {
+  en: 'en-IN',
+  hi: 'hi-IN',
+  bn: 'bn-IN',
+  te: 'te-IN',
+  mr: 'mr-IN',
+  ta: 'ta-IN',
+  gu: 'gu-IN',
+  kn: 'kn-IN',
+  ml: 'ml-IN',
+  pa: 'pa-IN',
+  or: 'or-IN',
+  as: 'as-IN',
+  ur: 'ur-IN',
+};
+
+export function getBcp47Locale(langCode: string): string {
+  return LANGUAGE_TO_BCP47[langCode] || `${langCode}-IN`;
+}
+
 export class VoiceAssistantService {
   /**
    * Safe helper to parse JSON response without throwing raw JSON syntax errors.
@@ -182,8 +202,23 @@ export class VoiceAssistantService {
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language;
+    const targetLocale = getBcp47Locale(language);
+    utterance.lang = targetLocale;
     utterance.rate = 0.9;
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
+      const match = voices.find(
+        (v) =>
+          v.lang === targetLocale ||
+          v.lang.replace('_', '-').toLowerCase() === targetLocale.toLowerCase() ||
+          v.lang.startsWith(language)
+      );
+      if (match) {
+        utterance.voice = match;
+      }
+    }
+
     window.speechSynthesis.speak(utterance);
     return true;
   }
@@ -197,4 +232,5 @@ export class VoiceAssistantService {
     }
   }
 }
+
 
