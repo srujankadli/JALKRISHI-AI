@@ -179,7 +179,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         undefined, // lng
         responseLang,
         undefined, // audioBase64
-        undefined, // stationId (do NOT force background selectedStation.id on text queries!)
+        selectedStation?.id || undefined, // Fallback stationId if text contains no explicit place name
         text // locationQuery candidate
       );
       setResponse(res);
