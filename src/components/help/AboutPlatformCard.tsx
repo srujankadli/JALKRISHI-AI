@@ -20,7 +20,7 @@ export const AboutPlatformCard: React.FC = () => {
                 {APP_CONFIG.version}
               </span>
               <span className="rounded-md bg-agri-100 px-2.5 py-0.5 text-xs font-bold text-agri-800">
-                Enterprise Groundwater AI
+                Groundwater Intelligence Platform
               </span>
             </div>
             <h3 className="mt-2 text-xl font-black text-stone-900">

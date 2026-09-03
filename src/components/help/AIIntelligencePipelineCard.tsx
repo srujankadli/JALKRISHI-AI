@@ -3,7 +3,7 @@ import { Cpu, CheckCircle2, Clock, ArrowRight, ShieldCheck } from 'lucide-react'
 
 export const AIIntelligencePipelineCard: React.FC = () => {
   const steps = [
-    { num: 1, title: 'DWLR Telemetry Data', desc: '5,260 observation wells emitting hourly/daily groundwater depth (mbgl)' },
+    { num: 1, title: 'DWLR Telemetry Data', desc: '5,260 reference observation wells emitting groundwater depth (mbgl)' },
     { num: 2, title: 'Data Quality & Filtering', desc: '12 hydrogeological checks (range, stuck value, spike, battery voltage)' },
     { num: 3, title: 'Groundwater Analytics', desc: 'National summary, state/district rollups, and regional risk scores' },
     { num: 4, title: '30/60/90d Forecasting', desc: 'Hydrodynamic regression, confidence bands, and Days-to-Critical' },
@@ -60,7 +60,7 @@ export const AIIntelligencePipelineCard: React.FC = () => {
             <span>Implemented & Verified Now (Phase A–L)</span>
           </div>
           <ul className="text-xs text-stone-700 space-y-1 font-medium list-disc list-inside">
-            <li>5,260-Station Deterministic DWLR Network</li>
+            <li>5,260-Station Reference DWLR Network</li>
             <li>FastAPI Intelligence Engines (Analytics, Forecast, Anomalies, Crops, Insights)</li>
             <li>React + Vite Live API Bridge &amp; Offline Fallback</li>
             <li>In-Browser WhatsApp Farmer Simulator</li>

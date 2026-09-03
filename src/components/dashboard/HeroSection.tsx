@@ -29,7 +29,7 @@ export const HeroSection: React.FC = () => {
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white/90 px-2.5 py-1 text-xs font-semibold text-stone-600">
               <Radio className="h-3 w-3 text-water-600 animate-pulse" />
-              DWLR Network • Demo Simulation
+              DWLR Network • Reference Simulation
             </span>
           </div>
 
@@ -48,7 +48,7 @@ export const HeroSection: React.FC = () => {
 
           {/* Supporting Description */}
           <p className="max-w-xl text-sm font-normal text-stone-600 sm:text-base leading-relaxed">
-            Monitor groundwater conditions, understand depletion risk, and make smarter crop decisions using DWLR-based intelligence.
+            Monitor groundwater conditions, understand depletion risk, and make smarter crop decisions using groundwater, remote-sensing, weather, and hydro-agronomic intelligence.
           </p>
 
           {/* Action CTAs */}
@@ -164,7 +164,7 @@ export const HeroSection: React.FC = () => {
                 <Droplets className="h-3.5 w-3.5 text-water-600" />
                 Hydrostatic Telemetry
               </span>
-              <span className="font-semibold text-agri-800">5,260 Stations Connected</span>
+              <span className="font-semibold text-agri-800">5,260 Reference Stations</span>
             </div>
           </div>
         </div>

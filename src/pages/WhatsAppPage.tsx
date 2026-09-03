@@ -23,7 +23,7 @@ export const WhatsAppPage: React.FC = () => {
         badge={
           <span className="rounded-full bg-emerald-700 px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 shadow-xs">
             <MessageSquare className="h-3.5 w-3.5 text-emerald-300" />
-            Conversational Engine v2.0
+            Conversational Engine v2.6
           </span>
         }
       />

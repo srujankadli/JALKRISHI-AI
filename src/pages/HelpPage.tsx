@@ -52,12 +52,12 @@ export const HelpPage: React.FC = () => {
             JalKrishi Knowledge Base &amp; System Documentation
           </span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">National DWLR Telemetry Network</span>
+          <span className="text-stone-500 font-medium">JalKrishi Reference DWLR Network</span>
         </div>
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-agri-600" />
-          Simulated DWLR Data
+          Reference Simulation Telemetry
         </span>
       </div>
 

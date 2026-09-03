@@ -341,7 +341,7 @@ export const AnalyticsPage: React.FC = () => {
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-agri-600" />
-          Demo Simulation
+          Reference Simulation
         </span>
       </div>
 
@@ -353,7 +353,7 @@ export const AnalyticsPage: React.FC = () => {
         badge={
           <span className="rounded-full bg-stone-900 px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 shadow-xs">
             <BarChart3 className="h-3.5 w-3.5 text-amber-400" />
-            Decision Intelligence v2.4
+            Decision Intelligence v2.6
           </span>
         }
       />

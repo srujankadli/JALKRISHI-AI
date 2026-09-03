@@ -34,7 +34,7 @@ export const BackendStatusBadge: React.FC<BackendStatusBadgeProps> = ({
     return (
       <div
         className={`inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 text-xs font-semibold text-emerald-800 transition-all ${className}`}
-        title="FastAPI intelligence backend connected. Current data mode: demonstration simulation."
+        title="FastAPI intelligence backend connected. Current data mode: reference simulation."
       >
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -44,7 +44,7 @@ export const BackendStatusBadge: React.FC<BackendStatusBadgeProps> = ({
         <span>Backend Connected</span>
         {showDetails && (
           <span className="text-[10px] text-emerald-600 font-normal border-l border-emerald-200 pl-1.5 ml-0.5">
-            Demo Sim
+            Reference Data
           </span>
         )}
         <button

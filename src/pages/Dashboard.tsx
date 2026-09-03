@@ -74,9 +74,9 @@ export const Dashboard: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-2.5 shadow-xs text-xs">
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="font-bold text-stone-900">DWLR Network Active</span>
+          <span className="font-bold text-stone-900">Reference DWLR Network</span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">5,260 Observation Wells (Simulated Telemetry)</span>
+          <span className="text-stone-500 font-medium">5,260 Reference Stations (Simulated Telemetry)</span>
         </div>
 
         <div className="flex items-center gap-3">

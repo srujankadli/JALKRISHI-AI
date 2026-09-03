@@ -100,7 +100,7 @@ export const ForecastPage: React.FC = () => {
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-water-600" />
-          Demo Simulation Model
+          Reference Simulation Model
         </span>
       </div>
 

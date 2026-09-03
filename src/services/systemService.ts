@@ -56,7 +56,7 @@ export const systemService = {
     return {
       status: 'healthy (offline mode)',
       app_name: 'JalKrishi AI — Groundwater Intelligence Platform',
-      version: '2.0.0-phase-j',
+      version: '2.6.0',
       environment: 'development',
       data_mode: 'DEMO_FALLBACK',
       active_source: 'DEMO_SIMULATION',
@@ -79,7 +79,7 @@ export const systemService = {
         cgwb: 'NOT_CONFIGURED',
         imd: 'NOT_CONFIGURED',
       },
-      disclaimer: 'Demo Simulation Mode: Offline local fallback active.',
+      disclaimer: 'Reference Simulation Mode: Offline local fallback active.',
       timestamp: new Date().toISOString(),
     };
   },
