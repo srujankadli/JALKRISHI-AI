@@ -25,7 +25,15 @@ class ApiClient {
   private lastHealthCheckResult: boolean = false;
 
   constructor() {
-    this.baseUrl = (import.meta.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1').replace(/\/$/, '');
+    const envUrl = import.meta.env?.VITE_API_BASE_URL;
+    if (envUrl && envUrl.trim()) {
+      this.baseUrl = envUrl.replace(/\/$/, '');
+    } else if (typeof window !== 'undefined' && window.location && window.location.origin) {
+      const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      this.baseUrl = isLocalDev ? 'http://127.0.0.1:8000/api/v1' : `${window.location.origin}/api/v1`;
+    } else {
+      this.baseUrl = 'http://127.0.0.1:8000/api/v1';
+    }
   }
 
   public getBaseUrl(): string {
