@@ -1108,6 +1108,10 @@ class GroundwaterIntelligenceSchema(BaseModel):
     timestamp: str = Field(..., description="ISO timestamp")
     disclaimer: str = Field(..., description="Data provenance & scientific transparency disclaimer")
     data_mode: str = Field("DEMO_SIMULATION", description="Data mode")
+    location_info: Optional[LocationInfoSchema] = Field(None, description="Resolved location metadata")
+    coverage_info: Optional[CoverageInfoSchema] = Field(None, description="Coverage mode & distance metadata")
+    groundwater_info: Optional[GroundwaterLevelSchema] = Field(None, description="Direct or model-derived groundwater level metadata")
+    provenance_info: Optional[ProvenanceInfoSchema] = Field(None, description="Data provenance metadata")
 
 
 # ==========================================
@@ -1183,11 +1187,45 @@ class LanguageConfigSchema(BaseModel):
     status: str = Field("CONFIGURED", description="Provider status for this language")
 
 
+# ==========================================
+# 15. Dynamic Location & Evidence Schemas
+# ==========================================
+
+class LocationInfoSchema(BaseModel):
+    name: str = Field(..., description="Resolved location or region name")
+    district: Optional[str] = Field(None, description="District name if available")
+    state: Optional[str] = Field(None, description="State name if available")
+    latitude: float = Field(..., description="Latitude coordinate")
+    longitude: float = Field(..., description="Longitude coordinate")
+
+
+class CoverageInfoSchema(BaseModel):
+    mode: str = Field(..., description="DIRECT_DWLR or SATELLITE_ASSISTED")
+    nearest_station_id: Optional[str] = Field(None, description="Nearest DWLR station code")
+    nearest_station_name: Optional[str] = Field(None, description="Nearest DWLR station name")
+    distance_km: float = Field(..., description="Geodesic distance to nearest station in km")
+
+
+class GroundwaterLevelSchema(BaseModel):
+    level_value: Optional[float] = Field(None, description="Direct depth observation in m bgl if available")
+    level_min: Optional[float] = Field(None, description="Estimated lower bound depth in m bgl for satellite mode")
+    level_max: Optional[float] = Field(None, description="Estimated upper bound depth in m bgl for satellite mode")
+    unit: str = Field("m bgl", description="Measurement unit")
+    is_direct_measurement: bool = Field(..., description="True if direct DWLR observation, False if satellite model estimate")
+    confidence: str = Field(..., description="Confidence level: HIGH, MEDIUM, LOW")
+
+
+class ProvenanceInfoSchema(BaseModel):
+    primary_source: str = Field(..., description="DWLR or SATELLITE_REMOTE_SENSING")
+    data_mode: str = Field("REFERENCE_SIMULATION", description="Data provenance mode")
+
+
 class VoiceQueryRequest(BaseModel):
     query: str = Field(..., description="Spoken or typed farmer query string")
     station_id: Optional[str] = Field(None, description="Selected DWLR station code if available")
     latitude: Optional[float] = Field(None, description="Farm latitude coordinate")
     longitude: Optional[float] = Field(None, description="Farm longitude coordinate")
+    location_query: Optional[str] = Field(None, description="Explicit or extracted location name query")
     language: str = Field("en", description="Farmer requested/interface language code")
     audio_base64: Optional[str] = Field(None, description="Base64 encoded audio bytes if available")
 
@@ -1198,6 +1236,10 @@ class VoiceQueryResponse(BaseModel):
     farmer_response_language: str = Field(..., description="Language code of returned response")
     text_response: str = Field(..., description="Formatted farmer-facing natural language response")
     intelligence: GroundwaterIntelligenceSchema = Field(..., description="Structured hydrogeological decision support")
+    location: Optional[LocationInfoSchema] = Field(None, description="Resolved location metadata")
+    coverage: Optional[CoverageInfoSchema] = Field(None, description="Coverage mode & distance metadata")
+    groundwater: Optional[GroundwaterLevelSchema] = Field(None, description="Direct or model-derived groundwater level metadata")
+    provenance: Optional[ProvenanceInfoSchema] = Field(None, description="Data provenance metadata")
     audio_url: Optional[str] = Field(None, description="Synthesized TTS audio URL if available")
     voice_playback_available: bool = Field(False, description="Whether spoken audio playback is active")
     stt_provider_status: str = Field("NOT_CONFIGURED", description="Speech-to-Text provider status")

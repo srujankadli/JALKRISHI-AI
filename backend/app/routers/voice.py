@@ -70,19 +70,20 @@ def respond_to_voice_query(request: VoiceQueryRequest):
     detected_lang = LanguageDetector.detect_language(raw_query, default=request.language or "en")
     target_lang = request.language if request.language in [l.language_code for l in SUPPORTED_LANGUAGES] else detected_lang
 
-    # 2. Location Resolution
-    lat = request.latitude if request.latitude is not None else 13.1367
-    lon = request.longitude if request.longitude is not None else 78.1291
-
-    # 3. Invoke Existing Unified Farmer Intelligence Engine
+    # 2. Invoke Existing Unified Farmer Intelligence Engine with Location Resolution
     intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(
-        lat, lon, radius_km=15.0, station_id=request.station_id
+        lat=request.latitude,
+        lon=request.longitude,
+        radius_km=15.0,
+        station_id=request.station_id,
+        location_query=request.location_query,
+        query_text=raw_query,
     )
 
-    # 4. Multilingual Response Formatting & Translation
+    # 3. Multilingual Response Formatting & Translation
     formatted_text = hydro_translator.format_farmer_response(intel, target_lang)
 
-    # 5. Text-to-Speech Synthesis Attempt
+    # 4. Text-to-Speech Synthesis Attempt
     audio_url, tts_status = tts_provider.synthesize(formatted_text, target_lang)
 
     disclaimer = (
@@ -96,6 +97,10 @@ def respond_to_voice_query(request: VoiceQueryRequest):
         farmer_response_language=target_lang,
         text_response=formatted_text,
         intelligence=intel,
+        location=intel.location_info,
+        coverage=intel.coverage_info,
+        groundwater=intel.groundwater_info,
+        provenance=intel.provenance_info,
         audio_url=audio_url,
         voice_playback_available=audio_url is not None,
         stt_provider_status=stt_provider.status,

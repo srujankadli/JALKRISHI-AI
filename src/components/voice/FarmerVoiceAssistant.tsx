@@ -268,25 +268,70 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         </div>
       </div>
 
-      {/* Capabilities & Provider Status Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-stone-50 border border-stone-200 px-4 py-2 text-[11px] font-medium text-stone-600">
-        <div className="flex items-center gap-2">
-          <span className="flex h-2 w-2 rounded-full bg-teal-500" />
-          <span>
-            Target Context:{' '}
-            <strong className="text-stone-800 font-bold">
-              {selectedStation
-                ? `DWLR Well: ${selectedStation.stationName} (${selectedStation.district}, ${selectedStation.state}) [${selectedStation.id}]`
-                : 'General Reference Guidance (Select DWLR station on map for station-specific advice)'}
-            </strong>
-          </span>
+      {/* Capabilities & Dynamic Location Context Card */}
+      {response?.location ? (
+        <div className="rounded-2xl bg-teal-50/80 border border-teal-200 p-4 space-y-2 text-xs text-stone-800">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-teal-200/60 pb-2">
+            <span className="font-black tracking-wide text-teal-900 uppercase text-[10px]">
+              Groundwater Location Assessment
+            </span>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[10px] ${
+              response.coverage?.mode === 'DIRECT_DWLR'
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                : 'bg-amber-100 text-amber-800 border border-amber-300'
+            }`}>
+              {response.coverage?.mode === 'DIRECT_DWLR'
+                ? 'Direct DWLR Measurement'
+                : 'Satellite-Assisted Groundwater Outlook'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 font-medium">
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Groundwater Location</span>
+              <strong className="text-stone-900 font-bold">{response.location.name}</strong>
+              {response.location.state && <span className="text-stone-500 block text-[10px]">{response.location.district ? `${response.location.district}, ` : ''}{response.location.state}</span>}
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Data Source / Provenance</span>
+              <strong className="text-stone-900 font-bold">
+                {response.coverage?.mode === 'DIRECT_DWLR' ? 'Direct DWLR Measurement' : 'Satellite-Assisted Groundwater Outlook'}
+              </strong>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">
+                {response.coverage?.mode === 'DIRECT_DWLR' ? 'DWLR Station' : 'DWLR Coverage'}
+              </span>
+              <strong className="text-stone-900 font-bold">
+                {response.coverage?.mode === 'DIRECT_DWLR'
+                  ? `${response.coverage?.nearest_station_name || 'DWLR Station'} [${response.coverage?.nearest_station_id || 'Well'}]`
+                  : 'No suitable DWLR within 15 km'}
+              </strong>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-3 font-mono text-[10px] text-stone-500">
-          <span>STT: {hasBrowserSpeechSupport ? 'Browser Voice' : 'Text Input'}</span>
-          <span>&bull;</span>
-          <span>Locale: {getBcp47Locale(responseLang)}</span>
+      ) : (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-stone-50 border border-stone-200 px-4 py-2 text-[11px] font-medium text-stone-600">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 rounded-full bg-teal-500" />
+            <span>
+              Target Context:{' '}
+              <strong className="text-stone-800 font-bold">
+                {selectedStation
+                  ? `DWLR Well: ${selectedStation.stationName} (${selectedStation.district}, ${selectedStation.state}) [${selectedStation.id}]`
+                  : 'Ask about any location (e.g. Kolar, Sangrur, Thanjavur, Mehsana)'}
+              </strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-3 font-mono text-[10px] text-stone-500">
+            <span>STT: {hasBrowserSpeechSupport ? 'Browser Voice' : 'Text Input'}</span>
+            <span>&bull;</span>
+            <span>Locale: {getBcp47Locale(responseLang)}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Microphone Interaction Circle */}
       <div className="flex flex-col items-center justify-center py-6 space-y-4 text-center bg-stone-50/70 rounded-3xl border border-stone-200/80 p-6">

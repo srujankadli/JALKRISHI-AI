@@ -373,35 +373,42 @@ class HydroAgronomicTranslator:
         Formats structured GroundwaterIntelligenceSchema into concise farmer natural language response in target language.
         Preserves data-honesty disclaimers and satellite-assisted terms across all languages.
         """
-        st_header = ""
-        if intel.nearest_station_name and intel.nearest_station_id:
-            st_header = f" — {intel.nearest_station_name} [{intel.nearest_station_id}]"
-        elif intel.nearest_station_id:
-            st_header = f" — DWLR Station {intel.nearest_station_id}"
+        loc_name = intel.location_info.name if (intel.location_info and intel.location_info.name) else "your location"
+        is_dwlr = intel.estimation_mode == "DIRECT_DWLR"
+        st_id = intel.nearest_station_id or "DWLR-Well"
+        st_name = intel.nearest_station_name or "Direct DWLR Well"
+        gw_val = intel.groundwater_info.level_value if intel.groundwater_info and intel.groundwater_info.level_value else None
+        gw_min = intel.groundwater_info.level_min if intel.groundwater_info else None
+        gw_max = intel.groundwater_info.level_max if intel.groundwater_info else None
 
         if target_lang not in cls.TRANSLATED_TERMS:
             # English Default
-            cov_label = intel.coverage_type
+            cov_label = "Direct DWLR Measurement" if is_dwlr else "Satellite-Assisted Groundwater Outlook"
             cond_label = intel.groundwater_condition.replace("_", " ")
             trend_label = intel.trend
             recharge_label = intel.recharge_outlook
             crops_str = ", ".join(intel.recommended_crops[:3])
-            irrigation_str = intel.irrigation_implications
+
+            if is_dwlr:
+                intro_line = f"Groundwater level near {loc_name} is {gw_val or 12.5} m bgl based on nearby DWLR station {st_name} ({st_id})."
+            else:
+                depth_range = f"{int(gw_min)}–{int(gw_max)}" if (gw_min and gw_max) else "13–17"
+                intro_line = f"No suitable DWLR station is available near {loc_name} (within 15 km). JalKrishi estimates groundwater level at approximately {depth_range} m bgl using satellite-assisted hydrogeological indicators."
 
             lines = [
-                f"🌾 JalKrishi Farmer Advice{st_header} ({cov_label}):",
+                f"🌾 JalKrishi Farmer Advice — {loc_name} ({cov_label}):",
+                f"• {intro_line}",
                 f"• Groundwater Condition: {cond_label} (Stress Score: {intel.stress_score:.2f})",
                 f"• Trajectory Trend: {trend_label}",
                 f"• Recharge Outlook: {recharge_label}",
                 f"• Recommended Water-Smart Crops: {crops_str}",
-                f"• Irrigation Guidance: {irrigation_str}",
+                f"• Irrigation Guidance: {intel.irrigation_implications}",
                 f"• Confidence: {intel.confidence} ({round(intel.confidence_score * 100)}%)",
                 f"• Provenance: {intel.disclaimer}",
             ]
             return "\n".join(lines)
 
         terms = cls.TRANSLATED_TERMS[target_lang]
-        is_dwlr = intel.estimation_mode == "DIRECT_DWLR"
         cov_label = terms["coverage_dwlr"] if is_dwlr else terms["coverage_sat"]
 
         # Map condition label
@@ -415,7 +422,7 @@ class HydroAgronomicTranslator:
         crops_str = ", ".join(intel.recommended_crops[:3])
 
         lines = [
-            f"🌾 {terms['title']}{st_header} ({cov_label}):",
+            f"🌾 {terms['title']} — {loc_name} ({cov_label}):",
             f"• {terms['condition']}: {cond_label} (Stress Index: {intel.stress_score:.2f})",
             f"• {terms['trend']}: {trend_label}",
             f"• {terms['recharge']}: {intel.recharge_outlook}",

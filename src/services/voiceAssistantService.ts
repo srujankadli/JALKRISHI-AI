@@ -10,12 +10,45 @@ export interface LanguageConfig {
   status: string;
 }
 
+export interface LocationInfo {
+  name: string;
+  district?: string | null;
+  state?: string | null;
+  latitude: number;
+  longitude: number;
+}
+
+export interface CoverageInfo {
+  mode: string;
+  nearest_station_id?: string | null;
+  nearest_station_name?: string | null;
+  distance_km: number;
+}
+
+export interface GroundwaterLevelInfo {
+  level_value?: number | null;
+  level_min?: number | null;
+  level_max?: number | null;
+  unit: string;
+  is_direct_measurement: boolean;
+  confidence: string;
+}
+
+export interface ProvenanceInfo {
+  primary_source: string;
+  data_mode: string;
+}
+
 export interface VoiceQueryResponse {
   query_text: string;
   detected_language: string;
   farmer_response_language: string;
   text_response: string;
   intelligence: any;
+  location?: LocationInfo | null;
+  coverage?: CoverageInfo | null;
+  groundwater?: GroundwaterLevelInfo | null;
+  provenance?: ProvenanceInfo | null;
   audio_url: string | null;
   voice_playback_available: boolean;
   stt_provider_status: string;
@@ -135,11 +168,13 @@ export class VoiceAssistantService {
     longitude?: number,
     language: string = 'en',
     audioBase64?: string,
-    stationId?: string
+    stationId?: string,
+    locationQuery?: string
   ): Promise<VoiceQueryResponse> {
     return await apiClient.post<VoiceQueryResponse>('/voice/respond', {
       query: queryText,
       station_id: stationId || null,
+      location_query: locationQuery || null,
       latitude,
       longitude,
       language,

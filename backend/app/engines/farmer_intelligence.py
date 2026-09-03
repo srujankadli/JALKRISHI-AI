@@ -18,34 +18,82 @@ from app.engines.forecasting import forecasting_engine
 from app.engines.crop_recommender import crop_engine
 from app.engines.anomaly_detector import anomaly_engine
 from app.pipeline.dwlr_ingest import station_repo
-from app.models.schemas import GroundwaterIntelligenceSchema, IndicatorItemSchema
+from app.pipeline.location_resolver import resolve_location, LocationResolution
+from app.models.schemas import (
+    GroundwaterIntelligenceSchema,
+    IndicatorItemSchema,
+    LocationInfoSchema,
+    CoverageInfoSchema,
+    GroundwaterLevelSchema,
+    ProvenanceInfoSchema,
+)
 
 
 class FarmerIntelligenceEngine:
     """Unified Engine orchestrating Mode A (Direct DWLR) and Mode B (Satellite-Assisted)."""
 
     def get_unified_groundwater_intelligence(
-        self, lat: float, lon: float, radius_km: Optional[float] = None, station_id: Optional[str] = None
+        self,
+        lat: Optional[float] = None,
+        lon: Optional[float] = None,
+        radius_km: Optional[float] = None,
+        station_id: Optional[str] = None,
+        location_query: Optional[str] = None,
+        query_text: Optional[str] = None,
     ) -> GroundwaterIntelligenceSchema:
         r = radius_km if radius_km is not None else settings.DWLR_COVERAGE_RADIUS_KM
 
-        # 0. Direct Station ID Resolution (Prioritize explicit station context)
+        # PRIORITY 1: Explicit station_id
         if station_id and station_id.strip():
             st_schema = station_repo.get_by_id(station_id.strip())
             if st_schema:
                 st_dict = st_schema.model_dump()
                 st_lat = st_schema.latitude
                 st_lon = st_schema.longitude
-                return self._build_mode_a_direct_dwlr(st_lat, st_lon, st_dict, 0.0, r)
+                return self._build_mode_a_direct_dwlr(
+                    st_lat, st_lon, st_dict, 0.0, r,
+                    loc_name=f"{st_schema.stationName} ({st_schema.district}, {st_schema.state})"
+                )
 
-        # 1. Coverage Check via Spatial Proximity
-        nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(lat, lon)
-        dwlr_available = dist <= r if nearest else False
+        # PRIORITY 2: Explicit location_query / extracted place in query_text
+        resolved_loc = resolve_location(location_query=location_query, query_text=query_text)
+        if resolved_loc.is_resolved and resolved_loc.latitude is not None and resolved_loc.longitude is not None:
+            if resolved_loc.matched_station_id:
+                st_schema = station_repo.get_by_id(resolved_loc.matched_station_id)
+                if st_schema:
+                    return self._build_mode_a_direct_dwlr(
+                        st_schema.latitude, st_schema.longitude, st_schema.model_dump(), 0.0, r,
+                        loc_name=resolved_loc.name, district_name=st_schema.district, state_name=st_schema.state
+                    )
 
-        if dwlr_available and nearest:
-            return self._build_mode_a_direct_dwlr(lat, lon, nearest, dist, r)
-        else:
-            return self._build_mode_b_satellite_assisted(lat, lon, nearest, dist, r)
+            target_lat = resolved_loc.latitude
+            target_lon = resolved_loc.longitude
+            loc_name = resolved_loc.name
+            d_name = resolved_loc.district
+            s_name = resolved_loc.state
+
+            nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(target_lat, target_lon)
+            if dist <= r and nearest:
+                return self._build_mode_a_direct_dwlr(target_lat, target_lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
+            else:
+                return self._build_mode_b_satellite_assisted(target_lat, target_lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
+
+        # PRIORITY 3: Explicit latitude + longitude passed from client/map
+        if lat is not None and lon is not None:
+            nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(lat, lon)
+            loc_name = f"{nearest.get('district', 'Target Position')}, {nearest.get('state', '')}" if nearest else f"{lat:.2f}, {lon:.2f}"
+            d_name = nearest.get("district") if nearest else None
+            s_name = nearest.get("state") if nearest else None
+            if dist <= r and nearest:
+                return self._build_mode_a_direct_dwlr(lat, lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
+            else:
+                return self._build_mode_b_satellite_assisted(lat, lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
+
+        # PRIORITY 4 / 5: Fallback general location / Unresolvable location
+        # Default target position (e.g. Reference Kolar center if unmapped)
+        default_lat, default_lon = 13.1367, 78.1291
+        nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(default_lat, default_lon)
+        return self._build_mode_a_direct_dwlr(default_lat, default_lon, nearest, dist, r, loc_name="Reference DWLR Location")
 
     def _build_mode_a_direct_dwlr(
         self,
@@ -54,6 +102,9 @@ class FarmerIntelligenceEngine:
         nearest: Dict[str, Any],
         dist: float,
         radius_km: float,
+        loc_name: Optional[str] = None,
+        district_name: Optional[str] = None,
+        state_name: Optional[str] = None,
     ) -> GroundwaterIntelligenceSchema:
         """Mode A: Direct DWLR Observation & High-Confidence Hydrogeological Pipeline."""
         st_id = nearest.get("id") or nearest.get("stationCode", "DWLR-000")
@@ -64,6 +115,36 @@ class FarmerIntelligenceEngine:
         trend_val = str(nearest.get("trend", "stable")).upper()
         district = nearest.get("district", "Local District")
         state = nearest.get("state", "Local State")
+
+        resolved_district = district_name or district
+        resolved_state = state_name or state
+        resolved_name = loc_name or st_name
+
+        loc_schema = LocationInfoSchema(
+            name=resolved_name,
+            district=resolved_district,
+            state=resolved_state,
+            latitude=lat,
+            longitude=lon
+        )
+        cov_schema = CoverageInfoSchema(
+            mode="DIRECT_DWLR",
+            nearest_station_id=st_id,
+            nearest_station_name=st_name,
+            distance_km=dist
+        )
+        gw_schema = GroundwaterLevelSchema(
+            level_value=water_level,
+            level_min=None,
+            level_max=None,
+            unit="m bgl",
+            is_direct_measurement=True,
+            confidence="HIGH"
+        )
+        prov_schema = ProvenanceInfoSchema(
+            primary_source="DWLR",
+            data_mode=settings.DATA_MODE
+        )
 
         # Forecast from direct station model
         forecast_res = forecasting_engine.forecast_station(st_id, horizon_days=30)
@@ -145,6 +226,10 @@ class FarmerIntelligenceEngine:
             timestamp=datetime.now(timezone.utc).isoformat(),
             disclaimer=disclaimer,
             data_mode=settings.DATA_MODE,
+            location_info=loc_schema,
+            coverage_info=cov_schema,
+            groundwater_info=gw_schema,
+            provenance_info=prov_schema,
         )
 
     def _build_mode_b_satellite_assisted(
@@ -154,6 +239,9 @@ class FarmerIntelligenceEngine:
         nearest: Optional[Dict[str, Any]],
         dist: float,
         radius_km: float,
+        loc_name: Optional[str] = None,
+        district_name: Optional[str] = None,
+        state_name: Optional[str] = None,
     ) -> GroundwaterIntelligenceSchema:
         """Mode B: Satellite-Assisted Spatial Estimation & Propagated Uncertainty Pipeline."""
         sat_est = satellite_groundwater_engine.estimate_groundwater_condition(lat, lon, radius_km)
@@ -204,9 +292,36 @@ class FarmerIntelligenceEngine:
         # Adapt Crop Recommendation using Phase F crop_engine
         from app.models.schemas import CropRecommendationRequest, SoilType, CropSeason, WaterAvailabilityLevel, RainfallCondition
         soil_enum = SoilType.RED if lat < 16.0 else SoilType.ALLUVIAL if lat > 24.0 else SoilType.BLACK
-        district_name = nearest.get("district", "Regional Sector") if nearest else "Regional Sector"
-        state_name = nearest.get("state", "Regional State") if nearest else "Regional State"
+        resolved_district = district_name or (nearest.get("district", "Regional Sector") if nearest else "Regional Sector")
+        resolved_state = state_name or (nearest.get("state", "Regional State") if nearest else "Regional State")
         w_avail = WaterAvailabilityLevel.STRESSED if stress_score > 0.7 else WaterAvailabilityLevel.LIMITED if stress_score > 0.4 else WaterAvailabilityLevel.MODERATE
+
+        resolved_name = loc_name or resolved_district
+        loc_schema = LocationInfoSchema(
+            name=resolved_name,
+            district=resolved_district,
+            state=resolved_state,
+            latitude=lat,
+            longitude=lon
+        )
+        cov_schema = CoverageInfoSchema(
+            mode="SATELLITE_ASSISTED",
+            nearest_station_id=st_id,
+            nearest_station_name=st_name,
+            distance_km=dist
+        )
+        gw_schema = GroundwaterLevelSchema(
+            level_value=None,
+            level_min=float(d_min),
+            level_max=float(d_max),
+            unit="m bgl",
+            is_direct_measurement=False,
+            confidence=conf
+        )
+        prov_schema = ProvenanceInfoSchema(
+            primary_source="SATELLITE_REMOTE_SENSING",
+            data_mode=settings.DATA_MODE
+        )
 
         crop_req = CropRecommendationRequest(
             state=state_name,
@@ -271,6 +386,10 @@ class FarmerIntelligenceEngine:
             timestamp=datetime.now(timezone.utc).isoformat(),
             disclaimer=sat_est.disclaimer,
             data_mode=settings.DATA_MODE,
+            location_info=loc_schema,
+            coverage_info=cov_schema,
+            groundwater_info=gw_schema,
+            provenance_info=prov_schema,
         )
 
 
