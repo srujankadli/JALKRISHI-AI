@@ -187,7 +187,7 @@ export class VoiceAssistantService {
 
     return await this.parseResponseJson<VoiceQueryResponse>(
       res,
-      'Cloud speech-to-text is not configured. Please use the text input, or enable a speech provider.'
+      'Failed to parse response from JalKrishi AI voice service.'
     );
   }
 

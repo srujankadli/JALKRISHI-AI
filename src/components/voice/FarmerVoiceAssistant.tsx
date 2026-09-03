@@ -51,6 +51,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
   useEffect(() => {
     setResponseLang(currentLanguage);
+    setErrorMessage('');
   }, [currentLanguage]);
 
   // Clean up browser speech recognition on unmount
@@ -81,6 +82,8 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
   // User-initiated Web Speech Recognition
   const startListening = () => {
+    setErrorMessage('');
+
     if (state === 'LISTENING') {
       stopListening();
       return;
@@ -89,7 +92,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     if (!hasBrowserSpeechSupport) {
       setState('ERROR');
       setErrorMessage(
-        'Voice input is not supported by this browser. Please type your question in any language below.'
+        'Voice input is not supported by this browser. You can type your question in any language below.'
       );
       return;
     }
@@ -111,7 +114,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
       };
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
+        const transcript = event.results[0][0]?.transcript || '';
         setQueryText(transcript);
         handleSendQuery(transcript);
       };
@@ -119,17 +122,26 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
       recognition.onerror = (event: any) => {
         setState('ERROR');
         recognitionRef.current = null;
-        if (event.error === 'not-allowed') {
+        const errType = event.error || '';
+        if (errType === 'not-allowed') {
           setErrorMessage(
-            'Microphone access was denied. Please check your browser microphone permissions or type your question below.'
+            'Microphone access was denied. Please allow microphone access or use text input.'
           );
-        } else if (event.error === 'no-speech') {
+        } else if (errType === 'no-speech') {
           setErrorMessage(
-            'No speech was detected. Please tap the microphone and speak again, or type your question below.'
+            'No speech was detected. Please tap the microphone and speak again, or type below.'
+          );
+        } else if (errType === 'audio-capture') {
+          setErrorMessage(
+            'No microphone was detected on your device. Please connect a microphone or use text input.'
+          );
+        } else if (errType === 'network') {
+          setErrorMessage(
+            'Speech recognition network error. Please try speaking again or use text input.'
           );
         } else {
           setErrorMessage(
-            'Voice recognition encountered an issue. You can speak again or type your question in any language below.'
+            'Voice recognition encountered an issue. You can speak again or type your question below.'
           );
         }
       };
@@ -167,13 +179,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     } catch (err: any) {
       setState('ERROR');
       const msg = err?.message || '';
-      if (msg.includes('JSON') || msg.includes('json') || msg.includes('NOT_CONFIGURED')) {
-        setErrorMessage(
-          'Cloud speech recognition service is unconfigured. Manual text queries and browser voice input remain active.'
-        );
-      } else {
-        setErrorMessage(msg || 'Failed to generate farmer advice. Please try again.');
-      }
+      setErrorMessage(msg || 'Failed to generate farmer advice. Please try again.');
     }
   };
 
@@ -229,12 +235,15 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
           </div>
         </div>
 
-        {/* Farmer Response Language Override */}
+        {/* Farmer Response Language Selection */}
         <div className="flex items-center gap-2">
           <Globe className="h-3.5 w-3.5 text-stone-500" />
           <select
             value={responseLang}
-            onChange={(e) => setResponseLang(e.target.value)}
+            onChange={(e) => {
+              setResponseLang(e.target.value);
+              setErrorMessage('');
+            }}
             className="text-xs font-bold bg-stone-100 border border-stone-300 text-stone-800 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
           >
             {SUPPORTED_LANGUAGES.map((l) => (
@@ -260,7 +269,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-3 font-mono text-[10px] text-stone-500">
-          <span>STT: NOT_CONFIGURED (Cloud)</span>
+          <span>STT: {hasBrowserSpeechSupport ? 'Browser Voice' : 'Text Input'} (Cloud STT: Not Configured)</span>
           <span>&bull;</span>
           <span>Locale: {getBcp47Locale(responseLang)}</span>
         </div>
