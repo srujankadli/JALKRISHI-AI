@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import type { DWLRStation, StationStatus } from '../../types';
 import { APP_CONFIG } from '../../utils/constants';
-import { RotateCcw, Locate, Maximize2, Minimize2 } from 'lucide-react';
+import { RotateCcw, Locate, Maximize2, Minimize2, Satellite, Radio } from 'lucide-react';
 
 interface GroundwaterMapProps {
   stations: DWLRStation[];
@@ -15,6 +15,7 @@ interface GroundwaterMapProps {
   height?: string;
   className?: string;
   panToCoords?: { lat: number; lng: number; zoom?: number } | null;
+  onSelectLocationCoords?: (lat: number, lng: number) => void;
 }
 
 // Marker Icon Generator
@@ -219,6 +220,8 @@ const MapControlsOverlay: React.FC<{
   isLocating: boolean;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
+  showCoverageLayer: boolean;
+  onToggleCoverageLayer: () => void;
 }> = ({
   mapLayer,
   setMapLayer,
@@ -226,6 +229,8 @@ const MapControlsOverlay: React.FC<{
   isLocating,
   isFullscreen,
   onToggleFullscreen,
+  showCoverageLayer,
+  onToggleCoverageLayer,
 }) => {
   const map = useMap();
 
@@ -260,6 +265,20 @@ const MapControlsOverlay: React.FC<{
           {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
         </button>
 
+        {/* Groundwater Coverage Map Layer Toggle */}
+        <button
+          onClick={onToggleCoverageLayer}
+          className={`rounded-xl border p-2 text-xs font-extrabold flex items-center gap-1.5 shadow-md backdrop-blur-xs transition-all cursor-pointer ${
+            showCoverageLayer
+              ? 'bg-teal-700 text-white border-teal-800'
+              : 'bg-white/95 text-stone-800 border-stone-300 hover:bg-white'
+          }`}
+          title="Toggle Groundwater Intelligence Coverage Overlay"
+        >
+          <Satellite className="h-4 w-4" />
+          <span className="hidden sm:inline">Coverage Map</span>
+        </button>
+
         {/* Base Layer Switcher */}
         <div className="flex items-center rounded-xl border border-stone-300 bg-white/95 p-1 shadow-md backdrop-blur-xs text-xs font-semibold">
           <button
@@ -284,6 +303,19 @@ const MapControlsOverlay: React.FC<{
   );
 };
 
+const MapClickHandler: React.FC<{
+  onSelectLocationCoords?: (lat: number, lng: number) => void;
+}> = ({ onSelectLocationCoords }) => {
+  useMapEvents({
+    click(e) {
+      if (onSelectLocationCoords) {
+        onSelectLocationCoords(e.latlng.lat, e.latlng.lng);
+      }
+    },
+  });
+  return null;
+};
+
 export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
   stations,
   selectedStation,
@@ -293,10 +325,12 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
   height = '600px',
   className = '',
   panToCoords,
+  onSelectLocationCoords,
 }) => {
   const [mapLayer, setMapLayer] = useState<'osm' | 'terrain' | 'carto'>('osm');
   const [isLocating, setIsLocating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showCoverageLayer, setShowCoverageLayer] = useState(false);
 
   const tileUrls = {
     osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -345,6 +379,7 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
         />
 
         <MapNavigationController panToCoords={panToCoords} selectedStation={selectedStation} />
+        <MapClickHandler onSelectLocationCoords={onSelectLocationCoords} />
 
         <MapControlsOverlay
           mapLayer={mapLayer}
@@ -353,6 +388,8 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
           isLocating={isLocating}
           isFullscreen={isFullscreen}
           onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
+          showCoverageLayer={showCoverageLayer}
+          onToggleCoverageLayer={() => setShowCoverageLayer(!showCoverageLayer)}
         />
 
         <ClusteredStationMarkers
@@ -394,9 +431,40 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
         </div>
 
         <p className="mt-1.5 text-[10px] text-stone-400 border-t border-stone-100 pt-1">
-          Simulated DWLR Network &bull; Click cluster to zoom
+          Simulated DWLR Network &bull; Click anywhere for Satellite Estimate
         </p>
       </div>
+
+      {/* Coverage Map Overlay (Bottom Right) */}
+      {showCoverageLayer && (
+        <div className="absolute bottom-3 right-3 z-[1000] max-w-sm rounded-2xl border border-teal-300 bg-white/95 p-3.5 shadow-2xl backdrop-blur-md text-xs space-y-2 animate-fadeIn">
+          <div className="flex items-center justify-between">
+            <span className="font-extrabold text-teal-900 text-xs flex items-center gap-1.5">
+              <Satellite className="h-4 w-4 text-teal-600" />
+              Groundwater Coverage Map Layer
+            </span>
+            <button
+              onClick={() => setShowCoverageLayer(false)}
+              className="text-stone-400 hover:text-stone-700 text-xs font-bold cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+          <p className="text-[11px] text-stone-600 leading-snug">
+            Locations within <strong>15.0 km</strong> of an observation well receive direct DWLR telemetry. Other areas use satellite-assisted spatial estimation.
+          </p>
+          <div className="grid grid-cols-2 gap-2 text-[10px] pt-1 border-t border-stone-100 font-medium">
+            <div className="flex items-center gap-1.5 text-blue-800">
+              <Radio className="h-3 w-3 text-blue-600" />
+              <span>Direct DWLR</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-teal-800">
+              <Satellite className="h-3 w-3 text-teal-600" />
+              <span>Satellite-Assisted</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

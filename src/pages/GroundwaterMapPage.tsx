@@ -13,6 +13,7 @@ import { StationCard } from '../components/station/StationCard';
 import { PageHeader } from '../components/common/PageHeader';
 import { EmptyState, LoadingState } from '../components/common/States';
 import { STATE_CENTERS } from '../utils/geoUtils';
+import { UnifiedGroundwaterPanel } from '../components/groundwater/UnifiedGroundwaterPanel';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
@@ -26,6 +27,9 @@ export const GroundwaterMapPage: React.FC = () => {
   const [allStations, setAllStations] = useState<DWLRStation[]>([]);
   const [filteredStations, setFilteredStations] = useState<DWLRStation[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Satellite Groundwater Panel State (Phase N)
+  const [selectedCoordsForSatellite, setSelectedCoordsForSatellite] = useState<{ lat: number; lng: number } | null>(null);
 
   // Filter States
   const [statesList, setStatesList] = useState<string[]>(['All States']);
@@ -247,6 +251,7 @@ export const GroundwaterMapPage: React.FC = () => {
             onSelectStation={(st) => setActiveStation(st)}
             onViewStationDetails={(st) => onSelectStation(st)}
             onUserLocationFound={handleUserLocationFound}
+            onSelectLocationCoords={(lat, lng) => setSelectedCoordsForSatellite({ lat, lng })}
             panToCoords={panToCoords}
             height="620px"
           />
@@ -295,6 +300,15 @@ export const GroundwaterMapPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Unified Groundwater Intelligence Panel Modal (Phase O) */}
+      {selectedCoordsForSatellite && (
+        <UnifiedGroundwaterPanel
+          latitude={selectedCoordsForSatellite.lat}
+          longitude={selectedCoordsForSatellite.lng}
+          onClose={() => setSelectedCoordsForSatellite(null)}
+        />
+      )}
     </div>
   );
 };

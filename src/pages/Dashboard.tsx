@@ -19,9 +19,13 @@ import { GroundwaterAlertsFeed } from '../components/dashboard/GroundwaterAlerts
 import { AreasToWatchTable } from '../components/dashboard/AreasToWatchTable';
 import { MiniMapPreview } from '../components/dashboard/MiniMapPreview';
 import { QuickActionsGrid } from '../components/dashboard/QuickActionsGrid';
+import { GroundwaterCoverageCard } from '../components/dashboard/GroundwaterCoverageCard';
 
 // Executive Water Brief
 import { ExecutiveWaterBrief } from '../components/intelligence/ExecutiveWaterBrief';
+
+import { FarmerVoiceAssistant } from '../components/voice/FarmerVoiceAssistant';
+import { useLanguage } from '../context/LanguageContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
@@ -29,6 +33,7 @@ interface OutletContextType {
 
 export const Dashboard: React.FC = () => {
   const { onSelectStation } = useOutletContext<OutletContextType>();
+  const { currentLanguage } = useLanguage();
 
   const [metrics, setMetrics] = useState<DashboardSummary | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState('Just now');
@@ -98,6 +103,9 @@ export const Dashboard: React.FC = () => {
       {/* 2. Executive Water Situation Brief */}
       <ExecutiveWaterBrief />
 
+      {/* 2.5 Phase P Multilingual Farmer Voice Assistant */}
+      <FarmerVoiceAssistant currentLanguage={currentLanguage} />
+
       {/* 3. Your Water Situation Card */}
       <WaterSituationCard metrics={metrics} />
 
@@ -122,6 +130,9 @@ export const Dashboard: React.FC = () => {
           <AreasToWatchTable onSelectStation={handleOpenStationById} />
         </div>
       </div>
+
+      {/* 7.5 Spatial Groundwater Intelligence Coverage (Phase N) */}
+      <GroundwaterCoverageCard />
 
       {/* 8. Mini Map Preview */}
       <MiniMapPreview onSelectStation={onSelectStation} />

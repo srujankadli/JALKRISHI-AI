@@ -20,6 +20,10 @@ from app.routers.whatsapp import router as whatsapp_router
 from app.routers.data_pipeline import router as data_pipeline_router
 from app.routers.insights import router as insights_router
 from app.routers.auth import router as auth_router
+from app.routers.satellite_groundwater import router as satellite_groundwater_router
+from app.routers.farmer_intelligence import router as farmer_intelligence_router
+from app.routers.provider_resilience import router as provider_resilience_router
+from app.routers.voice import router as voice_router
 
 # Initialize Logging
 setup_logging()
@@ -102,12 +106,19 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     req_id = getattr(request.state, "request_id", "unknown")
     logger.warning(f"Validation Error: {exc.errors()} [{req_id}]")
+    sanitized_issues = []
+    for err in exc.errors():
+        err_copy = dict(err)
+        if "input" in err_copy and isinstance(err_copy["input"], bytes):
+            err_copy["input"] = f"<bytes len={len(err_copy['input'])}>"
+        sanitized_issues.append(err_copy)
+
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "error": "Validation Error",
             "detail": "Invalid request parameter format or value payload.",
-            "issues": exc.errors(),
+            "issues": sanitized_issues,
             "status_code": 422,
             "request_id": req_id,
             "timestamp": datetime.utcnow().isoformat() + "Z",
@@ -147,6 +158,14 @@ app.include_router(whatsapp_router, prefix=settings.API_V1_STR)
 app.include_router(whatsapp_router, prefix="/api")
 app.include_router(data_pipeline_router, prefix=settings.API_V1_STR)
 app.include_router(data_pipeline_router, prefix="/api")
+app.include_router(satellite_groundwater_router, prefix=settings.API_V1_STR)
+app.include_router(satellite_groundwater_router, prefix="/api")
+app.include_router(farmer_intelligence_router, prefix=settings.API_V1_STR)
+app.include_router(farmer_intelligence_router, prefix="/api")
+app.include_router(provider_resilience_router, prefix=settings.API_V1_STR)
+app.include_router(provider_resilience_router, prefix="/api")
+app.include_router(voice_router, prefix=settings.API_V1_STR)
+app.include_router(voice_router, prefix="/api")
 
 
 @app.get("/", summary="Root Overview")

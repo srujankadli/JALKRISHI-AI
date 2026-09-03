@@ -6,32 +6,37 @@ import {
   Lock,
   Eye,
   EyeOff,
-  ShieldCheck,
-  Radio,
   ArrowRight,
-  UserCheck,
-  Building2,
   Sprout,
-  HelpCircle,
-  X,
+  Building2,
+  Phone,
+  AlertCircle,
   CheckCircle2,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageSelector } from '../components/common/LanguageSelector';
 import { APP_CONFIG } from '../utils/constants';
 
-type UserRole = 'hydrogeologist' | 'officer' | 'kvk' | 'farmer';
+type LoginTab = 'FARMER' | 'OFFICIAL';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, quickLogin, isLoading } = useAuth();
+  const { login, isLoading } = useAuth();
+  const { currentLanguage, setLanguage } = useLanguage();
 
+  const [activeTab, setActiveTab] = useState<LoginTab>('FARMER');
+
+  // Official Form State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('hydrogeologist');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
-  
+
+  // Farmer Form State
+  const [farmerPhoneOrEmail, setFarmerPhoneOrEmail] = useState('');
+
   const [errorMsg, setErrorMsg] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
@@ -40,7 +45,7 @@ export const LoginPage: React.FC = () => {
 
   const fromPath = (location.state as any)?.from?.pathname || '/';
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleOfficialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -57,31 +62,34 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    const success = await login(email, password, role);
-    if (success) {
-      setIsSuccess(true);
-      setTimeout(() => {
-        navigate(fromPath, { replace: true });
-      }, 700);
-    } else {
-      setErrorMsg('Authentication failed. Please verify credentials or select a Quick Access Account.');
-    }
-  };
-
-  const handleQuickAccount = async (targetEmail: string, targetRole: UserRole) => {
-    setErrorMsg('');
-    setEmail(targetEmail);
-    setPassword('jalkrishi2026');
-    setRole(targetRole);
-
-    const success = await quickLogin(targetEmail);
+    const success = await login(email, password, 'officer');
     if (success) {
       setIsSuccess(true);
       setTimeout(() => {
         navigate(fromPath, { replace: true });
       }, 600);
+    } else {
+      setErrorMsg('Authentication failed. Please verify official credentials.');
     }
   };
+
+  const handleFarmerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    const input = farmerPhoneOrEmail.trim() || 'farmer@jalkrishi.in';
+
+    const success = await login(input, 'farmer123', 'farmer');
+    if (success) {
+      setIsSuccess(true);
+      setTimeout(() => {
+        navigate(fromPath, { replace: true });
+      }, 600);
+    } else {
+      setErrorMsg('Farmer login failed. Please try again.');
+    }
+  };
+
 
   const handleForgotPasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,364 +106,269 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col justify-between relative overflow-hidden select-none font-sans">
       {/* Background Animated Water Aquifer Gradients & Light Orbs */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(13,148,136,0.25),rgba(2,6,23,0.95))]" />
-      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl pointer-events-none animate-pulse" />
-      <div className="absolute bottom-10 -right-20 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none animate-pulse" />
-      
-      {/* Subtle Vector Aquifer Grid Lines */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-25 pointer-events-none" />
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-600/15 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl" />
+        {/* Subtle Hydrographic Water Wave Lines */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `radial-gradient(#38bdf8 1px, transparent 1px)`,
+            backgroundSize: '24px 24px',
+          }}
+        />
+      </div>
 
-      {/* Top Bar Navigation */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      {/* Top Header */}
+      <header className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-slate-950 shadow-lg shadow-teal-500/20">
-            <Droplets className="h-6 w-6 text-slate-950 fill-slate-950" />
+          <div className="h-10 w-10 rounded-2xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-teal-400 shadow-inner">
+            <Droplets className="h-6 w-6" />
           </div>
           <div>
-            <span className="font-extrabold text-white text-lg tracking-tight flex items-center gap-2">
+            <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
               {APP_CONFIG.appName}
               <span className="text-[10px] font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded-full">
-                {APP_CONFIG.version}
+                v2.6
               </span>
-            </span>
-            <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
-              {APP_CONFIG.tagline}
-            </p>
+            </h1>
+            <p className="text-xs text-slate-400 font-medium">Know Your Water. Grow Smarter.</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900/80 border border-slate-800 px-3 py-1.5 rounded-full text-xs text-slate-300">
-            <Radio className="h-3.5 w-3.5 text-teal-400 animate-pulse" />
-            <span>DWLR Network: <strong>5,260 Stations</strong></span>
-          </div>
+          {/* Multilingual Global Language Selector */}
+          <LanguageSelector currentLanguage={currentLanguage} onLanguageChange={setLanguage} />
         </div>
       </header>
 
-      {/* Main Content Split Screen Container */}
-      <main className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8 flex-1 flex items-center justify-center">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
-          
-          {/* Left Column: Environmental Platform Hero Presentation */}
-          <div className="lg:col-span-6 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-teal-500/30 text-teal-300 text-xs font-semibold">
-              <ShieldCheck className="h-4 w-4 text-emerald-400" />
-              <span>National DWLR Hydro-Telemetry Network</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
-              Real-Time <span className="bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-300 bg-clip-text text-transparent">Groundwater</span> Evaluation Platform
-            </h1>
-
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-normal">
-              Empowering government hydrogeologists, water resource planners, and farmers with automated DWLR piezometer quality control, 30-day hydrodynamic forecasts, statistical anomaly triage, and crop sowing intelligence.
-            </p>
-
-            {/* Platform Stats Grid */}
-            <div className="grid grid-cols-3 gap-3 pt-2">
-              <div className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800 backdrop-blur-md">
-                <span className="text-xl sm:text-2xl font-black text-teal-400 block font-mono">5,260</span>
-                <span className="text-[11px] text-slate-400 font-medium">Observation Wells</span>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800 backdrop-blur-md">
-                <span className="text-xl sm:text-2xl font-black text-emerald-400 block font-mono">100%</span>
-                <span className="text-[11px] text-slate-400 font-medium">Quality Score</span>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800 backdrop-blur-md">
-                <span className="text-xl sm:text-2xl font-black text-cyan-400 block font-mono">37</span>
-                <span className="text-[11px] text-slate-400 font-medium">States &amp; UTs</span>
-              </div>
-            </div>
-
-            {/* Key Capabilities Checklist */}
-            <div className="space-y-2 pt-1 text-xs text-slate-300">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-teal-400 flex-shrink-0" />
-                <span>Automated 12-rule DWLR telemetry quality audit &amp; spike filtering</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-                <span>Hydrodynamic 30/60/90-day depletion forecasting with Days-to-Critical</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-cyan-400 flex-shrink-0" />
-                <span>Farmer-first WhatsApp chatbot &amp; groundwater-aware crop advisor</span>
-              </div>
-            </div>
+      {/* Main Authentication Container */}
+      <main className="relative z-10 w-full max-w-md mx-auto px-4 my-8">
+        <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
+          {/* Section Selector Tabs */}
+          <div className="grid grid-cols-2 p-1.5 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs font-bold">
+            <button
+              onClick={() => {
+                setActiveTab('FARMER');
+                setErrorMsg('');
+              }}
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-xl transition-all cursor-pointer ${
+                activeTab === 'FARMER'
+                  ? 'bg-teal-600 text-white shadow-md font-black'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Sprout className="h-4 w-4" />
+              <span>🌾 Farmer</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('OFFICIAL');
+                setErrorMsg('');
+              }}
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-xl transition-all cursor-pointer ${
+                activeTab === 'OFFICIAL'
+                  ? 'bg-blue-600 text-white shadow-md font-black'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Building2 className="h-4 w-4" />
+              <span>🏛 Official</span>
+            </button>
           </div>
 
-          {/* Right Column: Premium Interactive Glassmorphism Login Card */}
-          <div className="lg:col-span-6 flex justify-center">
-            <div className="w-full max-w-md bg-slate-900/85 backdrop-blur-2xl border border-teal-500/25 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-teal-950/50 space-y-6 relative overflow-hidden">
-              
-              {/* Card Top Ambient Glow */}
-              <div className="absolute -top-24 -right-24 w-48 h-48 bg-teal-500/20 rounded-full blur-2xl pointer-events-none" />
+          {/* Form Header */}
+          <div className="text-center space-y-1">
+            <h2 className="text-xl font-black text-white">
+              {activeTab === 'FARMER' ? 'Farmer Decision Support Login' : 'Government Official Console'}
+            </h2>
+            <p className="text-xs text-slate-400 font-medium">
+              {activeTab === 'FARMER'
+                ? 'Crop • Irrigation • Groundwater • Voice Advice'
+                : 'Stations • Maps • Forecasts • Risk • Data Resilience'}
+            </p>
+          </div>
 
-              {/* Login Card Header */}
-              <div className="text-center space-y-1 relative z-10">
-                <div className="inline-flex h-12 w-12 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 text-slate-950 items-center justify-center shadow-lg shadow-teal-500/30 mb-2">
-                  <Droplets className="h-7 w-7 text-slate-950 fill-slate-950" />
+          {/* Success Banner */}
+          {isSuccess && (
+            <div className="p-3.5 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>Session Authenticated. Loading JalKrishi Platform...</span>
+            </div>
+          )}
+
+          {/* Error Banner */}
+          {errorMsg && (
+            <div className="p-3.5 rounded-2xl bg-rose-950/80 border border-rose-500/40 text-rose-300 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in">
+              <AlertCircle className="h-4 w-4 text-rose-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {/* TAB 1: FARMER LOGIN FORM */}
+          {activeTab === 'FARMER' && (
+            <form onSubmit={handleFarmerSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                  <span>Mobile Number or Email</span>
+                  <span className="text-[10px] text-slate-500">Fast Registration</span>
+                </label>
+                <div className="relative">
+                  <Phone className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+                  <input
+                    type="text"
+                    value={farmerPhoneOrEmail}
+                    onChange={(e) => setFarmerPhoneOrEmail(e.target.value)}
+                    placeholder="Enter 10-digit mobile number or email..."
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none transition-all"
+                  />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  Groundwater Intelligence Login
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Sign in to access DWLR telemetry, forecasts &amp; risk models
+              </div>
+
+              {/* Status Notice on SMS OTP Provider */}
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                <div className="flex items-center justify-between text-slate-300 font-bold">
+                  <span>SMS OTP Verification Status</span>
+                  <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
+                    NOT_CONFIGURED
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-500 leading-relaxed">
+                  SMS OTP gateway is not configured in current deployment environment. Authenticating directly via JalKrishi Farmer account credentials.
                 </p>
               </div>
 
-              {/* Role Selection Tabs */}
-              <div className="grid grid-cols-3 gap-1 p-1 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setRole('hydrogeologist')}
-                  className={`py-2 px-2 rounded-lg font-bold transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                    role === 'hydrogeologist'
-                      ? 'bg-teal-500 text-slate-950 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <UserCheck className="h-3.5 w-3.5" />
-                  <span className="text-[10px]">Hydrogeologist</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('officer')}
-                  className={`py-2 px-2 rounded-lg font-bold transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                    role === 'officer'
-                      ? 'bg-teal-500 text-slate-950 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Building2 className="h-3.5 w-3.5" />
-                  <span className="text-[10px]">Jal Officer</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('farmer')}
-                  className={`py-2 px-2 rounded-lg font-bold transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                    role === 'farmer'
-                      ? 'bg-teal-500 text-slate-950 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Sprout className="h-3.5 w-3.5" />
-                  <span className="text-[10px]">KVK / Farmer</span>
-                </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-lg shadow-teal-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Continue as Farmer</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
+          )}
+
+          {/* TAB 2: GOVERNMENT OFFICIAL LOGIN FORM */}
+          {activeTab === 'OFFICIAL' && (
+            <form onSubmit={handleOfficialSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300">Official Email or ID</label>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="official@jalkrishi.gov.in"
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-all"
+                  />
+                </div>
               </div>
 
-              {/* Error Message Box */}
-              {errorMsg && (
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold animate-shake">
-                  {errorMsg}
-                </div>
-              )}
-
-              {/* Authentication Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                
-                {/* Email / Username Input */}
-                <div className="space-y-1 text-left">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
-                    <span>Official Email / Username</span>
-                    <span className="text-[10px] text-teal-400">Required</span>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                      <Mail className="h-4 w-4" />
-                    </div>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. admin@jalkrishi.gov.in"
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-950/80 border border-slate-700/80 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 rounded-xl text-xs font-medium text-white placeholder-slate-500 transition-all outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Password Input */}
-                <div className="space-y-1 text-left">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-slate-300">Password</label>
-                    <button
-                      type="button"
-                      onClick={() => setShowForgotPasswordModal(true)}
-                      className="text-[11px] text-teal-400 hover:text-teal-300 hover:underline cursor-pointer font-medium"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                      <Lock className="h-4 w-4" />
-                    </div>
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter password (min 4 chars)"
-                      className="w-full pl-10 pr-10 py-2.5 bg-slate-950/80 border border-slate-700/80 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 rounded-xl text-xs font-medium text-white placeholder-slate-500 transition-all outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200 cursor-pointer"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember Me Option */}
-                <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded border-slate-700 bg-slate-950 text-teal-500 focus:ring-teal-400/20 h-4 w-4 cursor-pointer"
-                    />
-                    <span>Remember my session</span>
-                  </label>
-                </div>
-
-                {/* Submit Login Button */}
-                <button
-                  type="submit"
-                  disabled={isLoading || isSuccess}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl transition-all shadow-lg shadow-teal-500/25 active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {isSuccess ? (
-                    <>
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>Authenticated! Redirecting...</span>
-                    </>
-                  ) : isLoading ? (
-                    <>
-                      <span className="h-4 w-4 rounded-full border-2 border-slate-950 border-t-transparent animate-spin" />
-                      <span>Authenticating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Access Groundwater Intelligence</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              {/* Quick Role Accounts Launcher */}
-              <div className="space-y-2 pt-2 border-t border-slate-800 text-left">
-                <span className="text-[11px] font-bold text-slate-400 block">
-                  ⚡ Quick Role Accounts:
-                </span>
-                
-                <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-300">Password</label>
                   <button
                     type="button"
-                    onClick={() => handleQuickAccount('admin@jalkrishi.gov.in', 'hydrogeologist')}
-                    className="p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left transition-all cursor-pointer group"
+                    onClick={() => setShowForgotPasswordModal(true)}
+                    className="text-[11px] text-blue-400 hover:text-blue-300 font-medium cursor-pointer"
                   >
-                    <span className="text-[11px] font-bold text-teal-300 block group-hover:text-teal-200">
-                      Chief Hydrogeologist
-                    </span>
-                    <span className="text-[10px] text-slate-400 block font-mono">admin@jalkrishi.gov.in</span>
+                    Forgot Password?
                   </button>
-
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password..."
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-all"
+                  />
                   <button
                     type="button"
-                    onClick={() => handleQuickAccount('officer@jalkrishi.gov.in', 'officer')}
-                    className="p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left transition-all cursor-pointer group"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-3 text-slate-500 hover:text-slate-300 cursor-pointer"
                   >
-                    <span className="text-[11px] font-bold text-emerald-300 block group-hover:text-emerald-200">
-                      Senior Water Officer
-                    </span>
-                    <span className="text-[10px] text-slate-400 block font-mono">officer@jalkrishi.gov.in</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickAccount('kvk@jalkrishi.gov.in', 'kvk')}
-                    className="p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left transition-all cursor-pointer group"
-                  >
-                    <span className="text-[11px] font-bold text-cyan-300 block group-hover:text-cyan-200">
-                      KVK Scientist
-                    </span>
-                    <span className="text-[10px] text-slate-400 block font-mono">kvk@jalkrishi.gov.in</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickAccount('farmer@jalkrishi.in', 'farmer')}
-                    className="p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left transition-all cursor-pointer group"
-                  >
-                    <span className="text-[11px] font-bold text-amber-300 block group-hover:text-amber-200">
-                      Progressive Farmer
-                    </span>
-                    <span className="text-[10px] text-slate-400 block font-mono">farmer@jalkrishi.in</span>
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-            </div>
-          </div>
+              {/* 2FA Status Notice */}
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                <div className="flex items-center justify-between text-slate-300 font-bold">
+                  <span>2FA Security Gate</span>
+                  <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
+                    NOT_CONFIGURED
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-500 leading-relaxed">
+                  2FA provider is not configured. Authenticating via verified government credentials.
+                </p>
+              </div>
 
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Official Login</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
+          )}
         </div>
       </main>
 
-      {/* Footer Branding & Disclaimer */}
-      <footer className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-900 text-xs text-slate-500">
-        <div>
-          <span>&copy; 2026 {APP_CONFIG.appName} Platform</span>
-        </div>
-        <div className="flex items-center gap-3 text-[11px]">
-          <span>Data Mode: <strong className="text-teal-400">SIMULATED_TELEMETRY</strong></span>
-          <span>&bull;</span>
-          <span>5,260 Active Observation Wells</span>
+      {/* Footer Data Honesty Notice */}
+      <footer className="relative z-10 w-full max-w-7xl mx-auto px-4 py-4 text-center border-t border-slate-900 text-slate-500 text-[11px]">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span>JalKrishi Reference DWLR Network: 5,260 Observation Points (Simulated Telemetry)</span>
+          <span>Authentication Protocol &amp; Role-Based Access Control (RBAC) Active</span>
         </div>
       </footer>
 
       {/* Forgot Password Modal */}
       {showForgotPasswordModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-slate-800 p-6 space-y-4 text-left relative">
             <button
               onClick={() => setShowForgotPasswordModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-300 cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <div className="space-y-1">
-              <div className="h-10 w-10 rounded-2xl bg-teal-500/20 text-teal-300 flex items-center justify-center mb-2">
-                <HelpCircle className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-black text-white">Reset Official Password</h3>
-              <p className="text-xs text-slate-400">
-                Enter your registered government email address to receive password reset instructions.
-              </p>
-            </div>
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <Lock className="h-4 w-4 text-blue-400" />
+              Password Reset Request
+            </h3>
 
             {forgotSubmitted ? (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold text-center">
-                Password reset instructions dispatched to your email!
+              <div className="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+                Reset instructions sent if email is registered.
               </div>
             ) : (
               <form onSubmit={handleForgotPasswordSubmit} className="space-y-3">
+                <p className="text-xs text-slate-400">
+                  Enter your registered official email address to receive password reset instructions.
+                </p>
                 <input
                   type="email"
-                  required
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="Enter email address"
-                  className="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 focus:border-teal-400 rounded-xl text-xs text-white outline-none"
+                  placeholder="name@jalkrishi.gov.in"
+                  required
+                  className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2 text-xs text-white focus:border-blue-500 focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="w-full py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs cursor-pointer"
                 >
-                  Send Reset Instructions
+                  Send Reset Link
                 </button>
               </form>
             )}

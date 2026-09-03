@@ -982,15 +982,29 @@ class LoginRequest(BaseModel):
     role: Optional[str] = Field("hydrogeologist", description="Role selection")
 
 
+class UserRoleEnum(str, Enum):
+    FARMER = "FARMER"
+    READ_ONLY_OFFICIAL = "READ_ONLY_OFFICIAL"
+    DISTRICT_OFFICIAL = "DISTRICT_OFFICIAL"
+    STATE_OFFICIAL = "STATE_OFFICIAL"
+    HYDROLOGIST_ANALYST = "HYDROLOGIST_ANALYST"
+    ADMIN = "ADMIN"
+
+
 class UserProfile(BaseModel):
     id: str
     name: str
     email: str
     role: str
+    system_role: UserRoleEnum = Field(UserRoleEnum.FARMER, description="Authoritative backend role")
     organization: str
     department: str
     assigned_state: Optional[str] = "All India"
     avatar_initials: str = "JA"
+    phone: Optional[str] = None
+    preferred_language: str = "en"
+    farm_latitude: Optional[float] = None
+    farm_longitude: Optional[float] = None
 
 
 class LoginResponse(BaseModel):
@@ -998,4 +1012,207 @@ class LoginResponse(BaseModel):
     token_type: str = "bearer"
     user: UserProfile
     data_mode: str = "DEMO_SIMULATION"
+
+
+# ==========================================
+# 12. Satellite-Assisted Groundwater Schemas
+# ==========================================
+
+class IndicatorItemSchema(BaseModel):
+    name: str = Field(..., description="Name of indicator")
+    value: Union[float, str] = Field(..., description="Observed or simulated indicator value")
+    unit: str = Field(..., description="Unit of measurement")
+    status: str = Field(..., description="Status e.g. NORMAL, ELEVATED_STRESS, CRITICAL")
+    source: str = Field(..., description="Source e.g. REMOTE_SENSING_SIMULATION")
+    confidence: str = Field("MEDIUM", description="Confidence level: HIGH | MEDIUM | LOW")
+    description: str = Field(..., description="Plain language explanation of signal")
+
+
+class SatelliteGroundwaterEstimateResponse(BaseModel):
+    latitude: float = Field(..., description="Target query latitude")
+    longitude: float = Field(..., description="Target query longitude")
+    dwlr_available: bool = Field(..., description="Whether direct DWLR observation is available within coverage radius")
+    nearest_station_id: Optional[str] = Field(None, description="Station ID of nearest DWLR well")
+    nearest_station_name: Optional[str] = Field(None, description="Station name of nearest DWLR well")
+    nearest_station_distance_km: float = Field(..., description="Distance to nearest DWLR station in kilometers")
+    estimation_mode: str = Field(..., description="DIRECT_DWLR or SATELLITE_ASSISTED")
+    groundwater_condition: str = Field(..., description="LOW_STRESS | MODERATE_STRESS | HIGH_STRESS | CRITICAL_STRESS")
+    groundwater_stress_score: float = Field(..., description="Stress index from 0.0 (safe) to 1.0 (critical)")
+    estimated_trend: str = Field(..., description="RISING | STABLE | FALLING")
+    confidence: str = Field(..., description="HIGH | MEDIUM | LOW")
+    confidence_score: float = Field(..., description="Confidence index from 0.0 to 1.0")
+    rainfall_condition: str = Field("NORMAL", description="Rainfall signal: DEFICIT | NORMAL | EXCESS")
+    rainfall_probability: float = Field(..., description="Estimated rainfall probability (0-100%)")
+    rainfall_mm_estimate: float = Field(..., description="Estimated 30-day precipitation in mm")
+    recharge_outlook: str = Field(..., description="Recharge outlook: POOR | MODERATE | GOOD | EXCELLENT")
+    indicators: Dict[str, IndicatorItemSchema] = Field(default_factory=dict, description="Supporting indicators")
+    data_sources: List[str] = Field(default_factory=list, description="Data sources used for estimation")
+    timestamp: str = Field(..., description="ISO timestamp of estimate calculation")
+    disclaimer: str = Field(..., description="Scientific disclaimer on satellite estimation vs direct measurement")
+    data_mode: str = Field("DEMO_SIMULATION", description="Data provenance mode")
+
+
+class SatelliteGroundwaterCoverageResponse(BaseModel):
+    latitude: float
+    longitude: float
+    dwlr_available: bool
+    coverage_type: str  # Direct DWLR Measurement | Satellite-Assisted Estimate
+    radius_km: float
+    nearest_station_id: Optional[str] = None
+    nearest_station_distance_km: float
+    confidence_level: str
+    data_mode: str = "DEMO_SIMULATION"
+
+
+class SatelliteProviderSourceSchema(BaseModel):
+    provider_name: str
+    category: str
+    status: str  # CONFIGURED | NOT_CONFIGURED | SIMULATED
+    description: str
     disclaimer: str = "Demo Simulation Mode: Authenticated session established under JalKrishi AI security policy."
+
+
+# ==========================================
+# 13. Unified Groundwater & Farmer Intelligence Schemas
+# ==========================================
+
+class GroundwaterIntelligenceSchema(BaseModel):
+    latitude: float = Field(..., description="Query latitude")
+    longitude: float = Field(..., description="Query longitude")
+    coverage_type: str = Field(..., description="Direct DWLR Measurement | Satellite-Assisted Estimate")
+    estimation_mode: str = Field(..., description="DIRECT_DWLR | SATELLITE_ASSISTED")
+    groundwater_condition: str = Field(..., description="HEALTHY | LOW_STRESS | MODERATE_STRESS | HIGH_STRESS | CRITICAL_STRESS")
+    current_groundwater_signal: str = Field(..., description="Human-readable depth or stress signal")
+    trend: str = Field(..., description="RISING | STABLE | FALLING")
+    forecast_summary: str = Field(..., description="Unified 30-day hydrogeological forecast or outlook summary")
+    forecast_30d_water_level: Optional[float] = Field(None, description="Inferred or predicted water level depth in mbgl if available")
+    estimated_depth_range: Optional[str] = Field(None, description="Depth range e.g. 13-17 m bgl (Model-Derived Estimate)")
+    forecast_confidence: str = Field(..., description="HIGH | MEDIUM | LOW (propagated uncertainty)")
+    stress_score: float = Field(..., description="Aquifer stress index 0.0 to 1.0")
+    recharge_outlook: str = Field(..., description="EXCELLENT | GOOD | MODERATE | POOR")
+    recharge_score: float = Field(..., description="Infiltration score 0.0 to 1.0")
+    nearest_station_id: Optional[str] = Field(None, description="Station code of nearest DWLR well")
+    nearest_station_name: Optional[str] = Field(None, description="Station name of nearest DWLR well")
+    nearest_station_distance_km: float = Field(..., description="Geodesic distance to nearest DWLR well")
+    remote_sensing_indicators: Dict[str, IndicatorItemSchema] = Field(default_factory=dict, description="Supporting remote sensing signals")
+    rainfall_signal: str = Field(..., description="30-day precipitation status")
+    risk_alerts: List[str] = Field(default_factory=list, description="Direct anomaly flags or spatial risk signals")
+    crop_implications: str = Field(..., description="Agronomic water availability implications for cropping")
+    irrigation_implications: str = Field(..., description="Water conservation & irrigation schedule caution")
+    farmer_recommendations: List[str] = Field(default_factory=list, description="3-5 concise actionable farmer recommendations")
+    recommended_crops: List[str] = Field(default_factory=list, description="Top water-smart crop recommendations")
+    confidence: str = Field(..., description="Overall pipeline confidence: HIGH | MEDIUM | LOW")
+    confidence_score: float = Field(..., description="Overall confidence index 0.0 to 1.0")
+    data_sources: List[str] = Field(default_factory=list, description="Data provenance list")
+    timestamp: str = Field(..., description="ISO timestamp")
+    disclaimer: str = Field(..., description="Data provenance & scientific transparency disclaimer")
+    data_mode: str = Field("DEMO_SIMULATION", description="Data mode")
+
+
+# ==========================================
+# 14. Data Provider Resilience Layer Schemas
+# ==========================================
+
+class ProviderTypeEnum(str, Enum):
+    GOVERNMENT_API = "GOVERNMENT_API"
+    DATASET_UPLOAD = "DATASET_UPLOAD"
+    REMOTE_SENSING = "REMOTE_SENSING"
+    WEATHER_PROVIDER = "WEATHER_PROVIDER"
+    SIMULATION = "SIMULATION"
+
+
+class ProviderStatusEnum(str, Enum):
+    LIVE = "LIVE"
+    ACTIVE = "ACTIVE"
+    AVAILABLE = "AVAILABLE"
+    AVAILABLE_CAPABILITY = "AVAILABLE_CAPABILITY"
+    NOT_CONFIGURED = "NOT_CONFIGURED"
+    FALLBACK = "FALLBACK"
+    ACTIVE_SIMULATION = "ACTIVE_SIMULATION"
+    ERROR = "ERROR"
+
+
+class ProviderMetadataSchema(BaseModel):
+    provider_name: str = Field(..., description="Name of data provider")
+    provider_type: ProviderTypeEnum = Field(..., description="Type category of data provider")
+    status: ProviderStatusEnum = Field(..., description="Operational status of data provider")
+    last_updated: str = Field(..., description="Human-readable timestamp of last update")
+    coverage: str = Field(..., description="Geographic or spatial coverage summary")
+    capabilities: List[str] = Field(default_factory=list, description="Supported provider capabilities")
+    message: str = Field(..., description="Transparent status message")
+    data_mode: str = Field("DEMO_SIMULATION", description="Data mode")
+
+
+class NormalizedDWLRObservation(BaseModel):
+    station_id: str = Field(..., description="Normalized station code")
+    station_name: str = Field(..., description="Normalized station name")
+    state: str = Field(..., description="State name")
+    district: str = Field(..., description="District name")
+    block: str = Field(..., description="Block name")
+    latitude: float = Field(..., description="Latitude coordinate")
+    longitude: float = Field(..., description="Longitude coordinate")
+    timestamp: str = Field(..., description="Observation timestamp")
+    groundwater_level_mbgl: float = Field(..., description="Depth in metres below ground level")
+    risk_score: float = Field(..., description="Risk score 0.0 to 1.0")
+    status: str = Field(..., description="Station status")
+    provider_source: str = Field(..., description="Name of provider supplying this reading")
+    data_mode: str = Field("DEMO_SIMULATION", description="Data mode")
+
+
+class SystemProviderMatrixResponse(BaseModel):
+    active_provider: ProviderMetadataSchema = Field(..., description="Currently active resolved DWLR provider")
+    providers: List[ProviderMetadataSchema] = Field(default_factory=list, description="All registered system data providers")
+    fallback_chain: List[str] = Field(default_factory=list, description="Ordered resolution fallback chain")
+    total_providers: int = Field(..., description="Count of registered providers")
+    data_mode: str = Field("DEMO_SIMULATION", description="Data mode")
+    disclaimer: str = Field(..., description="Data honesty disclaimer")
+
+
+# ==========================================
+# 15. Multilingual & Voice Assistant Schemas
+# ==========================================
+
+class LanguageConfigSchema(BaseModel):
+    language_code: str = Field(..., description="ISO language code (e.g. en, hi, bn, te, mr, ta, gu, kn, ml, pa, or, as, ur)")
+    display_name: str = Field(..., description="English display name")
+    native_name: str = Field(..., description="Native language script name")
+    speech_supported: bool = Field(True, description="Whether speech recognition is supported")
+    translation_supported: bool = Field(True, description="Whether translation is supported")
+    tts_supported: bool = Field(True, description="Whether text-to-speech is supported")
+    status: str = Field("CONFIGURED", description="Provider status for this language")
+
+
+class VoiceQueryRequest(BaseModel):
+    query: str = Field(..., description="Spoken or typed farmer query string")
+    latitude: Optional[float] = Field(None, description="Farm latitude coordinate")
+    longitude: Optional[float] = Field(None, description="Farm longitude coordinate")
+    language: str = Field("en", description="Farmer requested/interface language code")
+    audio_base64: Optional[str] = Field(None, description="Base64 encoded audio bytes if available")
+
+
+class VoiceQueryResponse(BaseModel):
+    query_text: str = Field(..., description="Transcribed or received query text")
+    detected_language: str = Field(..., description="Language code detected or requested")
+    farmer_response_language: str = Field(..., description="Language code of returned response")
+    text_response: str = Field(..., description="Formatted farmer-facing natural language response")
+    intelligence: GroundwaterIntelligenceSchema = Field(..., description="Structured hydrogeological decision support")
+    audio_url: Optional[str] = Field(None, description="Synthesized TTS audio URL if available")
+    voice_playback_available: bool = Field(False, description="Whether spoken audio playback is active")
+    stt_provider_status: str = Field("NOT_CONFIGURED", description="Speech-to-Text provider status")
+    tts_provider_status: str = Field("NOT_CONFIGURED", description="Text-to-Speech provider status")
+    translation_provider_status: str = Field("LOCAL_CORE_TRANSLATIONS", description="Translation provider status")
+    data_mode: str = Field("DEMO_SIMULATION", description="Data mode")
+    disclaimer: str = Field(..., description="Data honesty disclaimer")
+
+
+class TTSRequest(BaseModel):
+    text: str = Field(..., description="Text to synthesize")
+    language: str = Field("en", description="Target language code")
+
+
+class TTSResponse(BaseModel):
+    text: str = Field(..., description="Input text")
+    language: str = Field(..., description="Language code")
+    audio_url: Optional[str] = Field(None, description="Audio URL if synthesized")
+    status: str = Field("NOT_CONFIGURED", description="TTS provider status")
+    message: str = Field(..., description="Status message")

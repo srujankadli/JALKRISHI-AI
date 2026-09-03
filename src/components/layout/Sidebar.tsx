@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { APP_CONFIG } from '../../utils/constants';
 
+import { useLanguage } from '../../context/LanguageContext';
+
 interface SidebarProps {
   anomalyCount?: number;
   criticalStationCount?: number;
@@ -22,6 +24,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   anomalyCount = 4,
 }) => {
+  const { t } = useLanguage();
   const navItems = [
     {
       to: '/',
@@ -125,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-semibold text-emerald-900">DWLR Live Telemetry</span>
+            <span className="text-xs font-semibold text-emerald-900">DWLR Telemetry Network</span>
           </div>
           <span className="text-[11px] font-bold font-mono text-emerald-800">5,260 Nodes</span>
         </div>
@@ -158,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {item.emoji}
                     </span>
                     <div>
-                      <span className="block leading-tight">{item.label}</span>
+                      <span className="block leading-tight">{t(item.label)}</span>
                       <span
                         className={`text-[10px] block ${
                           isActive ? 'text-agri-100' : 'text-stone-400 group-hover:text-stone-500'

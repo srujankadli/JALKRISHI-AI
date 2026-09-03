@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     MAX_PAGINATION_LIMIT: int = 10000
     MAX_QUERY_STRING_LENGTH: int = 256
     
+    # Spatial & Coverage Settings
+    DWLR_COVERAGE_RADIUS_KM: float = 15.0
+    
     # System Runtime Stats
     BOOT_TIMESTAMP: float = time.time()
     

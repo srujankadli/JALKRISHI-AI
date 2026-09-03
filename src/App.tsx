@@ -11,30 +11,34 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { WhatsAppPage } from './pages/WhatsAppPage';
 import { HelpPage } from './pages/HelpPage';
 
+import { LanguageProvider } from './context/LanguageContext';
+
 export function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Standalone Login Route */}
-          <Route path="/login" element={<LoginPage />} />
+    <LanguageProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Standalone Login Route */}
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* Main Platform Shell Routes */}
-          <Route element={<AppShell />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/map" element={<GroundwaterMapPage />} />
-            <Route path="/forecast" element={<ForecastPage />} />
-            <Route path="/anomalies" element={<AnomaliesPage />} />
-            <Route path="/crops" element={<CropAdvisorPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/whatsapp" element={<WhatsAppPage />} />
-            <Route path="/help" element={<HelpPage />} />
-            {/* Catch-all redirect */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            {/* Main Platform Shell Routes */}
+            <Route element={<AppShell />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/map" element={<GroundwaterMapPage />} />
+              <Route path="/forecast" element={<ForecastPage />} />
+              <Route path="/anomalies" element={<AnomaliesPage />} />
+              <Route path="/crops" element={<CropAdvisorPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/whatsapp" element={<WhatsAppPage />} />
+              <Route path="/help" element={<HelpPage />} />
+              {/* Catch-all redirect */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

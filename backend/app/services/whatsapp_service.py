@@ -16,6 +16,7 @@ from app.pipeline.dwlr_ingest import station_repo
 from app.engines.forecasting import forecasting_engine
 from app.engines.anomaly_detector import anomaly_engine
 from app.engines.crop_recommender import crop_engine
+from app.engines.farmer_intelligence import farmer_intelligence_engine
 
 
 class ConversationSession:
@@ -363,52 +364,86 @@ class WhatsAppConversationalService:
         )
 
     def _build_water_status_response(self, session: ConversationSession, district: str, state: str, is_hindi: bool) -> WhatsAppWebhookResponse:
-        stations = station_repo.filter_stations(district=district)
-        if not stations:
-            stations = station_repo.filter_stations(state=state)
-        if not stations:
-            stations = station_repo.get_all()[:10]
+        district_stations = station_repo.filter_stations(district=district)
+        has_direct_dwlr = len(district_stations) > 0
 
-        total = len(stations)
-        avg_depth = round(sum(s.waterLevel for s in stations) / total, 1) if total > 0 else 24.5
-        avg_risk = round(sum(s.riskScore for s in stations) / total, 2) if total > 0 else 0.52
-        crit_count = sum(1 for s in stations if s.status.value == "critical")
-        warn_count = sum(1 for s in stations if s.status.value == "warning")
-        fall_count = sum(1 for s in stations if s.trend.value == "falling")
+        if not has_direct_dwlr:
+            # Fallback coordinate lookup for satellite estimation
+            lat, lon = 13.50, 78.50  # Default regional center fallback
+            intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(lat, lon)
 
-        status_emoji = "🔴" if crit_count > 0.2 * total else "🟠" if warn_count + crit_count > 0.3 * total else "🟢"
-        status_label_en = "Critical Stress" if crit_count > 0.2 * total else "Moderate / Warning" if warn_count + crit_count > 0.3 * total else "Safe & Favorable"
-        status_label_hi = "अति संवेदनशील (गंभीर संकट)" if crit_count > 0.2 * total else "मध्यम / सतर्कता" if warn_count + crit_count > 0.3 * total else "सुरक्षित व अनुकूल"
-
-        trend_label_en = "Falling (-0.2 m/mo)" if fall_count > 0.5 * total else "Stable"
-        trend_label_hi = "नीचे गिर रहा है (गिरावट)" if fall_count > 0.5 * total else "स्थिर"
-
-        if is_hindi:
-            reply = (
-                f"💧 *जलकृषि एआई — {district} ({state})*\n\n"
-                f"भूजल स्थिति: {status_emoji} *{status_label_hi}*\n"
-                f"📊 औसत गहराई: *{avg_depth} मीटर mbgl*\n"
-                f"📉 वर्तमान रुझान: *{trend_label_hi}*\n"
-                f"⚠️ जोखिम सूचकांक: *{int(avg_risk * 100)}/100* (निगरानी: {total} कुएं)\n\n"
-                f"💡 *किसान सलाह:*\n"
-                f"• {district} में भूजल स्तर नीचे जा रहा है। सिंचाई का समय रात में रखें।\n"
-                f"• अधिक पानी वाली धान/गन्ना की जगह कम पानी वाली दलहन/मक्का चुनें।\n"
-                f"• ड्रिप या स्प्रिंकलर से 35% पानी की बचत करें।\n\n"
-                f"_डेमो सिमुलेशन — रियल-टाइम DWLR टेलीमेट्री_"
-            )
+            if is_hindi:
+                reply = (
+                    f"🛰️ *जलकृषि एआई — {district} ({state})*\n"
+                    f"_आपकी स्थिति के पास कोई प्रत्यक्ष DWLR स्टेशन उपलब्ध नहीं है, इसलिए जलकृषि उपग्रह-सहायता प्राप्त भूजल बुद्धिमत्ता का उपयोग कर रहा है।_\n\n"
+                    f"कवरेज: *उपग्रह-सहायता प्राप्त अनुमान (Satellite-Assisted Estimate)*\n"
+                    f"📊 स्थिति: *{intel.groundwater_condition}* (तनाव सूचकांक: {intel.stress_score:.2f})\n"
+                    f"📉 रुझान: *{intel.trend}* | 🎯 मॉडल विश्वसनीयता: *{intel.confidence}*\n"
+                    f"🌧️ वर्षा संकेत: {intel.rainfall_signal}\n\n"
+                    f"💡 *किसान सलाह:*\n"
+                    f"• {intel.crop_implications}\n"
+                    f"• {intel.irrigation_implications}\n"
+                    f"• सुझाई गई फसलें: {', '.join(intel.recommended_crops[:3])}\n\n"
+                    f"_{intel.disclaimer}_"
+                )
+            else:
+                reply = (
+                    f"🛰️ *JalKrishi AI — {district} ({state})*\n"
+                    f"_There is no direct DWLR observation near your location, so JalKrishi is using satellite-assisted groundwater intelligence._\n\n"
+                    f"Coverage: *Satellite-Assisted Estimate*\n"
+                    f"📊 Condition: *{intel.groundwater_condition}* (Stress Score: {intel.stress_score:.2f})\n"
+                    f"📉 Trend: *{intel.trend}* | 🎯 Confidence: *{intel.confidence}*\n"
+                    f"🌧️ Rainfall Signal: {intel.rainfall_signal}\n\n"
+                    f"💡 *What this means for your farm:*\n"
+                    f"• {intel.crop_implications}\n"
+                    f"• {intel.irrigation_implications}\n"
+                    f"• Recommended Crops: {', '.join(intel.recommended_crops[:3])}\n\n"
+                    f"_{intel.disclaimer}_"
+                )
         else:
-            reply = (
-                f"💧 *JalKrishi AI — {district} ({state})*\n\n"
-                f"Water Status: {status_emoji} *{status_label_en}*\n"
-                f"📊 Current Depth: *{avg_depth} m mbgl*\n"
-                f"📉 Groundwater Trend: *{trend_label_en}*\n"
-                f"⚠️ Risk Index: *{int(avg_risk * 100)}/100* (Monitored wells: {total})\n\n"
-                f"💡 *What this means for your farm:*\n"
-                f"• The water table is depleting. Continuous tube-well pumping should be controlled.\n"
-                f"• Prioritize water-efficient crops (Gram, Mustard, Millets) over flood irrigation.\n"
-                f"• Adopt drip/micro-sprinklers to reduce extraction load.\n\n"
-                f"_Demo Simulation — 5,260 Simulated DWLR Nodes_"
-            )
+            stations = district_stations
+            total = len(stations)
+            avg_depth = round(sum(s.waterLevel for s in stations) / total, 1) if total > 0 else 24.5
+            avg_risk = round(sum(s.riskScore for s in stations) / total, 2) if total > 0 else 0.52
+            crit_count = sum(1 for s in stations if s.status.value == "critical")
+            warn_count = sum(1 for s in stations if s.status.value == "warning")
+            fall_count = sum(1 for s in stations if s.trend.value == "falling")
+
+            status_emoji = "🔴" if crit_count > 0.2 * total else "🟠" if warn_count + crit_count > 0.3 * total else "🟢"
+            status_label_en = "Critical Stress" if crit_count > 0.2 * total else "Moderate / Warning" if warn_count + crit_count > 0.3 * total else "Safe & Favorable"
+            status_label_hi = "अति संवेदनशील (गंभीर संकट)" if crit_count > 0.2 * total else "मध्यम / सतर्कता" if warn_count + crit_count > 0.3 * total else "सुरक्षित व अनुकूल"
+
+            trend_label_en = "Falling (-0.2 m/mo)" if fall_count > 0.5 * total else "Stable"
+            trend_label_hi = "नीचे गिर रहा है (गिरावट)" if fall_count > 0.5 * total else "स्थिर"
+
+            if is_hindi:
+                reply = (
+                    f"💧 *जलकृषि एआई — {district} ({state})*\n\n"
+                    f"कवरेज: *प्रत्यक्ष DWLR मापन (Direct DWLR Measurement)*\n"
+                    f"भूजल स्थिति: {status_emoji} *{status_label_hi}*\n"
+                    f"📊 औसत गहराई: *{avg_depth} मीटर mbgl*\n"
+                    f"📉 वर्तमान रुझान: *{trend_label_hi}*\n"
+                    f"⚠️ जोखिम सूचकांक: *{int(avg_risk * 100)}/100* (निगरानी: {total} कुएं)\n\n"
+                    f"💡 *किसान सलाह:*\n"
+                    f"• {district} में भूजल स्तर नीचे जा रहा है। सिंचाई का समय रात में रखें।\n"
+                    f"• अधिक पानी वाली धान/गन्ना की जगह कम पानी वाली दलहन/मक्का चुनें।\n"
+                    f"• ड्रिप या स्प्रिंकलर से 35% पानी की बचत करें।\n\n"
+                    f"_डेमो सिमुलेशन — रियल-टाइम DWLR टेलीमेट्री_"
+                )
+            else:
+                reply = (
+                    f"💧 *JalKrishi AI — {district} ({state})*\n\n"
+                    f"Coverage: *Direct DWLR Measurement*\n"
+                    f"Water Status: {status_emoji} *{status_label_en}*\n"
+                    f"📊 Current Depth: *{avg_depth} m mbgl*\n"
+                    f"📉 Groundwater Trend: *{trend_label_en}*\n"
+                    f"⚠️ Risk Index: *{int(avg_risk * 100)}/100* (Monitored wells: {total})\n\n"
+                    f"💡 *What this means for your farm:*\n"
+                    f"• The water table is depleting. Continuous tube-well pumping should be controlled.\n"
+                    f"• Prioritize water-efficient crops (Gram, Mustard, Millets) over flood irrigation.\n"
+                    f"• Adopt drip/micro-sprinklers to reduce extraction load.\n\n"
+                    f"_Demo Simulation — 5,260 Simulated DWLR Nodes_"
+                )
 
         actions = [
             WhatsAppAction(label="🔮 View Forecast", action="forecast", payload={"district": district}),

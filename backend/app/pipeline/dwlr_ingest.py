@@ -967,6 +967,18 @@ class DWLRStationRepository:
         self.initialize()
         return self._stations
 
+    def set_custom_stations(self, stations: List[DWLRStationSchema]):
+        """Sets custom uploaded station dataset as active station network."""
+        self._stations = stations
+        self._station_map = {s.id.lower(): s for s in stations}
+        for s in stations:
+            self._station_map[s.stationCode.lower()] = s
+        self._initialized = True
+
+    def reset_to_default(self):
+        """Resets active station repository back to reference simulation loader."""
+        self.reload()
+
     def get_all(self) -> List[DWLRStationSchema]:
         self.initialize()
         return self._stations

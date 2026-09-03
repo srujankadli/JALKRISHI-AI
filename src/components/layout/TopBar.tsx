@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Menu,
   X,
@@ -9,6 +9,9 @@ import {
 import { APP_CONFIG } from '../../utils/constants';
 import { BackendStatusBadge } from '../common/BackendStatusBadge';
 import { UserMenu } from './UserMenu';
+import { LanguageSelector } from '../common/LanguageSelector';
+
+import { useLanguage } from '../../context/LanguageContext';
 
 interface TopBarProps {
   onToggleMobileNav: () => void;
@@ -23,7 +26,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   onOpenNotifications,
   unreadAlertCount = 4,
 }) => {
-  const [selectedLanguage, setSelectedLanguage] = useState<'EN' | 'HI' | 'PA' | 'MR'>('EN');
+  const { currentLanguage, setLanguage } = useLanguage();
 
   return (
     <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-stone-200 bg-white/95 px-4 backdrop-blur-md sm:px-6">
@@ -51,7 +54,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         <div className="hidden lg:flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-water-50 border border-water-200 px-3 py-1 text-xs font-semibold text-water-800">
             <Radio className="h-3.5 w-3.5 text-water-600 animate-pulse" />
-            National DWLR Network Live: 5,260 Stations
+            JalKrishi Reference DWLR Network: 5,260 Stations (Simulated Telemetry)
           </span>
           <BackendStatusBadge showDetails={true} />
         </div>
@@ -64,20 +67,11 @@ export const TopBar: React.FC<TopBarProps> = ({
           <BackendStatusBadge />
         </div>
 
-        {/* Language Selector */}
-        <div className="relative">
-          <select
-            value={selectedLanguage}
-            onChange={(e) => setSelectedLanguage(e.target.value as any)}
-            className="rounded-lg border border-stone-200 bg-stone-50 py-1.5 pl-2.5 pr-7 text-xs font-semibold text-stone-700 hover:bg-stone-100 focus:border-agri-600 focus:outline-none cursor-pointer"
-            aria-label="Select interface language"
-          >
-            <option value="EN">English</option>
-            <option value="HI">हिन्दी (Hindi)</option>
-            <option value="PA">ਪੰਜਾਬੀ (Punjabi)</option>
-            <option value="MR">मराठी (Marathi)</option>
-          </select>
-        </div>
+        {/* Multilingual Global Language Selector */}
+        <LanguageSelector
+          currentLanguage={currentLanguage}
+          onLanguageChange={setLanguage}
+        />
 
         {/* Alert Bell Button */}
         <button
