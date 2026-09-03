@@ -60,6 +60,10 @@ KNOWN_REFERENCE_LOCATIONS: Dict[str, Tuple[float, float, str, str]] = {
     "barmer": (25.7532, 71.4181, "Barmer", "Rajasthan"),
     "wayanad": (11.6854, 76.1320, "Wayanad", "Kerala"),
     "kanyakumari": (8.0883, 77.5385, "Kanyakumari", "Tamil Nadu"),
+    "mumbai": (19.0760, 72.8777, "Mumbai", "Maharashtra"),
+    "bombay": (19.0760, 72.8777, "Mumbai", "Maharashtra"),
+    "delhi": (28.6139, 77.2090, "Delhi", "Delhi"),
+    "new delhi": (28.6139, 77.2090, "Delhi", "Delhi"),
 }
 
 # Multilingual Location Dictionary Mapping across 13 Indian regional scripts
@@ -73,7 +77,10 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "ಮೆಹಸಾನಾ": "mehsana",
     "ಅಮೃತಸರ": "amritsar",
     "ಬೆಂಗಳೂರು": "bengaluru",
+    "ಬೆಂಗಳೂರಿನಲ್ಲಿ": "bengaluru",
     "ಮೈಸೂರು": "mysore",
+    "ಮುಂಬೈ": "mumbai",
+    "ದೆಹಲಿ": "delhi",
     "ಪುಣೆ": "pune",
     "ಲೇಹ್": "leh",
     "ಲಡಾಖ್": "ladakh",
@@ -89,6 +96,9 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "पुणे": "pune",
     "मैसूर": "mysore",
     "बेंगलुरु": "bengaluru",
+    "बैंगलोर": "bengaluru",
+    "मुंबई": "mumbai",
+    "दिल्ली": "delhi",
     "लेह": "leh",
     "लद्दाख": "ladakh",
     # Tamil
@@ -98,6 +108,10 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "தஞ்சாவூரில்": "thanjavur",
     "சங்ரூர்": "sangrur",
     "மெஹசானா": "mehsana",
+    "பெங்களூர்": "bengaluru",
+    "பெங்களூரில்": "bengaluru",
+    "மும்பை": "mumbai",
+    "டெல்லி": "delhi",
     # Telugu
     "కోలార్": "kolar",
     "కోలార్లో": "kolar",
@@ -106,6 +120,10 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "తంజావూరులో": "thanjavur",
     "సంగ్రూర్": "sangrur",
     "మెహసానా": "mehsana",
+    "బెంగళూరు": "bengaluru",
+    "బెంగళూరులో": "bengaluru",
+    "ముంబై": "mumbai",
+    "ఢిల్లీ": "delhi",
     # Bengali
     "কোলারে": "kolar",
     "কোলার": "kolar",
@@ -113,20 +131,34 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "তাঞ্জাভুর": "thanjavur",
     "থাঞ্জাভুরে": "thanjavur",
     "মেহসানা": "mehsana",
+    "বেঙ্গালুরু": "bengaluru",
+    "বেঙ্গালুরুতে": "bengaluru",
+    "মুম্বাই": "mumbai",
+    "দিল্লি": "delhi",
     # Gujarati
     "કોલાર": "kolar",
     "મહેસાણા": "mehsana",
+    "મુંબઈ": "mumbai",
+    "દિલ્હી": "delhi",
     # Marathi
     "कोलार": "kolar",
     "पुणे": "pune",
+    "मुंबई": "mumbai",
+    "दिल्ली": "delhi",
     # Punjabi
     "ਸੰਗਰੂਰ": "sangrur",
     "ਅੰਮ੍ਰਿਤਸਰ": "amritsar",
+    "ਮੁੰਬਈ": "mumbai",
+    "ਦਿੱਲੀ": "delhi",
     # Malayalam
     "കോലാർ": "kolar",
     "വയനാട്": "wayanad",
+    "മുംബൈ": "mumbai",
+    "ദില്ലി": "delhi",
     # Odia
     "କୋଲାର": "kolar",
+    "ମୁମ୍ବାଇ": "mumbai",
+    "ଦିଲ୍ଲୀ": "delhi",
     # Assamese
     "কোলৰ": "kolar",
     # Urdu
@@ -134,6 +166,8 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "سنگرور": "sangrur",
     "تھنجاور": "thanjavur",
     "مہسانا": "mehsana",
+    "ممبئی": "mumbai",
+    "دہلی": "delhi",
 }
 
 

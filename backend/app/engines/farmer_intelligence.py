@@ -305,8 +305,8 @@ class FarmerIntelligenceEngine:
         )
         cov_schema = CoverageInfoSchema(
             mode="SATELLITE_ASSISTED",
-            nearest_station_id=st_id,
-            nearest_station_name=st_name,
+            nearest_station_id=None,
+            nearest_station_name=None,
             distance_km=dist
         )
         gw_schema = GroundwaterLevelSchema(
