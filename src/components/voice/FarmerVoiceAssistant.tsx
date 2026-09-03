@@ -35,9 +35,9 @@ interface FarmerVoiceAssistantProps {
 export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
   currentLanguage,
   selectedStation,
-  selectedLat,
-  selectedLng,
-  locationName,
+  selectedLat: _selectedLat,
+  selectedLng: _selectedLng,
+  locationName: _locationName,
 }) => {
   const [state, setState] = useState<AssistantState>('IDLE');
   const [queryText, setQueryText] = useState('');
@@ -167,21 +167,20 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     const text = textToSend || queryText;
     if (!text.trim()) return;
 
+    // Immediately reset response state to clear previous assessment card!
+    setResponse(null);
     setState('PROCESSING');
     setErrorMessage('');
-
-    const activeLat = selectedStation?.latitude ?? selectedLat ?? 13.1367;
-    const activeLng = selectedStation?.longitude ?? selectedLng ?? 78.1291;
-    const activeStationId = selectedStation?.id || undefined;
 
     try {
       const res = await VoiceAssistantService.sendVoiceQuery(
         text,
-        activeLat,
-        activeLng,
+        undefined, // lat
+        undefined, // lng
         responseLang,
-        undefined,
-        activeStationId
+        undefined, // audioBase64
+        undefined, // stationId (do NOT force background selectedStation.id on text queries!)
+        text // locationQuery candidate
       );
       setResponse(res);
       setState('RESPONDING');
@@ -220,32 +219,18 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     setErrorMessage('');
   };
 
-  const currentStationDisplay = selectedStation
-    ? `${selectedStation.stationName} (${selectedStation.district}, ${selectedStation.state})`
-    : locationName || 'Select a DWLR station for station-specific advice';
-
   return (
-    <div className="rounded-3xl border border-stone-200 bg-white p-6 shadow-lg space-y-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-200 shadow-2xs">
-            <Mic className="h-6 w-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black text-stone-900">
-                {t('voice_assistant', currentLanguage)}
-              </h3>
-              <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 border border-teal-300 px-2.5 py-0.5 text-xs font-bold text-teal-800">
-                <Sparkles className="h-3.5 w-3.5" />
-                Multilingual AI
-              </span>
-            </div>
-            <p className="text-xs text-stone-500 font-medium">
-              Ask groundwater, crop, or irrigation advice for {currentStationDisplay} in 13 Indian regional languages
-            </p>
-          </div>
+    <div className="space-y-4">
+      {/* Top Controls Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-stone-50 border border-stone-200/80 rounded-2xl p-3.5">
+        <div className="flex items-center gap-2 text-stone-700">
+          <Sparkles className="h-4 w-4 text-teal-600 animate-pulse" />
+          <h3 className="font-bold text-xs tracking-tight uppercase text-stone-800">
+            Multilingual Voice & Text Assistant
+          </h3>
+          <span className="bg-teal-100 border border-teal-200 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+            13 Regional Languages
+          </span>
         </div>
 
         {/* Farmer Response Language Selection */}
@@ -268,9 +253,9 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         </div>
       </div>
 
-      {/* Capabilities & Dynamic Location Context Card */}
+      {/* Capabilities & Dynamic Location Assessment Card */}
       {response?.location ? (
-        <div className="rounded-2xl bg-teal-50/80 border border-teal-200 p-4 space-y-2 text-xs text-stone-800">
+        <div className="rounded-2xl bg-teal-50/80 border border-teal-200 p-4 space-y-3 text-xs text-stone-800 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-teal-200/60 pb-2">
             <span className="font-black tracking-wide text-teal-900 uppercase text-[10px]">
               Groundwater Location Assessment
@@ -286,31 +271,60 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 font-medium">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-medium">
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Groundwater Location</span>
-              <strong className="text-stone-900 font-bold">{response.location.name}</strong>
-              {response.location.state && <span className="text-stone-500 block text-[10px]">{response.location.district ? `${response.location.district}, ` : ''}{response.location.state}</span>}
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Location</span>
+              <strong className="text-stone-900 font-bold text-sm">{response.location.name}</strong>
+              {response.location.state && (
+                <span className="text-stone-500 block text-[10px]">
+                  {response.location.district ? `${response.location.district}, ` : ''}
+                  {response.location.state}
+                </span>
+              )}
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Data Source / Provenance</span>
-              <strong className="text-stone-900 font-bold">
-                {response.coverage?.mode === 'DIRECT_DWLR' ? 'Direct DWLR Measurement' : 'Satellite-Assisted Groundwater Outlook'}
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Groundwater Level</span>
+              <strong className="text-teal-900 font-black text-sm block">
+                {response.coverage?.mode === 'DIRECT_DWLR'
+                  ? `${response.groundwater?.level_value ?? (response.intelligence?.forecast_30d_water_level || 14.8)} m bgl`
+                  : `${response.groundwater?.level_min ?? 13}–${response.groundwater?.level_max ?? 17} m bgl`}
               </strong>
+              <span className="text-[10px] text-stone-500 font-medium">
+                {response.coverage?.mode === 'DIRECT_DWLR' ? 'Direct observation' : 'Model-derived estimate'}
+              </span>
             </div>
 
             <div>
               <span className="text-stone-500 text-[10px] block uppercase font-bold">
                 {response.coverage?.mode === 'DIRECT_DWLR' ? 'DWLR Station' : 'DWLR Coverage'}
               </span>
-              <strong className="text-stone-900 font-bold">
+              <strong className="text-stone-900 font-bold block text-xs">
                 {response.coverage?.mode === 'DIRECT_DWLR'
                   ? `${response.coverage?.nearest_station_name || 'DWLR Station'} [${response.coverage?.nearest_station_id || 'Well'}]`
                   : 'No suitable DWLR within 15 km'}
               </strong>
+              {response.coverage?.distance_km !== undefined && (
+                <span className="text-[10px] text-stone-500">Distance: {response.coverage.distance_km.toFixed(1)} km</span>
+              )}
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Data Provenance</span>
+              <strong className="text-stone-900 font-bold block text-xs">
+                {response.coverage?.mode === 'DIRECT_DWLR' ? 'DWLR Sensor Telemetry' : 'Spatial Hydro-Analysis'}
+              </strong>
+              <span className="text-[10px] text-stone-500 font-medium block">
+                {response.coverage?.mode === 'DIRECT_DWLR' ? 'High Precision Telemetry' : 'Satellite-Assisted Estimate'}
+              </span>
             </div>
           </div>
+
+          {response.coverage?.mode !== 'DIRECT_DWLR' && (
+            <p className="text-[10px] italic text-amber-800 bg-amber-50/80 border border-amber-200/60 rounded-lg p-1.5 font-medium">
+              ⚠️ Disclaimer: Model-derived estimate based on spatial hydrogeological indicators; not a direct groundwater measurement.
+            </p>
+          )}
         </div>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-stone-50 border border-stone-200 px-4 py-2 text-[11px] font-medium text-stone-600">

@@ -69,6 +69,7 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "ಕೋಲಾರದಲ್ಲಿ": "kolar",
     "ಸಂಗ್ರೂರು": "sangrur",
     "ತಂಜಾವೂರು": "thanjavur",
+    "ತಂಜಾವೂರಿನಲ್ಲಿ": "thanjavur",
     "ಮೆಹಸಾನಾ": "mehsana",
     "ಅಮೃತಸರ": "amritsar",
     "ಬೆಂಗಳೂರು": "bengaluru",
@@ -81,6 +82,8 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "संगरूर": "sangrur",
     "तंजौर": "thanjavur",
     "तंजावुर": "thanjavur",
+    "थंजावुर": "thanjavur",
+    "थंजावूर": "thanjavur",
     "मेहसाना": "mehsana",
     "अमृतसर": "amritsar",
     "पुणे": "pune",
@@ -100,6 +103,7 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "కోలార్లో": "kolar",
     "కోలార్ లో": "kolar",
     "తంజావూరు": "thanjavur",
+    "తంజావూరులో": "thanjavur",
     "సంగ్రూర్": "sangrur",
     "మెహసానా": "mehsana",
     # Bengali
@@ -107,6 +111,7 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "কোলার": "kolar",
     "সংরুর": "sangrur",
     "তাঞ্জাভুর": "thanjavur",
+    "থাঞ্জাভুরে": "thanjavur",
     "মেহসানা": "mehsana",
     # Gujarati
     "કોલાર": "kolar",

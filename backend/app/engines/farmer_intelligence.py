@@ -43,7 +43,30 @@ class FarmerIntelligenceEngine:
     ) -> GroundwaterIntelligenceSchema:
         r = radius_km if radius_km is not None else settings.DWLR_COVERAGE_RADIUS_KM
 
-        # PRIORITY 1: Explicit station_id
+        # PRIORITY 1: Explicit location_query or location name extracted from query_text
+        resolved_loc = resolve_location(location_query=location_query, query_text=query_text)
+        if resolved_loc.is_resolved and resolved_loc.latitude is not None and resolved_loc.longitude is not None:
+            target_lat = resolved_loc.latitude
+            target_lon = resolved_loc.longitude
+            loc_name = resolved_loc.name
+            d_name = resolved_loc.district
+            s_name = resolved_loc.state
+
+            if resolved_loc.matched_station_id:
+                st_schema = station_repo.get_by_id(resolved_loc.matched_station_id)
+                if st_schema:
+                    return self._build_mode_a_direct_dwlr(
+                        st_schema.latitude, st_schema.longitude, st_schema.model_dump(), 0.0, r,
+                        loc_name=resolved_loc.name, district_name=st_schema.district, state_name=st_schema.state
+                    )
+
+            nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(target_lat, target_lon)
+            if dist <= r and nearest:
+                return self._build_mode_a_direct_dwlr(target_lat, target_lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
+            else:
+                return self._build_mode_b_satellite_assisted(target_lat, target_lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
+
+        # PRIORITY 2: Explicit station_id supplied from map/station selection (used when query text contains no place)
         if station_id and station_id.strip():
             st_schema = station_repo.get_by_id(station_id.strip())
             if st_schema:
@@ -54,29 +77,6 @@ class FarmerIntelligenceEngine:
                     st_lat, st_lon, st_dict, 0.0, r,
                     loc_name=f"{st_schema.stationName} ({st_schema.district}, {st_schema.state})"
                 )
-
-        # PRIORITY 2: Explicit location_query / extracted place in query_text
-        resolved_loc = resolve_location(location_query=location_query, query_text=query_text)
-        if resolved_loc.is_resolved and resolved_loc.latitude is not None and resolved_loc.longitude is not None:
-            if resolved_loc.matched_station_id:
-                st_schema = station_repo.get_by_id(resolved_loc.matched_station_id)
-                if st_schema:
-                    return self._build_mode_a_direct_dwlr(
-                        st_schema.latitude, st_schema.longitude, st_schema.model_dump(), 0.0, r,
-                        loc_name=resolved_loc.name, district_name=st_schema.district, state_name=st_schema.state
-                    )
-
-            target_lat = resolved_loc.latitude
-            target_lon = resolved_loc.longitude
-            loc_name = resolved_loc.name
-            d_name = resolved_loc.district
-            s_name = resolved_loc.state
-
-            nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(target_lat, target_lon)
-            if dist <= r and nearest:
-                return self._build_mode_a_direct_dwlr(target_lat, target_lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
-            else:
-                return self._build_mode_b_satellite_assisted(target_lat, target_lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
 
         # PRIORITY 3: Explicit latitude + longitude passed from client/map
         if lat is not None and lon is not None:
@@ -89,8 +89,7 @@ class FarmerIntelligenceEngine:
             else:
                 return self._build_mode_b_satellite_assisted(lat, lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
 
-        # PRIORITY 4 / 5: Fallback general location / Unresolvable location
-        # Default target position (e.g. Reference Kolar center if unmapped)
+        # PRIORITY 4: Fallback general reference location
         default_lat, default_lon = 13.1367, 78.1291
         nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(default_lat, default_lon)
         return self._build_mode_a_direct_dwlr(default_lat, default_lon, nearest, dist, r, loc_name="Reference DWLR Location")
