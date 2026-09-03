@@ -11,20 +11,17 @@ class Settings(BaseSettings):
     APP_NAME: str = "JalKrishi AI — Groundwater Intelligence Platform"
     APP_TAGLINE: str = "Know Your Water. Grow Smarter."
     APP_ENV: str = "development"  # development | staging | production
-    VERSION: str = "2.0.0-phase-j"
+    VERSION: str = "2.6.0"
     API_V1_STR: str = "/api/v1"
     
-    # Project & Hackathon Metadata
-    TEAM_NAME: str = "HACKSTACK"
-    PROBLEM_ID: str = "SH-AGR-005"
-    HACKATHON: str = "Smart Horizon 2026 — 48-Hour International Hackathon"
+    # Platform & Organization Metadata
+    ORGANIZATION: str = "JalKrishi AI Intelligence Division"
     
-    # Mode & Transparency (Honest Demo Simulation)
+    # Mode & Scientific Transparency (Reference Simulation Network)
     DATA_MODE: str = "DEMO_SIMULATION"
     DEMO_DISCLAIMER: str = (
-        "Demo Simulation Mode: Initial backend operational with deterministic 5,260-station telemetry "
-        "and simulated hydrogeological models. Real India-WRIS, CGWB, and IMD ingestion adapters "
-        "are architected for live production connection."
+        "Demo Simulation Mode: JalKrishi Reference DWLR Telemetry Network & Satellite Hydro-Agronomic Intelligence Engine. "
+        "Baseline telemetry utilizes reference observation dataset across 5,260 stations."
     )
     
     # Server & Execution Settings

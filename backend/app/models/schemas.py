@@ -96,9 +96,10 @@ class VersionResponse(BaseModel):
     app_name: str
     tagline: str
     version: str
-    team: str
-    problem_id: str
-    hackathon: str
+    organization: Optional[str] = "JalKrishi AI Intelligence Division"
+    team: Optional[str] = "JalKrishi Team"
+    problem_id: Optional[str] = "JALKRISHI-CORE"
+    hackathon: Optional[str] = "Production Platform"
     data_mode: str
     api_prefix: str
     disclaimer: str

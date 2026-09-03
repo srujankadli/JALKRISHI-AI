@@ -175,8 +175,7 @@ def root_overview():
         "app_name": settings.APP_NAME,
         "tagline": settings.APP_TAGLINE,
         "version": settings.VERSION,
-        "team": settings.TEAM_NAME,
-        "problem_id": settings.PROBLEM_ID,
+        "organization": settings.ORGANIZATION,
         "data_mode": settings.DATA_MODE,
         "disclaimer": settings.DEMO_DISCLAIMER,
         "endpoints": {
