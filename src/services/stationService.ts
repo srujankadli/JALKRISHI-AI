@@ -275,6 +275,25 @@ export const stationService = {
   },
 
   /**
+   * Retrieves nearby DWLR stations within radiusKm for evidence display.
+   */
+  async getNearbyStations(latitude: number, longitude: number, radiusKm = 35.0, limit = 5): Promise<any[]> {
+    try {
+      const res = await apiClient.get<any[]>(
+        '/stations/nearby',
+        { latitude, longitude, radius_km: radiusKm, limit },
+        { useCache: true, cacheTtlMs: 30000, timeoutMs: 3000 }
+      );
+      if (res && Array.isArray(res)) {
+        return res;
+      }
+    } catch {
+      // Fallback
+    }
+    return [];
+  },
+
+  /**
    * Finds closest DWLR observation well using Haversine calculation.
    */
   async findNearest(userLat: number, userLon: number) {

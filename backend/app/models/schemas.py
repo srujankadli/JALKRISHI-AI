@@ -108,6 +108,65 @@ class VersionResponse(BaseModel):
 
 
 # ==========================================
+# 2B. Location Resolution & Verification Schemas
+# ==========================================
+
+class LocationResolutionStatus(str, Enum):
+    VERIFIED = "VERIFIED"
+    RESOLVED = "RESOLVED"
+    AMBIGUOUS = "AMBIGUOUS"
+    UNRESOLVED = "UNRESOLVED"
+    INTERNATIONAL = "INTERNATIONAL"
+    OUTSIDE_SUPPORTED_REGION = "OUTSIDE_SUPPORTED_REGION"
+
+
+class AmbiguousLocationOption(BaseModel):
+    name: Optional[str] = Field(None, description="Canonical place name")
+    district: str = Field(..., description="District name")
+    state: str = Field(..., description="State name")
+    latitude: float = Field(..., description="Latitude coordinate")
+    longitude: float = Field(..., description="Longitude coordinate")
+    confidence: Optional[float] = Field(0.85, description="Confidence score")
+    display_label: Optional[str] = Field(None, description="Formatted display label, e.g. Rajpur, Barwani, Madhya Pradesh")
+
+
+class LocationResolutionResponse(BaseModel):
+    is_resolved: bool = Field(..., description="Whether the location query was verified")
+    query: str = Field(..., description="Raw input query")
+    name: Optional[str] = Field(None, description="Display / place name")
+    canonical_name: Optional[str] = Field(None, description="Canonical verified place name")
+    district: Optional[str] = Field(None, description="District name")
+    state: Optional[str] = Field(None, description="State name")
+    latitude: Optional[float] = Field(None, description="Latitude coordinate")
+    longitude: Optional[float] = Field(None, description="Longitude coordinate")
+    matched_station_id: Optional[str] = Field(None, description="Matched DWLR station ID")
+    resolution_source: Optional[str] = Field("UNVERIFIED", description="REFERENCE_GAZETTEER | PIN_CODE | STATION_GEOGRAPHY | EXPLICIT_COORDINATES | MULTILINGUAL_ALIAS | UNVERIFIED")
+    confidence: Optional[Any] = Field("NONE", description="HIGH | MEDIUM | LOW | numeric score")
+    status: LocationResolutionStatus = Field(LocationResolutionStatus.UNRESOLVED, description="Resolution status")
+    ambiguous_options: Optional[List[AmbiguousLocationOption]] = Field(None, description="Options for disambiguation if ambiguous")
+    error_message: Optional[str] = Field(None, description="Farmer-friendly error message if unverified")
+    is_international: bool = Field(False, description="Whether location is detected outside India")
+    disclaimer: str = Field("JalKrishi location verification references official gazetteer and station geography data.", description="Provenance disclaimer")
+
+
+class NearbyStationEvidenceSchema(BaseModel):
+    id: str
+    stationCode: str
+    stationName: str
+    state: str
+    district: str
+    block: Optional[str] = None
+    latitude: float
+    longitude: float
+    distance_km: float
+    waterLevel: float
+    status: StationStatus
+    trend: TrendDirection
+    daysToCritical: Optional[int] = None
+    lastUpdated: str
+
+
+# ==========================================
 # 3. Station & Telemetry Schemas
 # ==========================================
 

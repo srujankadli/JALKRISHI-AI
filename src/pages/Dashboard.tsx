@@ -97,7 +97,7 @@ export const Dashboard: React.FC = () => {
           <span className="text-xs font-bold text-stone-700 uppercase tracking-wide">
             {isOfficial
               ? t('Official Command Mode • 5,260 Telemetry Nodes Synchronized')
-              : `${t('Farmer Water Intelligence Active • Localized Farm Workspace')} (${farmLocation || t('All India')})`}
+              : `${t('Farmer Water Intelligence Active • Localized Farm Workspace')} (${farmLocation || t('Set Your Location')})`}
           </span>
         </div>
         <div className="flex items-center gap-3 text-xs font-medium text-stone-500">

@@ -12,9 +12,11 @@ import { PageHeader } from '../components/common/PageHeader';
 import { WhatsAppSimulator } from '../components/whatsapp/WhatsAppSimulator';
 import { BackendStatusBadge } from '../components/common/BackendStatusBadge';
 import { useLanguage } from '../context/LanguageContext';
+import { useFarm } from '../context/FarmContext';
 
 export const WhatsAppPage: React.FC = () => {
   const { t } = useLanguage();
+  const { location: farmLocation } = useFarm();
   return (
     <div className="space-y-8 animate-fadeIn pb-10">
       {/* 1. Page Header */}
@@ -59,7 +61,7 @@ export const WhatsAppPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Interactive WhatsApp Simulator (lg:col-span-7) */}
         <div className="lg:col-span-7">
-          <WhatsAppSimulator initialDistrict={localStorage.getItem('jalkrishi_selected_location') || ''} />
+          <WhatsAppSimulator initialDistrict={farmLocation || ''} />
         </div>
 
         {/* Right Column: Farmer Voice & Conversational Guide (lg:col-span-5) */}

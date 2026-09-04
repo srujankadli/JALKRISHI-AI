@@ -28,6 +28,10 @@ logger = logging.getLogger("app.location_resolver")
 @dataclass
 class LocationResolution:
     is_resolved: bool
+    status: str = "VERIFIED"  # "VERIFIED", "AMBIGUOUS", "UNRESOLVED", "INTERNATIONAL"
+    resolution_source: Optional[str] = None
+    confidence: float = 1.0
+    ambiguous_options: Optional[list] = None
     name: Optional[str] = None
     district: Optional[str] = None
     state: Optional[str] = None
@@ -37,6 +41,35 @@ class LocationResolution:
     error_message: Optional[str] = None
     is_international: bool = False
 
+
+
+# ==============================================================================
+# AMBIGUOUS LOCATIONS DATABASE (Requires disambiguation)
+# ==============================================================================
+AMBIGUOUS_LOCATIONS_MAP: Dict[str, list] = {
+    "rajpur": [
+        {"district": "Barwani", "state": "Madhya Pradesh", "latitude": 21.9333, "longitude": 75.1333, "confidence": 0.85},
+        {"district": "Balrampur", "state": "Chhattisgarh", "latitude": 23.5167, "longitude": 83.3333, "confidence": 0.85},
+        {"district": "Dehradun", "state": "Uttarakhand", "latitude": 30.3833, "longitude": 78.0833, "confidence": 0.85},
+    ],
+    "bilaspur": [
+        {"district": "Bilaspur", "state": "Chhattisgarh", "latitude": 22.0797, "longitude": 82.1391, "confidence": 0.90},
+        {"district": "Bilaspur", "state": "Himachal Pradesh", "latitude": 31.3260, "longitude": 76.7621, "confidence": 0.85},
+        {"district": "Rampur", "state": "Uttar Pradesh", "latitude": 28.8833, "longitude": 79.2667, "confidence": 0.80},
+    ],
+    "rampur": [
+        {"district": "Rampur", "state": "Uttar Pradesh", "latitude": 28.8033, "longitude": 79.0257, "confidence": 0.90},
+        {"district": "Shimla", "state": "Himachal Pradesh", "latitude": 31.4500, "longitude": 77.6333, "confidence": 0.85},
+    ],
+    "aurangabad": [
+        {"district": "Chhatrapati Sambhajinagar", "state": "Maharashtra", "latitude": 19.8762, "longitude": 75.3433, "confidence": 0.95},
+        {"district": "Aurangabad", "state": "Bihar", "latitude": 24.7500, "longitude": 84.3667, "confidence": 0.90},
+    ],
+    "pratapgarh": [
+        {"district": "Pratapgarh", "state": "Uttar Pradesh", "latitude": 25.9000, "longitude": 81.9833, "confidence": 0.90},
+        {"district": "Pratapgarh", "state": "Rajasthan", "latitude": 24.0333, "longitude": 74.7833, "confidence": 0.90},
+    ],
+}
 
 # ==============================================================================
 # 1. COMPREHENSIVE NATIONWIDE INDIAN REFERENCE LOCATIONS DATABASE
@@ -1076,34 +1109,52 @@ def resolve_location(
     query_text: Optional[str] = None,
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
-    station_id: Optional[str] = None,
+    station_id: Optional[str] = None
 ) -> LocationResolution:
     """
     Dynamically resolves any Indian location query (place name, district, state,
     PIN code, coordinate, or DWLR station) to geographical coordinates.
 
     STRICT RULES:
-    1. If location is empty and no coords provided: is_resolved=False, error_message="Enter your farm location to continue."
+    1. If location is empty and no coords provided: is_resolved=False, error_message="Please enter a valid village, town, city, district, state, or 6-digit PIN code."
     2. If location is international: is_resolved=False, error_message="JalKrishi currently supports locations in India."
-    3. If location is unrecognized: is_resolved=False, error_message="Location not recognized. Please enter a valid village, town, district, or PIN code."
-    4. Never return a hardcoded demonstration city as a default fallback.
+    3. If location is ambiguous: is_resolved=False, status="AMBIGUOUS", error_message="Multiple locations found. Please select your district and state."
+    4. If location is unverified/gibberish: is_resolved=False, status="UNRESOLVED", error_message="We couldn't verify that location. Please enter a valid village, town, city, district, state, or 6-digit PIN code."
+    5. Never return a hardcoded demonstration city or national centroid as a default fallback.
     """
     raw_input = (location_query or "").strip()
     full_text = (query_text or "").strip()
 
     text_to_search = raw_input if raw_input else full_text
 
-    # --- Case 0: Empty input check ---
+    # --- Case 0: Empty input check or direct Station ID lookup ---
     if not text_to_search:
+        if station_id and station_id.strip():
+            st = station_repo.get_by_id(station_id.strip())
+            if st:
+                logger.info(f"[LOCATION RESOLVER SUCCESS] Matched station_id parameter '{station_id}' -> '{st.stationName}'")
+                return LocationResolution(
+                    is_resolved=True,
+                    status="VERIFIED",
+                    resolution_source="dwlr_station",
+                    confidence=1.0,
+                    name=st.stationName,
+                    district=st.district,
+                    state=st.state,
+                    latitude=st.latitude,
+                    longitude=st.longitude,
+                    matched_station_id=st.id
+                )
         if latitude is not None and longitude is not None:
             # Check bounding box for India: Lat 6.0N - 37.5N, Lon 68.0E - 97.5E
             if not (6.0 <= latitude <= 37.5 and 68.0 <= longitude <= 97.5):
                 return LocationResolution(
                     is_resolved=False,
+                    status="INTERNATIONAL",
                     name=None,
-                    error_message="Coordinates are outside India. JalKrishi currently supports locations in India."
+                    error_message="Coordinates are outside India. JalKrishi currently supports locations in India.",
+                    is_international=True
                 )
-            # Find nearest station if within coverage distance
             import math
             nearest_st = station_repo.get_all()
             nearest = None
@@ -1117,9 +1168,12 @@ def resolve_location(
                     min_d = d
                     nearest = st
 
-            loc_name = f"Location ({latitude:.2f}°N, {longitude:.2f}°E)"
+            loc_name = f"Location ({latitude:.2f}N, {longitude:.2f}E)"
             return LocationResolution(
                 is_resolved=True,
+                status="VERIFIED",
+                resolution_source="coordinates",
+                confidence=0.90,
                 name=loc_name if min_d > 15.0 else nearest.stationName,
                 district=nearest.district if (nearest and min_d <= 50.0) else None,
                 state=nearest.state if (nearest and min_d <= 50.0) else None,
@@ -1130,13 +1184,13 @@ def resolve_location(
 
         return LocationResolution(
             is_resolved=False,
+            status="UNRESOLVED",
             name=None,
-            error_message="Enter your farm location to continue."
+            error_message="Please enter a valid village, town, city, district, state, or 6-digit PIN code."
         )
 
     clean_text = text_to_search.lower()
-    # Normalize punctuation and extra spaces
-    clean_text_norm = re.sub(r"[^\w\sऀ-ൿ]", " ", clean_text)
+    clean_text_norm = re.sub(r"[^\w\s\u0900-\u0D7F\u0600-\u06FF]", " ", clean_text)
     words = clean_text_norm.split()
 
     # --- Case 1: Check for International Locations (Outside India) ---
@@ -1145,6 +1199,7 @@ def resolve_location(
             logger.info(f"[LOCATION RESOLVER] International location detected: '{w}'")
             return LocationResolution(
                 is_resolved=False,
+                status="INTERNATIONAL",
                 name=w.capitalize(),
                 error_message="JalKrishi currently supports locations in India.",
                 is_international=True
@@ -1154,10 +1209,44 @@ def resolve_location(
             logger.info(f"[LOCATION RESOLVER] International location detected: '{int_loc}'")
             return LocationResolution(
                 is_resolved=False,
+                status="INTERNATIONAL",
                 name=int_loc.title(),
                 error_message="JalKrishi currently supports locations in India.",
                 is_international=True
             )
+
+    # --- Case 1.5: Ambiguous Location Check ---
+    for amb_key, options in AMBIGUOUS_LOCATIONS_MAP.items():
+        pattern = r"\b" + re.escape(amb_key) + r"\b"
+        if re.search(pattern, clean_text_norm):
+            has_qualifier = False
+            for opt in options:
+                st_kw = opt["state"].lower()
+                dt_kw = opt["district"].lower()
+                matched_state = re.search(r"\b" + re.escape(st_kw) + r"\b", clean_text_norm) if st_kw != amb_key else False
+                matched_dist = re.search(r"\b" + re.escape(dt_kw) + r"\b", clean_text_norm) if dt_kw != amb_key else False
+                if matched_state or matched_dist:
+                    has_qualifier = True
+                    return LocationResolution(
+                        is_resolved=True,
+                        status="VERIFIED",
+                        resolution_source="disambiguated_gazetteer",
+                        confidence=opt["confidence"],
+                        name=f"{amb_key.title()}, {opt['district']}",
+                        district=opt["district"],
+                        state=opt["state"],
+                        latitude=opt["latitude"],
+                        longitude=opt["longitude"]
+                    )
+            if not has_qualifier:
+                logger.info(f"[LOCATION RESOLVER AMBIGUOUS] Ambiguous location '{amb_key}' needs disambiguation")
+                return LocationResolution(
+                    is_resolved=False,
+                    status="AMBIGUOUS",
+                    name=amb_key.title(),
+                    ambiguous_options=options,
+                    error_message="Multiple locations found. Please select your district and state."
+                )
 
     # --- Case 2: Check 6-digit Indian PIN codes ---
     pin_match = re.search(r"\b([1-9][0-9]{5})\b", clean_text)
@@ -1170,6 +1259,9 @@ def resolve_location(
             logger.info(f"[LOCATION RESOLVER SUCCESS] Matched PIN code '{pin}' (prefix {prefix_3}) -> ({coords[2]}, {coords[3]})")
             return LocationResolution(
                 is_resolved=True,
+                status="VERIFIED",
+                resolution_source="pin_code",
+                confidence=0.95,
                 name=f"PIN {pin} ({coords[2]}, {coords[3]})",
                 district=coords[2],
                 state=coords[3],
@@ -1177,16 +1269,25 @@ def resolve_location(
                 longitude=coords[1]
             )
 
-    # --- Case 3: Check Multilingual Place Map (Exact & Substring match) ---
+    # --- Case 3: Check Multilingual Place Map ---
     for lang_key, target_place in MULTILINGUAL_PLACE_MAP.items():
-        pattern = r"(?:\b|_|^)" + re.escape(lang_key.lower()) + r"(?:\b|_|$)"
-        if re.search(pattern, clean_text_norm) or lang_key.lower() in clean_text:
+        lk = lang_key.lower()
+        if any(ord(c) > 127 for c in lk):
+            is_match = (lk in clean_text_norm or lk in clean_text)
+        else:
+            pattern = r"\b" + re.escape(lk) + r"\b"
+            is_match = bool(re.search(pattern, clean_text_norm))
+
+        if is_match:
             coords = KNOWN_REFERENCE_LOCATIONS.get(target_place)
             if coords:
                 lk_ascii = lang_key.encode('ascii', errors='backslashreplace').decode('ascii')
                 logger.info(f"[LOCATION RESOLVER SUCCESS] Matched multilingual '{lk_ascii}' -> '{target_place}' ({coords[2]}, {coords[3]})")
                 return LocationResolution(
                     is_resolved=True,
+                    status="VERIFIED",
+                    resolution_source="multilingual_gazetteer",
+                    confidence=0.95,
                     name=coords[2],
                     district=coords[2],
                     state=coords[3],
@@ -1194,13 +1295,23 @@ def resolve_location(
                     longitude=coords[1]
                 )
 
-    # --- Case 4: Check Known Reference Locations ---
-    for place_key, coords in KNOWN_REFERENCE_LOCATIONS.items():
-        pattern = r"(?:\b|_|^)" + re.escape(place_key) + r"(?:\b|_|$)"
-        if re.search(pattern, clean_text_norm) or place_key in clean_text:
+    # --- Case 4: Check Known Reference Locations (Prioritize Specific Cities/Districts over Whole States) ---
+    def ref_key_priority(k: str):
+        c = KNOWN_REFERENCE_LOCATIONS[k]
+        is_state_level = (c[2].lower() == c[3].lower() or k.lower() == c[3].lower())
+        return (1 if is_state_level else 0, -len(k.split()), -len(k))
+
+    sorted_ref_keys = sorted(KNOWN_REFERENCE_LOCATIONS.keys(), key=ref_key_priority)
+    for place_key in sorted_ref_keys:
+        coords = KNOWN_REFERENCE_LOCATIONS[place_key]
+        pattern = r"\b" + re.escape(place_key) + r"\b"
+        if re.search(pattern, clean_text_norm):
             logger.info(f"[LOCATION RESOLVER SUCCESS] Matched key '{place_key}' -> ({coords[2]}, {coords[3]})")
             return LocationResolution(
                 is_resolved=True,
+                status="VERIFIED",
+                resolution_source="gazetteer",
+                confidence=0.98,
                 name=coords[2],
                 district=coords[2],
                 state=coords[3],
@@ -1211,12 +1322,18 @@ def resolve_location(
     # --- Case 5: Search DWLR Station Repository ---
     all_stations = station_repo.get_all()
 
-    # 5A. Station ID or Code match
+    # 5A. Station ID or Code match (exact word boundary)
     for st in all_stations:
-        if st.id.lower() in clean_text or st.stationCode.lower() in clean_text:
+        st_id_clean = st.id.lower()
+        st_code_clean = st.stationCode.lower() if st.stationCode else ""
+        if (re.search(r"\b" + re.escape(st_id_clean) + r"\b", clean_text_norm) or
+            (st_code_clean and re.search(r"\b" + re.escape(st_code_clean) + r"\b", clean_text_norm))):
             logger.info(f"[LOCATION RESOLVER SUCCESS] Matched station ID '{st.id}' -> '{st.stationName}'")
             return LocationResolution(
                 is_resolved=True,
+                status="VERIFIED",
+                resolution_source="dwlr_station",
+                confidence=1.0,
                 name=st.stationName,
                 district=st.district,
                 state=st.state,
@@ -1225,13 +1342,16 @@ def resolve_location(
                 matched_station_id=st.id
             )
 
-    # 5B. District / Block / State match in repository
+    # 5B. District / Block / State match in repository (STRICT word boundary ONLY)
     for st in all_stations:
-        d_clean = st.district.lower()
-        if len(d_clean) >= 3 and (r"\b" + re.escape(d_clean) + r"\b" in clean_text_norm or d_clean in clean_text):
+        d_clean = st.district.lower() if st.district else ""
+        if len(d_clean) >= 3 and re.search(r"\b" + re.escape(d_clean) + r"\b", clean_text_norm):
             logger.info(f"[LOCATION RESOLVER SUCCESS] Matched DWLR district '{st.district}'")
             return LocationResolution(
                 is_resolved=True,
+                status="VERIFIED",
+                resolution_source="dwlr_network",
+                confidence=0.90,
                 name=st.district,
                 district=st.district,
                 state=st.state,
@@ -1239,21 +1359,27 @@ def resolve_location(
                 longitude=st.longitude
             )
         b_clean = st.block.lower() if st.block else ""
-        if len(b_clean) >= 3 and (r"\b" + re.escape(b_clean) + r"\b" in clean_text_norm or b_clean in clean_text):
+        if len(b_clean) >= 3 and re.search(r"\b" + re.escape(b_clean) + r"\b", clean_text_norm):
             logger.info(f"[LOCATION RESOLVER SUCCESS] Matched DWLR block '{st.block}'")
             return LocationResolution(
                 is_resolved=True,
+                status="VERIFIED",
+                resolution_source="dwlr_network",
+                confidence=0.88,
                 name=f"{st.block}, {st.district}",
                 district=st.district,
                 state=st.state,
                 latitude=st.latitude,
                 longitude=st.longitude
             )
-        s_clean = st.state.lower()
-        if len(s_clean) >= 4 and (r"\b" + re.escape(s_clean) + r"\b" in clean_text_norm or s_clean in clean_text):
+        s_clean = st.state.lower() if st.state else ""
+        if len(s_clean) >= 4 and re.search(r"\b" + re.escape(s_clean) + r"\b", clean_text_norm):
             logger.info(f"[LOCATION RESOLVER SUCCESS] Matched DWLR state '{st.state}'")
             return LocationResolution(
                 is_resolved=True,
+                status="VERIFIED",
+                resolution_source="dwlr_network",
+                confidence=0.85,
                 name=st.state,
                 district=st.district,
                 state=st.state,
@@ -1266,7 +1392,10 @@ def resolve_location(
         if 6.0 <= latitude <= 37.5 and 68.0 <= longitude <= 97.5:
             return LocationResolution(
                 is_resolved=True,
-                name=f"Location ({latitude:.2f}°N, {longitude:.2f}°E)",
+                status="VERIFIED",
+                resolution_source="coordinates",
+                confidence=0.85,
+                name=f"Location ({latitude:.2f}N, {longitude:.2f}E)",
                 district=None,
                 state=None,
                 latitude=latitude,
@@ -1277,6 +1406,7 @@ def resolve_location(
     logger.warning(f"[LOCATION RESOLVER UNRESOLVED] Could not resolve Indian location from text: '{clean_text}'")
     return LocationResolution(
         is_resolved=False,
+        status="UNRESOLVED",
         name=None,
-        error_message="Location not recognized. Please enter a valid village, town, district, or PIN code."
+        error_message="Location not recognized. Please enter a valid village, town, city, district, state, or 6-digit PIN code."
     )

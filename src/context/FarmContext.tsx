@@ -127,53 +127,58 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
 
     try {
-      const allStations = await stationService.getAllStations();
-
-      // 1. Try to match directly with existing DWLR station records
-      const cleanQ = trimmed.toLowerCase();
-      const directStationMatch = allStations.find(
-        (s) =>
-          s.district.toLowerCase() === cleanQ ||
-          s.stationName.toLowerCase().includes(cleanQ) ||
-          s.block?.toLowerCase() === cleanQ ||
-          s.id.toLowerCase() === cleanQ
+      // 1. Resolve location via backend dynamic location resolver
+      const locRes = await apiClient.get<any>(
+        '/location/resolve',
+        { query: trimmed },
+        { timeoutMs: 3000 }
       );
 
-      let targetLat: number;
-      let targetLon: number;
-      let targetDistrict: string;
-      let targetState: string;
-
-      if (directStationMatch) {
-        targetLat = directStationMatch.latitude;
-        targetLon = directStationMatch.longitude;
-        targetDistrict = directStationMatch.district;
-        targetState = directStationMatch.state;
-      } else {
-        // Query backend unified endpoint or fallback coordinates generator
-        try {
-          const res = await apiClient.get<any>(
-            '/intelligence/unified',
-            { location_query: trimmed },
-            { timeoutMs: 2500 }
-          );
-          if (res && res.latitude && res.longitude) {
-            targetLat = res.latitude;
-            targetLon = res.longitude;
-            targetDistrict = res.district || trimmed;
-            targetState = res.state || 'India';
-          } else {
-            throw new Error('Location could not be resolved. Enter a village, town, district, PIN code, or coordinates.');
-          }
-        } catch (resolutionError) {
-          throw resolutionError;
-        }
+      if (!locRes || !locRes.is_resolved || locRes.latitude === null || locRes.latitude === undefined || locRes.longitude === null || locRes.longitude === undefined) {
+        throw new Error(
+          locRes?.error_message ||
+            'Location could not be verified. Please enter a valid village, town, city, district, state, or 6-digit PIN code.'
+        );
       }
 
-      // 2. Calculate spatial distances to all monitoring stations
-      const stationDistances: NearbyStationEvidence[] = allStations.map((s) => ({
-        station: s,
-        distanceKm: calculateDistanceKm(targetLat, targetLon, s.latitude, s.longitude),
+      const targetLat = locRes.latitude;
+      const targetLon = locRes.longitude;
+      const targetDistrict = locRes.district || locRes.name || trimmed;
+      const targetState = locRes.state || 'India';
+      const canonicalName = locRes.name || locRes.canonical_name || trimmed;
+
+      // 2. Fetch nearby DWLR stations within 35 km
+      const nearbyRaw = await stationService.getNearbyStations(
+        targetLat,
+        targetLon,
+        FARMER_CONFIG.NEARBY_EVIDENCE_RADIUS_KM,
+        FARMER_CONFIG.MAX_NEARBY_STATIONS_DISPLAY
+      );
+
+      const stationDistances: NearbyStationEvidence[] = (nearbyRaw || []).map((st: any) => ({
+        station: {
+          id: st.id,
+          stationCode: st.stationCode,
+          stationName: st.stationName,
+          state: st.state,
+          district: st.district,
+          block: st.block || '',
+          latitude: st.latitude,
+          longitude: st.longitude,
+          waterLevel: st.waterLevel,
+          previousWaterLevel: st.waterLevel,
+          seasonalAverage: st.waterLevel,
+          criticalThreshold: 25.0,
+          riskScore: 0.5,
+          status: st.status,
+          trend: st.trend,
+          trendRateMetersPerMonth: 0.1,
+          daysToCritical: st.daysToCritical,
+          batteryLevel: 90,
+          telemetryStatus: 'online' as any,
+          lastUpdated: st.lastUpdated,
+        },
+        distanceKm: st.distance_km ?? calculateDistanceKm(targetLat, targetLon, st.latitude, st.longitude),
       }));
 
       // Sort by distance ascending
@@ -184,23 +189,17 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const isDirect = closest ? closest.distanceKm <= FARMER_CONFIG.DIRECT_DWLR_RADIUS_KM : false;
       setIsDirectObservation(isDirect);
-
-      // Filter stations within configured nearby evidence radius
-      const evidenceStations = stationDistances
-        .filter((item) => item.distanceKm <= FARMER_CONFIG.NEARBY_EVIDENCE_RADIUS_KM)
-        .slice(0, FARMER_CONFIG.MAX_NEARBY_STATIONS_DISPLAY);
-
-      setNearbyStations(evidenceStations);
+      setNearbyStations(stationDistances);
 
       const resolved: ResolvedFarmLocation = {
         locationQuery: trimmed,
-        name: trimmed,
+        name: canonicalName,
         district: targetDistrict,
         state: targetState,
         latitude: targetLat,
         longitude: targetLon,
         is_resolved: true,
-        matched_station_id: closest?.station.id || null,
+        matched_station_id: closest?.station.id || locRes.matched_station_id || null,
         nearest_station_distance_km: closest?.distanceKm || null,
         estimation_mode: isDirect ? 'DIRECT_DWLR' : 'SATELLITE_ASSISTED',
         confidence: isDirect ? 'HIGH' : closest && closest.distanceKm <= 50 ? 'MEDIUM' : 'LOW',

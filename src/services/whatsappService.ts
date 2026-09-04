@@ -127,8 +127,8 @@ export const whatsappService = {
         intent: 'ANOMALIES',
         language: isHindi ? 'hi' : 'en',
         reply: isHindi
-          ? '⚠️ *जलकृषि चेतावनी केंद्र — कोलार*\n\nसक्रिय चेतावनियां: *4*\n🚨 *मुख्य अलर्ट:* Possible Abnormal Extraction\nकुआं: DWLR-KA-008\nविवरण: निरंतर दोहन के कारण जल स्तर तेजी से घटा है।\nसलाह: सिंचाई के घंटों को कम करें और सामूहिक जल उपयोग अपनाएं।\n\n_ऑफ़लाइन डेमो फ़ॉलबैक_'
-          : '⚠️ *JalKrishi Alert Center — Kolar*\n\nActive Telemetry Anomalies: *4*\n🚨 *Primary Alert:* Possible Abnormal Extraction\nStation: DWLR-KA-008\nObserved: Continuous multi-day drawdown.\nAction: Restrict pumping hours and verify well recovery.\n\n_Offline Demo Fallback_',
+          ? `⚠️ *जलकृषि चेतावनी केंद्र — ${targetDistrict}*\n\nसक्रिय चेतावनियां: *4*\n🚨 *मुख्य अलर्ट:* Possible Abnormal Extraction\nविवरण: निरंतर दोहन के कारण जल स्तर तेजी से घटा है।\nसलाह: सिंचाई के घंटों को कम करें और सामूहिक जल उपयोग अपनाएं।\n\n_ऑफ़लाइन डेमो फ़ॉलबैक_`
+          : `⚠️ *JalKrishi Alert Center — ${targetDistrict}*\n\nActive Telemetry Anomalies: *4*\n🚨 *Primary Alert:* Possible Abnormal Extraction\nObserved: Continuous multi-day drawdown.\nAction: Restrict pumping hours and verify well recovery.\n\n_Offline Demo Fallback_`,
         actions: [
           { label: '💧 Water Status', action: 'water' },
           { label: '🔮 Forecast', action: 'forecast' },

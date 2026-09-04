@@ -97,12 +97,14 @@ export const forecastService = {
       // Backend offline -> fallback
     }
 
-    // Fallback deterministic location forecast
+    // Fallback location forecast
+    const farmLat = lat ?? 0.0;
+    const farmLon = lon ?? 0.0;
     return {
-      locationName: locationQuery || 'My Farm',
-      latitude: lat || 15.14,
-      longitude: lon || 76.92,
-      evidenceMode: 'REGIONAL_NEARBY_EVIDENCE',
+      locationName: locationQuery || (farmLat !== 0.0 ? `Farm (${farmLat.toFixed(2)}N, ${farmLon.toFixed(2)}E)` : 'My Farm'),
+      latitude: farmLat,
+      longitude: farmLon,
+      evidenceMode: farmLat !== 0.0 ? 'REGIONAL_NEARBY_EVIDENCE' : 'LOCATION_REQUIRED',
       criticalThreshold: 25.0,
       currentLevel: 14.2,
       projectedLevel30d: 14.5,
@@ -111,7 +113,7 @@ export const forecastService = {
       forecastRisk: 'worsening',
       horizonDays: validHorizon,
       dailyChangeM: 0.005,
-      confidenceScore: 0.85,
+      confidenceScore: farmLat !== 0.0 ? 0.85 : 0.0,
       farmerGuidance: 'Projected seasonal groundwater table variation. Adopt micro-irrigation schedules.',
       provenanceLabel: 'Regional groundwater forecast based on nearby evidence',
       forecastPoints: [

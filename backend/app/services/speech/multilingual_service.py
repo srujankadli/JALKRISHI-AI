@@ -434,6 +434,55 @@ class HydroAgronomicTranslator:
         ]
         return "\n".join(lines)
 
+    COMMON_PROMPTS: Dict[str, Dict[str, str]] = {
+        "hi": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "मैं भूजल स्तर, फसल अनुशंसा, सिंचाई समय सारिणी और मौसम पूर्वानुमान में मदद कर सकता हूँ। आप क्या जानना चाहते हैं?",
+            "How can I assist your farm today?": "आज मैं आपके खेत के लिए क्या सहायता कर सकता हूँ?",
+        },
+        "kn": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "ನಾನು ಅಂತರ್ಜಲ ಮಟ್ಟ, ಬೆಳೆ ಶಿಫಾರಸುಗಳು, ನೀರಾವರಿ ವೇಳಾಪಟ್ಟಿ ಮತ್ತು ಹವಾಮಾನ ಮುನ್ಸೂಚನೆಯಲ್ಲಿ ಸಹಾಯ ಮಾಡಬಲ್ಲೆ. ನೀವು ಏನು ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ?",
+            "How can I assist your farm today?": "ಇಂದು ನಿಮ್ಮ ಕೃಷಿಗೆ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?",
+        },
+        "ta": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "நிலத்தடி நீர் மட்டம், பயிர் பரிந்துரைகள், பாசன அட்டவணை மற்றும் வானிலை முன்னறிவிப்பு ஆகியவற்றில் நான் உதவ முடியும். நீங்கள் என்ன தெரிந்து கொள்ள விரும்புகிறீர்கள்?",
+        },
+        "te": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "నేను భూగర్భ జల మట్టం, పంట సిఫార్సులు, సాగునీటి షెడ్యూల్ మరియు వాతావరణ సూచనలలో సహాయం చేయగలను. మీరు ఏమి తెలుసుకోవాలనుకుంటున్నారు?",
+        },
+        "mr": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "मी भूजल पातळी, पीक शिफारसी, सिंचन वेळापत्रक आणि हवामान अंदाज यामध्ये मदत करू शकतो. आपल्याला काय जाणून घ्यायचे आहे?",
+        },
+        "bn": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "আমি ভূগর্ভস্থ জলের স্তর, ফসলের সুপারিশ, সেচ সময়সূচী এবং আবহাওয়ার পূর্বাভাসে সাহায্য করতে পারি। আপনি কি জানতে চান?",
+        },
+        "gu": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "હું ભૂગર્ભજળ સ્તર, પાક ભલામણો, સિંચાઈ સમયપત્રક અને હવામાન આગાહીમાં મદદ કરી શકું છું. તમે શું જાણવા માગો છો?",
+        },
+        "pa": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "ਮੈਂ ਧਰਤੀ ਹੇਠਲੇ ਪਾਣੀ ਦੇ ਪੱਧਰ, ਫਸਲਾਂ ਦੀਆਂ ਸਿਫ਼ਾਰਸ਼ਾਂ, ਸਿੰਚਾਈ ਦੇ ਸਮਾਂ-ਸਾਰਣੀ ਅਤੇ ਮੌਸਮ ਦੀ ਭਵਿੱਖਬਾਣੀ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ। ਤੁਸੀਂ ਕੀ ਜਾਣਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
+        },
+        "ml": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "ഭൂഗർഭജല നിരപ്പ്, വിള ശുപാർശകൾ, നനയ്ക്കൽ ഷെഡ്യൂൾ, കാലാവസ്ഥാ പ്രവചനം എന്നിവയിൽ എനിക്ക് സഹായിക്കാനാകും. നിങ്ങൾക്ക് എന്താണ് അറിയേണ്ടത്?",
+        },
+        "or": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "ମୁଁ ଭୂତଳ ଜଳ ସ୍ତର, ଫସଲ ପରାମର୍ଶ, ଜଳସେଚନ କାର୍ଯ୍ୟସୂଚୀ ଏବଂ ପାଣିପାଗ ପୂର୍ବାନୁମାନରେ ସାହାଯ୍ୟ କରିପାରିବି। ଆପଣ କ'ଣ ଜାଣିବାକୁ ଚାହାଁନ୍ତି?",
+        },
+        "as": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "মই ভূগৰ্ভস্থ পানীৰ স্তৰ, শস্যৰ পৰামৰ্শ, জলসিঞ্চনৰ সময়সূচী আৰু বতৰৰ পূৰ্বাভাসত সহায় কৰিব পাৰোঁ। আপুনি কি জানিব বিচাৰে?",
+        },
+        "ur": {
+            "I can help with groundwater levels, crop recommendations, irrigation schedules, and weather forecasts. What would you like to know?": "میں زیر زمین پانی کی سطح، فصلوں کی تجاویز، آبپاشی کے شیڈول اور موسم کی پیشن گوئی میں مدد کر سکتا ہوں۔ آپ کیا جاننا چاہتے ہیں؟",
+        },
+    }
+
+    @classmethod
+    def translate_text(cls, text: str, target_lang: str = "en") -> str:
+        """Translates standard text prompts into target regional language."""
+        if not text or target_lang == "en":
+            return text
+        lang_dict = cls.COMMON_PROMPTS.get(target_lang, {})
+        return lang_dict.get(text, text)
+
 
 stt_provider = SpeechToTextProvider()
 tts_provider = TextToSpeechProvider()

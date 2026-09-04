@@ -11,6 +11,7 @@ from fastapi import APIRouter, Query, HTTPException, status
 
 from app.engines.farmer_intelligence import farmer_intelligence_engine
 from app.engines.farmer_dialogue_manager import farmer_dialogue_manager
+from app.pipeline.location_resolver import resolve_location
 from app.routers.satellite_groundwater import validate_coordinates
 from app.models.schemas import GroundwaterIntelligenceSchema, VoiceQueryRequest, VoiceQueryResponse
 
@@ -25,7 +26,7 @@ router = APIRouter(
     response_model=GroundwaterIntelligenceSchema,
     summary="Get Unified Groundwater & Farmer Intelligence",
     description=(
-        "Returns complete hydrogeological decision-support intelligence for any lat/lon coordinate. "
+        "Returns complete hydrogeological decision-support intelligence for any lat/lon coordinate or verified location. "
         "Automatically determines DWLR vs Satellite-Assisted coverage and produces unified groundwater signals, "
         "30-day forecast outlook, spatial risk signals, crop recommendations, and irrigation guidance."
     ),
@@ -33,12 +34,30 @@ router = APIRouter(
 def get_unified_groundwater_intelligence(
     latitude: Optional[float] = Query(None, description="Target latitude (-90.0 to +90.0)"),
     longitude: Optional[float] = Query(None, description="Target longitude (-180.0 to +180.0)"),
+    location_query: Optional[str] = Query(None, description="Location search query (village, city, district)"),
     radius_km: Optional[float] = Query(
         None, gt=0, le=500, description="Custom DWLR coverage radius in km (default 15.0 km)"
     ),
 ):
-    lat = latitude if latitude is not None else 20.5937
-    lon = longitude if longitude is not None else 78.9629
+    lat = latitude
+    lon = longitude
+
+    if lat is None or lon is None:
+        if location_query:
+            res = resolve_location(location_query)
+            if not res.is_resolved or res.latitude is None or res.longitude is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=res.error_message or "We couldn't verify that location. Please enter a valid village, town, city, district, state, or 6-digit PIN code."
+                )
+            lat = res.latitude
+            lon = res.longitude
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Coordinates or a verified location query are required. Please provide a valid location."
+            )
+
     validate_coordinates(lat, lon)
     try:
         intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(
@@ -60,9 +79,27 @@ def get_unified_groundwater_intelligence(
 def get_crop_advice_for_location(
     latitude: Optional[float] = Query(None, description="Target latitude (-90.0 to +90.0)"),
     longitude: Optional[float] = Query(None, description="Target longitude (-180.0 to +180.0)"),
+    location_query: Optional[str] = Query(None, description="Location search query"),
 ):
-    lat = latitude if latitude is not None else 20.5937
-    lon = longitude if longitude is not None else 78.9629
+    lat = latitude
+    lon = longitude
+
+    if lat is None or lon is None:
+        if location_query:
+            res = resolve_location(location_query)
+            if not res.is_resolved or res.latitude is None or res.longitude is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=res.error_message or "We couldn't verify that location. Please enter a valid location."
+                )
+            lat = res.latitude
+            lon = res.longitude
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Coordinates or a verified location query are required."
+            )
+
     validate_coordinates(lat, lon)
     try:
         intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(
@@ -104,8 +141,10 @@ def get_irrigation_advice_for_location(
             "longitude": longitude,
             "coverage_type": intel.coverage_type,
             "groundwater_condition": intel.groundwater_condition,
-            "rainfall_signal": intel.rainfall_signal,
+            "irrigation_guidance": intel.irrigation_implications,
             "irrigation_implications": intel.irrigation_implications,
+            "rainfall_signal": intel.rainfall_signal,
+            "risk_signals": intel.risk_alerts,
             "confidence": intel.confidence,
             "disclaimer": intel.disclaimer,
         }
@@ -119,13 +158,47 @@ def get_irrigation_advice_for_location(
 @router.post(
     "/conversation",
     response_model=VoiceQueryResponse,
-    summary="Farmer Conversational AI & Dialogue Manager Endpoint",
-    description="Multi-turn conversational dialogue endpoint with slot context, location-first resolution, minimum questions, and data provenance.",
+    summary="Farmer Conversational Intelligence Dialogue Query",
+    description="Processes farmer queries in 13 Indian regional languages and returns structured audio and visual intelligence response.",
 )
-def handle_farmer_conversation(request: VoiceQueryRequest) -> VoiceQueryResponse:
-    raw_query = request.query.strip() if request.query else ""
-    if not raw_query and not request.audio_base64:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Query message must be provided.")
-    session_id = request.session_id or "default"
-    return farmer_dialogue_manager.process_message(request, session_id=session_id)
+def process_farmer_conversation(
+    req: VoiceQueryRequest,
+    session_id: Optional[str] = Query("default", description="Farmer session ID for multi-turn dialogue context")
+):
+    try:
+        s_id = req.session_id or session_id or "default"
+        response = farmer_dialogue_manager.process_farmer_message(
+            request=req,
+            session_id=s_id
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing farmer conversation dialogue: {str(e)}",
+        )
+
+
+@router.post(
+    "/voice/query",
+    response_model=VoiceQueryResponse,
+    summary="Multi-lingual Voice & Text Groundwater Dialogue Query",
+    description="Processes farmer queries in 13 Indian regional languages and returns structured audio and visual intelligence response.",
+)
+def process_voice_or_text_farmer_query(
+    req: VoiceQueryRequest,
+    session_id: Optional[str] = Query("default", description="Farmer session ID for multi-turn dialogue context")
+):
+    try:
+        s_id = req.session_id or session_id or "default"
+        response = farmer_dialogue_manager.process_farmer_message(
+            request=req,
+            session_id=s_id
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing multilingual voice/text dialogue: {str(e)}",
+        )
 

@@ -26,6 +26,7 @@ from app.routers.provider_resilience import router as provider_resilience_router
 from app.routers.voice import router as voice_router
 from app.routers.official_intelligence import router as official_intelligence_router
 from app.routers.proactive_intelligence import router as proactive_intelligence_router
+from app.routers.location import router as location_router
 
 # Initialize Logging
 setup_logging()
@@ -172,6 +173,9 @@ app.include_router(official_intelligence_router, prefix=settings.API_V1_STR)
 app.include_router(official_intelligence_router, prefix="/api")
 app.include_router(proactive_intelligence_router, prefix=settings.API_V1_STR)
 app.include_router(proactive_intelligence_router, prefix="/api")
+app.include_router(location_router, prefix=settings.API_V1_STR)
+app.include_router(location_router, prefix="/api")
+app.include_router(location_router)
 
 
 @app.get("/", summary="Root Overview")
