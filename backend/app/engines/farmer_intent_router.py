@@ -487,7 +487,7 @@ class FarmerIntentRouter:
 
         if target_intent:
             if target_intent in location_required_intents:
-                active_loc = loc_res if loc_res.is_resolved else ctx.last_location
+                active_loc = loc_res if (loc_res and loc_res.is_resolved) else (ctx.last_location if (ctx.last_location and ctx.last_location.is_resolved) else None)
                 if not active_loc and not location_query:
                     ctx.pending_intent = target_intent
                     ctx.awaiting_location = True

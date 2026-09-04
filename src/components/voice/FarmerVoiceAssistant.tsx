@@ -188,7 +188,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         langCode,
         undefined, // audioBase64
         undefined, // DO NOT silently default to dashboard selectedStation!
-        text, // locationQuery candidate
+        undefined, // Do NOT pass query text as locationQuery!
         sessionIdRef.current,
         conversationalLocation
       );

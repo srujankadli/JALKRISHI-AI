@@ -267,7 +267,59 @@ def test_sequential_7_step_farmer_trajectory():
     print("==================================================")
 
 
+def test_crop_advice_without_location_requires_location():
+    """Explicit regression test: 'crop advice' on fresh session MUST ask for location and NEVER execute crop engine."""
+    print("\n=== RUNNING REGRESSION: CROP ADVICE WITHOUT LOCATION ===")
+    session_id = "test_fresh_crop_advice_regression"
+    farmer_intent_router.reset_context(session_id)
+
+    res = client.post("/api/v1/voice/respond", json={
+        "query": "crop advice",
+        "language": "en",
+        "session_id": session_id
+    })
+    assert res.status_code == 200
+    d = res.json()
+
+    assert d["response_type"] == "CONVERSATIONAL", f"Expected CONVERSATIONAL, got {d['response_type']}"
+    assert d["intent"] == "CROP_RECOMMENDATION"
+    assert d["location"] is None
+    assert d["location_required"] is True
+    assert d["awaiting_location"] is True
+    assert d["pending_intent"] == "CROP_RECOMMENDATION"
+    assert d["crop_info"] is None, "crop_info MUST be None when location is missing!"
+    assert d["intelligence"] is None, "intelligence MUST be None when location is missing!"
+    print("   [PASS] test_crop_advice_without_location_requires_location")
+
+
+def test_selected_station_does_not_satisfy_location_requirement():
+    """Explicit regression test: station_id (e.g. DWLR-KA-004) MUST NOT satisfy location requirement for crop advice."""
+    print("\n=== RUNNING REGRESSION: SELECTED STATION DOES NOT SATISFY LOCATION REQUIREMENT ===")
+    session_id = "test_selected_station_regression"
+    farmer_intent_router.reset_context(session_id)
+
+    res = client.post("/api/v1/voice/respond", json={
+        "query": "crop advice",
+        "language": "en",
+        "session_id": session_id,
+        "station_id": "DWLR-KA-004"
+    })
+    assert res.status_code == 200
+    d = res.json()
+
+    assert d["response_type"] == "CONVERSATIONAL", f"Expected CONVERSATIONAL, got {d['response_type']}"
+    assert d["location_required"] is True
+    assert d["awaiting_location"] is True
+    assert d["pending_intent"] == "CROP_RECOMMENDATION"
+    assert d["location"] is None
+    assert d["crop_info"] is None
+    assert d["intelligence"] is None
+    print("   [PASS] test_selected_station_does_not_satisfy_location_requirement")
+
+
 if __name__ == "__main__":
+    test_crop_advice_without_location_requires_location()
+    test_selected_station_does_not_satisfy_location_requirement()
     test_location_required_without_context()
     test_pending_intent_followup_flow()
     test_location_only_without_pending_intent()
