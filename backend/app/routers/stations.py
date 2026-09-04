@@ -25,7 +25,7 @@ def get_stations(
     status: Optional[str] = Query(None, description="Filter by Status: healthy, moderate, warning, critical"),
     trend: Optional[str] = Query(None, description="Filter by Trend: rising, stable, falling"),
     risk: Optional[str] = Query(None, description="Filter by Risk band: low (<0.35), medium (0.35-0.6), high (0.6-0.8), critical (>=0.8)"),
-    limit: int = Query(50, ge=1, le=5260, description="Page size limit (default 50, max 5260)"),
+    limit: int = Query(50, ge=1, le=10000, description="Page size limit (default 50, max 10000)"),
     offset: int = Query(0, ge=0, description="Page offset"),
 ) -> StationListResponse:
     # 1. Filter stations

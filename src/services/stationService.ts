@@ -34,8 +34,8 @@ export const stationService = {
     try {
       const res = await apiClient.get<ApiStationListResponse>(
         '/stations',
-        { limit: 5300 },
-        { useCache: true, cacheTtlMs: 60000, timeoutMs: 3500 }
+        { limit: 5260 },
+        { useCache: true, cacheTtlMs: 60000, timeoutMs: 8000 }
       );
       if (res && res.stations && res.stations.length > 0) {
         return res.stations;
