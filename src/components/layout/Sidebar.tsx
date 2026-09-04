@@ -30,29 +30,73 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { user } = useAuth();
 
   const isFarmer =
+    !user ||
     user?.system_role === 'FARMER' ||
     user?.email === 'farmer@jalkrishi.in' ||
     (user?.role?.toUpperCase().includes('FARMER') && !user?.role?.toUpperCase().includes('OFFICIAL'));
 
-  const navItems = [
+  const farmerNavItems = [
     {
       to: '/',
       icon: LayoutDashboard,
-      label: 'Dashboard',
+      label: 'My Farm',
       emoji: '🌾',
     },
-    ...(!isFarmer ? [{
-      to: '/official',
-      icon: Landmark,
-      label: 'Official Command Center',
-      badge: t('Command'),
-      badgeColor: 'bg-amber-600 text-white',
-      emoji: '🏛️',
-    }] : []),
+    {
+      to: '/crops',
+      icon: Sprout,
+      label: 'Crop Advice',
+      badge: t('AI Smart'),
+      badgeColor: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
+      emoji: '🌱',
+    },
+    {
+      to: '/forecast',
+      icon: TrendingUp,
+      label: 'Forecast',
+      emoji: '🔮',
+    },
+    {
+      to: '/whatsapp',
+      icon: MessageSquare,
+      label: 'Water Watch',
+      badge: t('Advisories'),
+      badgeColor: 'bg-emerald-600 text-white',
+      emoji: '💬',
+    },
     {
       to: '/map',
       icon: MapPin,
-      label: 'Groundwater Map',
+      label: 'Nearby Monitoring',
+      emoji: '🗺️',
+    },
+    {
+      to: '/help',
+      icon: HelpCircle,
+      label: 'Help & Knowledge',
+      emoji: '📚',
+    },
+    {
+      to: '/login',
+      icon: LogIn,
+      label: 'Login / Workspace',
+      emoji: '🔐',
+    },
+  ];
+
+  const officialNavItems = [
+    {
+      to: '/official',
+      icon: Landmark,
+      label: 'Official Command Center',
+      badge: t('Executive'),
+      badgeColor: 'bg-amber-600 text-white',
+      emoji: '🏛️',
+    },
+    {
+      to: '/map',
+      icon: MapPin,
+      label: 'Groundwater Network',
       badge: `${APP_CONFIG.totalDwlrStationsCount}`,
       emoji: '🗺️',
     },
@@ -71,25 +115,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
       emoji: '⚠️',
     },
     {
-      to: '/crops',
-      icon: Sprout,
-      label: 'Crop Advisor',
-      badge: t('AI Smart'),
-      badgeColor: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
-      emoji: '🌱',
-    },
-    {
       to: '/analytics',
       icon: BarChart3,
       label: 'Regional Analytics',
       emoji: '📊',
     },
     {
+      to: '/crops',
+      icon: Sprout,
+      label: 'Crop Intelligence',
+      emoji: '🌱',
+    },
+    {
       to: '/whatsapp',
       icon: MessageSquare,
-      label: 'WhatsApp Farmer',
-      badge: t('Chat'),
-      badgeColor: 'bg-emerald-600 text-white',
+      label: 'WhatsApp Dispatcher',
       emoji: '💬',
     },
     {
@@ -101,10 +141,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       to: '/login',
       icon: LogIn,
-      label: 'Officer Login Portal',
+      label: 'Officer Account Portal',
       emoji: '🔐',
     },
   ];
+
+  const navItems = isFarmer ? farmerNavItems : officialNavItems;
 
   return (
     <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white border-r border-stone-200 h-screen sticky top-0 z-30 select-none">
@@ -128,18 +170,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Live Telemetry Health Indicator */}
+      {/* Telemetry Health Indicator */}
       <div className="px-4 pt-3 pb-1">
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="text-xs font-semibold text-emerald-900">{t('DWLR Telemetry Network')}</span>
+        {isFarmer ? (
+          <div className="rounded-xl border border-agri-200 bg-agri-50/60 p-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-agri-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-agri-600"></span>
+              </span>
+              <span className="text-xs font-semibold text-agri-900">{t('Farmer Workspace Active')}</span>
+            </div>
+            <span className="text-[11px] font-bold text-agri-800">My Farm</span>
           </div>
-          <span className="text-[11px] font-bold font-mono text-emerald-800">5,260 {t('Nodes')}</span>
-        </div>
+        ) : (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-xs font-semibold text-emerald-900">{t('DWLR Telemetry Network')}</span>
+            </div>
+            <span className="text-[11px] font-bold font-mono text-emerald-800">5,260 {t('Nodes')}</span>
+          </div>
+        )}
       </div>
 
       {/* Navigation Links */}

@@ -15,6 +15,8 @@ import { EmptyState, LoadingState } from '../components/common/States';
 import { STATE_CENTERS } from '../utils/geoUtils';
 import { UnifiedGroundwaterPanel } from '../components/groundwater/UnifiedGroundwaterPanel';
 import { useLanguage } from '../context/LanguageContext';
+import { useFarm } from '../context/FarmContext';
+import { useAuth } from '../context/AuthContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
@@ -24,6 +26,14 @@ export const GroundwaterMapPage: React.FC = () => {
   const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
+  const { location: farmLocation, resolvedLocation, nearestStation, nearbyStations } = useFarm();
+  const { user } = useAuth();
+
+  const isFarmer =
+    !user ||
+    user?.system_role === 'FARMER' ||
+    user?.email === 'farmer@jalkrishi.in' ||
+    (user?.role?.toUpperCase().includes('FARMER') && !user?.role?.toUpperCase().includes('OFFICIAL'));
 
   // All 5,260 stations loaded into memory
   const [allStations, setAllStations] = useState<DWLRStation[]>([]);
@@ -177,17 +187,49 @@ export const GroundwaterMapPage: React.FC = () => {
     return filteredStations.slice(0, 40);
   }, [filteredStations]);
 
+  // Focus on farm location for farmer mode
+  useEffect(() => {
+    if (isFarmer && resolvedLocation && resolvedLocation.latitude && resolvedLocation.longitude) {
+      setPanToCoords({
+        lat: resolvedLocation.latitude,
+        lng: resolvedLocation.longitude,
+        zoom: 10,
+      });
+      if (nearestStation) {
+        setNearestStationData(nearestStation);
+      }
+    }
+  }, [isFarmer, resolvedLocation, nearestStation]);
+
   return (
     <div className="space-y-6 animate-fadeIn pb-8">
       {/* 1. Page Header */}
       <PageHeader
-        title={t('Interactive Groundwater Map')}
-        subtitle={t('Explore 5,260 simulated DWLR observation wells across India with cluster aggregation, telemetry depth gauges, and depletion alerts.')}
-        farmerNote={t('Click any colored cluster or pin (🟢 Healthy, 🟡 Moderate, 🟠 Warning, 🔴 Critical) to check local water depth and actionable irrigation advice.')}
+        title={
+          isFarmer && farmLocation
+            ? `${t('Groundwater Monitoring Near Your Farm')} (${farmLocation})`
+            : t('Interactive Groundwater Map')
+        }
+        subtitle={
+          isFarmer && farmLocation
+            ? t('Observation wells and regional aquifer evidence within monitoring range of your farm.')
+            : t('Explore 5,260 simulated DWLR observation wells across India with cluster aggregation, telemetry depth gauges, and depletion alerts.')
+        }
+        farmerNote={
+          isFarmer
+            ? t('Nearby DWLR stations provide scientific reference evidence. They are not direct sensors inside your borewell.')
+            : t('Click any colored cluster or pin (🟢 Healthy, 🟡 Moderate, 🟠 Warning, 🔴 Critical) to check local water depth and actionable irrigation advice.')
+        }
         badge={
-          <span className="rounded-full bg-water-100 border border-water-200 px-3 py-1 text-xs font-bold text-water-800">
-            5,260 {t('DWLR Stations')}
-          </span>
+          isFarmer && farmLocation ? (
+            <span className="rounded-full bg-agri-100 border border-agri-200 px-3 py-1 text-xs font-bold text-agri-800">
+              {nearbyStations.length} {t('Nearby Stations Found')}
+            </span>
+          ) : (
+            <span className="rounded-full bg-water-100 border border-water-200 px-3 py-1 text-xs font-bold text-water-800">
+              5,260 {t('DWLR Stations')}
+            </span>
+          )
         }
       />
 

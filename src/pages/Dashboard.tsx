@@ -13,6 +13,7 @@ import { stationService } from '../services/stationService';
 
 // Farm Context & Personalized Components
 import { useFarm } from '../context/FarmContext';
+import { useAuth } from '../context/AuthContext';
 import { MyFarmOverviewCard } from '../components/dashboard/MyFarmOverviewCard';
 import { FarmerOnboardingCard } from '../components/dashboard/FarmerOnboardingCard';
 
@@ -45,6 +46,14 @@ export const Dashboard: React.FC = () => {
   const { onSelectStation, selectedStation } = useOutletContext<OutletContextType>();
   const { t } = useLanguage();
   const { location: farmLocation } = useFarm();
+  const { user } = useAuth();
+
+  const isOfficial =
+    user &&
+    (['ADMIN', 'STATE_OFFICIAL', 'DISTRICT_OFFICIAL', 'HYDROLOGIST_ANALYST', 'READ_ONLY_OFFICIAL'].includes(
+      user.system_role || ''
+    ) ||
+      (user?.role && user.role.toUpperCase().includes('OFFICIAL') && !user.role.toUpperCase().includes('FARMER')));
 
   const [metrics, setMetrics] = useState<DashboardSummary | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState('Just now');
@@ -86,7 +95,9 @@ export const Dashboard: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="h-3 w-3 rounded-full bg-agri-500 animate-pulse" />
           <span className="text-xs font-bold text-stone-700 uppercase tracking-wide">
-            {t('System Operational • 5,260 Telemetry Nodes Synchronized')}
+            {isOfficial
+              ? t('Official Command Mode • 5,260 Telemetry Nodes Synchronized')
+              : `${t('Farmer Water Intelligence Active • Localized Farm Workspace')} (${farmLocation || t('All India')})`}
           </span>
         </div>
         <div className="flex items-center gap-3 text-xs font-medium text-stone-500">
@@ -134,58 +145,83 @@ export const Dashboard: React.FC = () => {
         </>
       )}
 
-      {/* 2. Nationwide Telemetry & Hydrologist Exploration Toggle */}
-      <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <Landmark className="h-5 w-5 text-stone-700" />
-            <div>
-              <h3 className="text-sm font-bold text-stone-900">
-                {t('Nationwide Groundwater Network & Analytics')}
-              </h3>
-              <p className="text-xs text-stone-500">
-                {t('Access all 5,260 DWLR telemetry nodes, stress rankings, and hydrologist tools')}
-              </p>
+      {/* 2. Official Command Center & National Network Section */}
+      {isOfficial ? (
+        <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <Landmark className="h-5 w-5 text-stone-700" />
+              <div>
+                <h3 className="text-sm font-bold text-stone-900">
+                  {t('Nationwide Groundwater Network & Analytics')}
+                </h3>
+                <p className="text-xs text-stone-500">
+                  {t('Access all 5,260 DWLR telemetry nodes, stress rankings, and hydrologist tools')}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                to="/official"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2 text-xs font-bold text-stone-800 hover:bg-stone-100 transition-colors"
+              >
+                <span>{t('Official Command Center')}</span>
+              </Link>
+              <button
+                onClick={() => setShowFullNetworkTelemetry((prev) => !prev)}
+                className="inline-flex items-center gap-1 rounded-xl bg-stone-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-stone-800 transition-colors cursor-pointer"
+              >
+                <span>{showFullNetworkTelemetry ? t('Collapse Network View') : t('View Network Analytics')}</span>
+                {showFullNetworkTelemetry ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Expandable Full Telemetry View */}
+          {showFullNetworkTelemetry && (
+            <div className="mt-5 space-y-6 border-t border-stone-200/60 pt-5">
+              <ExecutiveWaterBrief />
+              <StatCardsGrid metrics={metrics} />
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <GroundwaterTrendCard />
+                <RainfallRechargeCard />
+              </div>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                <div className="lg:col-span-6">
+                  <GroundwaterAlertsFeed onSelectStation={handleOpenStationById} />
+                </div>
+                <div className="lg:col-span-6">
+                  <AreasToWatchTable onSelectStation={handleOpenStationById} />
+                </div>
+              </div>
+              <GroundwaterCoverageCard />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-stone-200/80 bg-stone-50/50 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <Landmark className="h-4 w-4 text-stone-500" />
+              <div>
+                <h4 className="text-xs font-bold text-stone-700">
+                  {t('Official & Hydrologist Command Center')}
+                </h4>
+                <p className="text-[11px] text-stone-500">
+                  {t('Pan-India 5,260 telemetry node analytics and policy tools are restricted to authorized water officials.')}
+                </p>
+              </div>
+            </div>
             <Link
-              to="/official"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2 text-xs font-bold text-stone-800 hover:bg-stone-100 transition-colors"
+              to="/login"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-stone-600 hover:text-stone-900"
             >
-              <span>{t('Official Command Center')}</span>
+              <span>{t('Official Login')}</span>
+              <span>&rarr;</span>
             </Link>
-            <button
-              onClick={() => setShowFullNetworkTelemetry((prev) => !prev)}
-              className="inline-flex items-center gap-1 rounded-xl bg-stone-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-stone-800 transition-colors cursor-pointer"
-            >
-              <span>{showFullNetworkTelemetry ? t('Collapse Network View') : t('View Network Analytics')}</span>
-              {showFullNetworkTelemetry ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-            </button>
           </div>
         </div>
-
-        {/* Expandable Full Telemetry View */}
-        {showFullNetworkTelemetry && (
-          <div className="mt-5 space-y-6 border-t border-stone-200/60 pt-5">
-            <ExecutiveWaterBrief />
-            <StatCardsGrid metrics={metrics} />
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <GroundwaterTrendCard />
-              <RainfallRechargeCard />
-            </div>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-6">
-                <GroundwaterAlertsFeed onSelectStation={handleOpenStationById} />
-              </div>
-              <div className="lg:col-span-6">
-                <AreasToWatchTable onSelectStation={handleOpenStationById} />
-              </div>
-            </div>
-            <GroundwaterCoverageCard />
-          </div>
-        )}
-      </div>
+      )}
 
       {/* 3. Mini Map Preview */}
       <MiniMapPreview onSelectStation={onSelectStation} />

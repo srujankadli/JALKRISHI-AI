@@ -79,6 +79,32 @@ export interface StationForecast {
   forecastPoints: ForecastPoint[];
 }
 
+export interface LocationForecast {
+  locationName: string;
+  district?: string;
+  state?: string;
+  latitude: number;
+  longitude: number;
+  evidenceMode: 'DIRECT_DWLR' | 'REGIONAL_NEARBY_EVIDENCE' | 'SATELLITE_ASSISTED' | 'LOCATION_REQUIRED' | 'UNRESOLVED';
+  nearestStationId?: string;
+  nearestStationName?: string;
+  nearestStationDistanceKm?: number;
+  currentLevel?: number;
+  criticalThreshold: number;
+  projectedLevel30d?: number;
+  projectedLevelEnd?: number;
+  projectedDaysToCritical: number | null;
+  daysToCriticalUrgency: string;
+  forecastRisk: string;
+  horizonDays: number;
+  dailyChangeM: number;
+  confidenceScore: number;
+  farmerGuidance: string;
+  personalizedProfileNotes?: string[];
+  provenanceLabel: string;
+  forecastPoints: ForecastPoint[];
+}
+
 export type SoilType =
   | 'Alluvial'
   | 'Black'

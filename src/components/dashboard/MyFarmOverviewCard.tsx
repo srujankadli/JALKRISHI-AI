@@ -315,29 +315,150 @@ export const MyFarmOverviewCard: React.FC<MyFarmOverviewCardProps> = ({ onOpenSt
         </p>
       </div>
 
-      {/* 4. Quick Action Pills for Farmer */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Link
-          to="/crops"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-agri-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-agri-800 shadow-sm transition-all"
-        >
-          <Sprout className="h-4 w-4" />
-          <span>{t('Personalized Crop Advice')}</span>
-        </Link>
-        <Link
-          to="/forecast"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-all"
-        >
-          <Calendar className="h-4 w-4 text-stone-500" />
-          <span>{t('30-Day Water Forecast')}</span>
-        </Link>
-        <Link
-          to="/map"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-all"
-        >
-          <Layers className="h-4 w-4 text-stone-500" />
-          <span>{t('Explore Groundwater Map')}</span>
-        </Link>
+      {/* 4. Explicit Farm Water Profile Overview Card */}
+      <div className="mt-5 rounded-xl border border-stone-200 bg-stone-50/70 p-4 space-y-3">
+        <div className="flex items-center justify-between border-b border-stone-200/80 pb-2">
+          <div className="flex items-center gap-2">
+            <Sprout className="h-4 w-4 text-agri-700" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-stone-800">
+              {t('My Farm Water Profile')}
+            </h3>
+          </div>
+          <Link
+            to="/crops"
+            className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-2xs"
+          >
+            <Edit3 className="h-3 w-3 text-stone-500" />
+            <span>{t('Edit Farm Profile')}</span>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-3 lg:grid-cols-6">
+          <div className="rounded-lg bg-white p-2.5 border border-stone-200 shadow-2xs">
+            <span className="text-[10px] font-bold uppercase text-stone-400 block">{t('Location')}</span>
+            <span className="font-bold text-stone-900 line-clamp-1 mt-0.5">
+              {resolvedLocation?.district || location}
+            </span>
+          </div>
+
+          <div className="rounded-lg bg-white p-2.5 border border-stone-200 shadow-2xs">
+            <span className="text-[10px] font-bold uppercase text-stone-400 block">{t('Crop')}</span>
+            <span className="font-bold text-stone-900 line-clamp-1 mt-0.5">
+              {profile.crop ? `🌾 ${profile.crop}` : t('Not selected')}
+            </span>
+          </div>
+
+          <div className="rounded-lg bg-white p-2.5 border border-stone-200 shadow-2xs">
+            <span className="text-[10px] font-bold uppercase text-stone-400 block">{t('Water Sources')}</span>
+            <span className="font-bold text-stone-900 line-clamp-1 mt-0.5">
+              {profile.waterSources && profile.waterSources.length > 0 ? profile.waterSources.join(' + ') : t('Borewell')}
+            </span>
+          </div>
+
+          <div className="rounded-lg bg-white p-2.5 border border-stone-200 shadow-2xs">
+            <span className="text-[10px] font-bold uppercase text-stone-400 block">{t('Groundwater Dep.')}</span>
+            <span className="font-bold text-stone-900 line-clamp-1 mt-0.5">
+              {profile.groundwaterDependence || t('Not sure')}
+            </span>
+          </div>
+
+          <div className="rounded-lg bg-white p-2.5 border border-stone-200 shadow-2xs">
+            <span className="text-[10px] font-bold uppercase text-stone-400 block">{t('External Source')}</span>
+            <span className="font-bold text-stone-900 line-clamp-1 mt-0.5">
+              {profile.facilities.includes('CANAL_IRRIGATION') ? t('Canal Network') : t('Rain / Pond')}
+            </span>
+          </div>
+
+          <div className="rounded-lg bg-white p-2.5 border border-stone-200 shadow-2xs">
+            <span className="text-[10px] font-bold uppercase text-stone-400 block">{t('Water Reliability')}</span>
+            <span className="font-bold text-stone-900 line-clamp-1 mt-0.5">
+              {profile.waterReliability || t('Seasonal')}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Context-Prioritized Farmer Quick Actions */}
+      <div className="mt-5 space-y-2">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block">
+          {t('Personalized Actions for Your Farm Context')}
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Priority Actions based on water sources */}
+          {profile.groundwaterDependence === 'HIGH' || (profile.waterSources && profile.waterSources.includes('Borewell')) ? (
+            <>
+              <Link
+                to="/forecast"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-agri-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-agri-800 shadow-xs transition-all"
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{t('View Groundwater Forecast')}</span>
+              </Link>
+              <Link
+                to="/crops"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-2xs transition-all"
+              >
+                <Sprout className="h-3.5 w-3.5 text-agri-600" />
+                <span>{t('Get Irrigation Guidance')}</span>
+              </Link>
+              <Link
+                to="/map"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-2xs transition-all"
+              >
+                <Layers className="h-3.5 w-3.5 text-stone-500" />
+                <span>{t('Check Water Table Level')}</span>
+              </Link>
+            </>
+          ) : profile.waterSources && profile.waterSources.includes('Canal') ? (
+            <>
+              <Link
+                to="/crops"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-agri-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-agri-800 shadow-xs transition-all"
+              >
+                <Sprout className="h-3.5 w-3.5" />
+                <span>{t('Check Crop Recommendation')}</span>
+              </Link>
+              <Link
+                to="/forecast"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-2xs transition-all"
+              >
+                <Calendar className="h-3.5 w-3.5 text-stone-500" />
+                <span>{t('View Water Availability')}</span>
+              </Link>
+              <Link
+                to="/map"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-2xs transition-all"
+              >
+                <Layers className="h-3.5 w-3.5 text-stone-500" />
+                <span>{t('Groundwater Status')}</span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/forecast"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-agri-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-agri-800 shadow-xs transition-all"
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{t('Check Rainfall Outlook')}</span>
+              </Link>
+              <Link
+                to="/crops"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-2xs transition-all"
+              >
+                <Sprout className="h-3.5 w-3.5 text-agri-600" />
+                <span>{t('View Crop Advice')}</span>
+              </Link>
+              <Link
+                to="/whatsapp"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-2xs transition-all"
+              >
+                <Radio className="h-3.5 w-3.5 text-stone-500" />
+                <span>{t('Check Crop Water Stress')}</span>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -394,6 +394,36 @@ class StationForecastResponse(BaseModel):
     disclaimer: str
 
 
+class LocationForecastResponse(BaseModel):
+    location_name: str
+    district: Optional[str] = None
+    state: Optional[str] = None
+    latitude: float
+    longitude: float
+    evidence_mode: str  # "DIRECT_DWLR", "REGIONAL_NEARBY_EVIDENCE", "SATELLITE_ASSISTED", "LOCATION_REQUIRED", "UNRESOLVED"
+    nearest_station_id: Optional[str] = None
+    nearest_station_name: Optional[str] = None
+    nearest_station_distance_km: Optional[float] = None
+    current_depth: Optional[float] = None
+    critical_threshold: float
+    projected_depth_30d: Optional[float] = None
+    projected_depth_end: Optional[float] = None
+    days_to_critical: Optional[int] = None
+    days_to_critical_status: str
+    days_to_critical_urgency: str
+    forecast_risk: str
+    horizon_days: int
+    daily_change_m: float
+    forecast_points: List[ForecastPointResponse]
+    confidence: float
+    farmer_guidance: str
+    personalized_profile_notes: Optional[List[str]] = None
+    provenance_label: str
+    methodology: str
+    data_mode: str
+    disclaimer: str
+
+
 class ForecastSummaryResponse(BaseModel):
     total_stations: int
     stations_with_forecast: int

@@ -13,9 +13,11 @@ import {
   AlertCircle,
   CheckCircle2,
   X,
+  MapPin,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useFarm } from '../context/FarmContext';
 import { LanguageSelector } from '../components/common/LanguageSelector';
 import { APP_CONFIG } from '../utils/constants';
 
@@ -26,6 +28,7 @@ export const LoginPage: React.FC = () => {
   const location = useLocation();
   const { login, isLoading } = useAuth();
   const { currentLanguage, setLanguage, t } = useLanguage();
+  const { location: farmLocation, resolvedLocation, profile } = useFarm();
 
   const [activeTab, setActiveTab] = useState<LoginTab>('FARMER');
 
@@ -205,48 +208,117 @@ export const LoginPage: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 1: FARMER LOGIN FORM */}
+          {/* TAB 1: FARMER LOGIN & WORKSPACE */}
           {activeTab === 'FARMER' && (
-            <form onSubmit={handleFarmerSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
-                  <span>{t('Mobile Number or Email')}</span>
-                  <span className="text-[10px] text-slate-500">{t('Fast Registration')}</span>
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
-                  <input
-                    type="text"
-                    value={farmerPhoneOrEmail}
-                    onChange={(e) => setFarmerPhoneOrEmail(e.target.value)}
-                    placeholder={t('Enter 10-digit mobile number or email...')}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none transition-all"
-                  />
-                </div>
-              </div>
+            <div className="space-y-5">
+              {farmLocation ? (
+                /* Personalized Farm Workspace Banner */
+                <div className="rounded-2xl border border-teal-500/30 bg-teal-950/40 p-4 space-y-3">
+                  <div className="flex items-center justify-between border-b border-teal-800/40 pb-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-teal-400">
+                      {t('Welcome Back • Your Farm')}
+                    </span>
+                    <span className="text-[10px] bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded font-bold">
+                      {t('Active Workspace')}
+                    </span>
+                  </div>
 
-              {/* Status Notice on SMS OTP Provider */}
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 space-y-1">
-                <div className="flex items-center justify-between text-slate-300 font-bold">
-                  <span>{t('SMS OTP Verification Status')}</span>
-                  <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
-                    NOT_CONFIGURED
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-500 leading-relaxed">
-                  {t('SMS OTP gateway is not configured in current deployment environment. Authenticating directly via JalKrishi Farmer account credentials.')}
-                </p>
-              </div>
+                  <div className="flex items-start gap-2.5">
+                    <MapPin className="h-5 w-5 text-teal-400 shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="text-base font-black text-white">
+                        {resolvedLocation?.district || farmLocation}
+                        {resolvedLocation?.state && (
+                          <span className="text-xs font-normal text-slate-400 ml-1.5">
+                            ({resolvedLocation.state})
+                          </span>
+                        )}
+                      </h3>
+                      <p className="text-[11px] text-slate-400">
+                        {profile.facilities.length > 0
+                          ? `💧 ${profile.facilities.join(', ').replace(/_/g, ' ')}`
+                          : t('Complete your farm profile for personalized guidance')}
+                      </p>
+                    </div>
+                  </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-lg shadow-teal-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>{t('Continue as Farmer')}</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
+                  {/* Profile Summary Badges */}
+                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                    <div className="rounded-lg bg-slate-950/80 p-2 border border-slate-800">
+                      <span className="text-slate-500 block text-[10px] uppercase font-bold">{t('Current Crop')}</span>
+                      <span className="font-bold text-white truncate block">
+                        {profile.crop ? `🌾 ${profile.crop}` : t('Not selected')}
+                      </span>
+                    </div>
+                    <div className="rounded-lg bg-slate-950/80 p-2 border border-slate-800">
+                      <span className="text-slate-500 block text-[10px] uppercase font-bold">{t('Groundwater Dep.')}</span>
+                      <span className="font-bold text-white truncate block">
+                        {profile.groundwaterDependence || t('Not set')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Quick Action Navigation Grid */}
+                  <div className="grid grid-cols-2 gap-2 pt-2">
+                    <button
+                      onClick={() => navigate('/')}
+                      className="w-full py-2 px-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Sprout className="h-3.5 w-3.5" />
+                      <span>{t('See Water Status')}</span>
+                    </button>
+                    <button
+                      onClick={() => navigate('/forecast')}
+                      className="w-full py-2 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <ArrowRight className="h-3.5 w-3.5" />
+                      <span>{t('Check Forecast')}</span>
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
+              <form onSubmit={handleFarmerSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                    <span>{t('Mobile Number or Email')}</span>
+                    <span className="text-[10px] text-slate-500">{t('Farmer Login')}</span>
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+                    <input
+                      type="text"
+                      value={farmerPhoneOrEmail}
+                      onChange={(e) => setFarmerPhoneOrEmail(e.target.value)}
+                      placeholder={t('Enter 10-digit mobile number or email...')}
+                      className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Status Notice on SMS OTP Provider */}
+                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                  <div className="flex items-center justify-between text-slate-300 font-bold">
+                    <span>{t('SMS OTP Verification Status')}</span>
+                    <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
+                      NOT_CONFIGURED
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
+                    {t('SMS OTP gateway is not configured in current deployment environment. Authenticating directly via JalKrishi Farmer account credentials.')}
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-lg shadow-teal-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>{farmLocation ? t('Continue with Farmer Account') : t('Continue as Farmer')}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </form>
+            </div>
           )}
 
           {/* TAB 2: GOVERNMENT OFFICIAL LOGIN FORM */}

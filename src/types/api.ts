@@ -131,6 +131,36 @@ export interface ApiStationForecastResponse {
   disclaimer: string;
 }
 
+export interface ApiLocationForecastResponse {
+  location_name: string;
+  district?: string;
+  state?: string;
+  latitude: number;
+  longitude: number;
+  evidence_mode: 'DIRECT_DWLR' | 'REGIONAL_NEARBY_EVIDENCE' | 'SATELLITE_ASSISTED' | 'LOCATION_REQUIRED' | 'UNRESOLVED';
+  nearest_station_id?: string;
+  nearest_station_name?: string;
+  nearest_station_distance_km?: number;
+  current_depth?: number;
+  critical_threshold: number;
+  projected_depth_30d?: number;
+  projected_depth_end?: number;
+  days_to_critical: number | null;
+  days_to_critical_status: string;
+  days_to_critical_urgency: string;
+  forecast_risk: string;
+  horizon_days: number;
+  daily_change_m: number;
+  forecast_points: ApiForecastPoint[];
+  confidence: number;
+  farmer_guidance: string;
+  personalized_profile_notes?: string[];
+  provenance_label: string;
+  methodology: string;
+  data_mode: string;
+  disclaimer: string;
+}
+
 export interface ApiForecastSummaryResponse {
   total_stations: number;
   stations_with_forecast: number;

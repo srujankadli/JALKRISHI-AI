@@ -6,6 +6,7 @@ from app.models.schemas import (
     DWLRStationSchema,
     ForecastPointResponse,
     StationForecastResponse,
+    LocationForecastResponse,
     ForecastSummaryResponse,
     ForecastRiskRow,
     ForecastRiskRankingResponse,
@@ -15,6 +16,8 @@ from app.models.schemas import (
     TrendDirection,
 )
 from app.pipeline.dwlr_ingest import station_repo
+from app.pipeline.location_resolver import resolve_location
+from app.engines.satellite_groundwater import satellite_groundwater_engine
 
 # Supported forecast horizons
 SUPPORTED_HORIZONS = [7, 30, 60, 90]
@@ -146,14 +149,7 @@ class GroundwaterForecastingEngine:
 
         station = station_repo.get_by_id(station_id)
         if not station:
-            all_st = station_repo.get_all_stations()
-            station = all_st[0] if all_st else DWLRStationSchema(
-                id=station_id, stationCode="REF01", stationName="Reference Monitor",
-                state="Punjab", district="Sangrur", block="Sangrur", latitude=30.24, longitude=75.84,
-                waterLevel=18.5, previousWaterLevel=18.0, seasonalAverage=15.0, criticalThreshold=25.0,
-                riskScore=65.0, status="warning", trend="falling", trendRateMetersPerMonth=-0.15,
-                batteryLevel=95, telemetryStatus="online", lastUpdated="2026-09-04T12:00:00Z"
-            )
+            raise KeyError(f"DWLR Station '{station_id}' not found")
 
         daily_change, monthly_change, hist_used = GroundwaterForecastingEngine.calculate_trend_velocity(station)
         days_crit, crit_status, crit_urgency = GroundwaterForecastingEngine.calculate_days_to_critical(
@@ -439,5 +435,252 @@ class GroundwaterForecastingEngine:
             disclaimer=settings.DEMO_DISCLAIMER,
         )
 
+    @staticmethod
+    def forecast_location(
+        location_query: Optional[str] = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
+        horizon_days: int = 30,
+        crop: Optional[str] = None,
+        water_source: Optional[str] = None,
+        groundwater_dependence: Optional[str] = None,
+        water_reliability: Optional[str] = None,
+    ) -> LocationForecastResponse:
+        """
+        Calculates location-aware multi-horizon groundwater forecast for a farmer.
+        Integrates dynamic location resolution, spatial DWLR evidence thresholds
+        (<=15km Direct, 15-35km Regional Evidence, >35km Satellite-Assisted), and
+        personalized Farm Profile interpretation.
+        """
+        # Snap horizon_days to nearest supported horizon
+        if horizon_days not in SUPPORTED_HORIZONS:
+            horizon_days = min(SUPPORTED_HORIZONS, key=lambda h: abs(h - horizon_days))
+
+        # 1. Resolve Location
+        resolved = resolve_location(
+            location_query=location_query,
+            latitude=latitude,
+            longitude=longitude,
+        )
+
+        if not resolved.is_resolved or resolved.latitude is None or resolved.longitude is None:
+            raw_q = (location_query or "").strip()
+            is_unresolved = bool(raw_q)
+            return LocationForecastResponse(
+                location_name=raw_q if is_unresolved else "Location Required",
+                district=None,
+                state=None,
+                latitude=0.0,
+                longitude=0.0,
+                evidence_mode="UNRESOLVED" if is_unresolved else "LOCATION_REQUIRED",
+                nearest_station_id=None,
+                nearest_station_name=None,
+                nearest_station_distance_km=None,
+                current_depth=None,
+                critical_threshold=25.0,
+                projected_depth_30d=None,
+                projected_depth_end=None,
+                days_to_critical=None,
+                days_to_critical_status="unknown",
+                days_to_critical_urgency="Location required to evaluate aquifer horizon.",
+                forecast_risk="unknown",
+                horizon_days=horizon_days,
+                daily_change_m=0.0,
+                forecast_points=[],
+                confidence=0.0,
+                farmer_guidance=(
+                    f"Location '{raw_q}' could not be resolved. Please specify a district or state (e.g. Nashik, Kochi, Jaipur, Ballari)."
+                    if is_unresolved
+                    else "Enter or select your farm location to generate forward groundwater projections."
+                ),
+                personalized_profile_notes=[],
+                provenance_label="Location Required",
+                methodology="Requires spatial coordinate resolution.",
+                data_mode=settings.DATA_MODE,
+                disclaimer=settings.DEMO_DISCLAIMER,
+            )
+
+        target_lat = latitude if latitude is not None else resolved.latitude
+        target_lon = longitude if longitude is not None else resolved.longitude
+        loc_name = resolved.name
+        dist_name = resolved.district
+        st_name = resolved.state
+
+        # 2. Find nearest DWLR station
+        nearest_dict, dist = satellite_groundwater_engine.find_nearest_dwlr_station(target_lat, target_lon)
+
+        # 3. Classify spatial evidence mode based on scientifically justified radius
+        if resolved.matched_station_id and target_lat == resolved.latitude:
+            st_schema = station_repo.get_by_id(resolved.matched_station_id)
+            if st_schema:
+                nearest_dict = st_schema.model_dump()
+                dist = 0.0
+
+        if dist <= 15.0 and nearest_dict:
+            evidence_mode = "DIRECT_DWLR"
+            prov_label = f"Forecast based on nearby DWLR observation ({dist:.1f} km away)"
+        elif dist <= 35.0 and nearest_dict:
+            evidence_mode = "REGIONAL_NEARBY_EVIDENCE"
+            prov_label = f"Regional groundwater forecast based on nearby evidence ({dist:.1f} km away)"
+        else:
+            evidence_mode = "SATELLITE_ASSISTED"
+            prov_label = f"Satellite-assisted regional groundwater outlook (> 35 km radius)"
+
+        # 4. Extract baseline depth, critical threshold, and daily trend rate
+        st_id = None
+        st_display_name = None
+        st_obj = None
+
+        if nearest_dict and dist <= 35.0:
+            st_id = nearest_dict.get("id") or nearest_dict.get("stationCode")
+            st_display_name = nearest_dict.get("stationName")
+            if st_id:
+                st_obj = station_repo.get_by_id(st_id)
+
+        if st_obj:
+            daily_change, monthly_change, _ = GroundwaterForecastingEngine.calculate_trend_velocity(st_obj)
+            baseline_depth = st_obj.waterLevel
+            crit_thresh = st_obj.criticalThreshold
+            curr_trend = st_obj.trend.value
+        elif nearest_dict and dist <= 35.0:
+            baseline_depth = float(nearest_dict.get("waterLevel", 15.0))
+            crit_thresh = float(nearest_dict.get("criticalThreshold", 25.0))
+            rate = float(nearest_dict.get("trendRateMetersPerMonth", 0.15))
+            daily_change = round(rate / 30.0, 4)
+            monthly_change = round(rate, 3)
+            curr_trend = str(nearest_dict.get("trend", "falling"))
+        else:
+            # Satellite-assisted inference
+            sat_est = satellite_groundwater_engine.estimate_groundwater_condition(target_lat, target_lon)
+            if nearest_dict:
+                baseline_depth = float(nearest_dict.get("waterLevel", 18.0))
+            else:
+                baseline_depth = round(10.0 + sat_est.groundwater_stress_score * 20.0, 1)
+            crit_thresh = 25.0
+            daily_change = 0.005 if sat_est.groundwater_stress_score > 0.5 else -0.003
+            monthly_change = round(daily_change * 30.0, 3)
+            curr_trend = "falling" if sat_est.estimated_trend.upper() == "FALLING" else ("rising" if sat_est.estimated_trend.upper() == "RISING" else "stable")
+
+        # 5. Calculate Days-to-Critical and Risk Category
+        days_crit, crit_status, crit_urgency = GroundwaterForecastingEngine.calculate_days_to_critical(
+            baseline_depth,
+            crit_thresh,
+            daily_change,
+        )
+        risk_class = GroundwaterForecastingEngine.classify_forecast_risk(
+            baseline_depth,
+            crit_thresh,
+            daily_change,
+            days_crit,
+        )
+
+        # 6. Build Multi-Horizon Trajectory Points
+        if horizon_days == 7:
+            offsets = [0, 1, 3, 5, 7]
+        elif horizon_days == 30:
+            offsets = [0, 7, 15, 21, 30]
+        elif horizon_days == 60:
+            offsets = [0, 7, 15, 30, 45, 60]
+        else:  # 90 days
+            offsets = [0, 7, 15, 30, 60, 90]
+
+        points: List[ForecastPointResponse] = []
+        for t in offsets:
+            date_label = "Today" if t == 0 else f"+{t} Days"
+            proj = round(baseline_depth + daily_change * t, 2)
+            uncertainty = round(0.04 + 0.015 * math.sqrt(t) + 0.008 * t, 2) if t > 0 else 0.0
+            lower = round(max(0.1, proj - uncertainty), 2)
+            upper = round(proj + uncertainty, 2)
+
+            chg_val = round(daily_change * t, 2)
+            chg_label = "Baseline" if t == 0 else f"{'+' if chg_val > 0 else ''}{chg_val:.2f}m mbgl"
+            rain_est = round(min(120.0, 5.0 + 1.1 * t), 1)
+
+            points.append(
+                ForecastPointResponse(
+                    date=date_label,
+                    predicted_depth=proj,
+                    baseline_depth=baseline_depth,
+                    lower_bound=lower,
+                    upper_bound=upper,
+                    day_offset=t,
+                    expected_rainfall_mm=rain_est,
+                    change_label=chg_label,
+                )
+            )
+
+        end_proj = points[-1].predicted_depth
+        p30 = next((p.predicted_depth for p in points if p.day_offset == 30), end_proj)
+
+        # 7. Generate Action Guidance & Personalize with Farm Profile
+        if st_obj:
+            guidance = GroundwaterForecastingEngine.generate_farmer_guidance(st_obj, risk_class, end_proj, days_crit)
+        else:
+            if risk_class == "critical":
+                guidance = f"High Depletion Velocity: Projected groundwater table may reach {end_proj:.1f} mbgl. Restrict continuous pumping and implement deficit irrigation."
+            elif risk_class == "worsening":
+                guidance = f"Drawdown Expected: Water table projected to deepen to {end_proj:.1f} mbgl over {horizon_days} days. Prioritize micro-irrigation."
+            elif risk_class == "improving":
+                guidance = f"Positive Recharging: Water table expected to improve to {end_proj:.1f} mbgl. Adequate water for planned seasonal rotation."
+            else:
+                guidance = f"Stable Aquifer: Projected level near {end_proj:.1f} mbgl with normal seasonal fluctuations."
+
+        # Farm Profile Personalization Notes
+        profile_notes: List[str] = []
+        clean_gw_dep = (groundwater_dependence or "").upper()
+        clean_src = (water_source or "").title()
+
+        if "HIGH" in clean_gw_dep or "70" in clean_gw_dep or "80" in clean_gw_dep or "90" in clean_gw_dep or "100" in clean_gw_dep or "Borewell" in clean_src:
+            if risk_class in ["critical", "worsening"]:
+                profile_notes.append("Borewell Reliance Warning: High groundwater dependence creates acute vulnerability to this projected drawdown. Schedule night-time micro-drip cycles.")
+            else:
+                profile_notes.append("Groundwater Priority: Safe seasonal water reserve, but continue calibrating pump operating hours.")
+
+        if "Canal" in clean_src or "Pond" in clean_src:
+            profile_notes.append("Surface Conjunctive Use: Maximize surface/canal water scheduling during upcoming high-drawdown phases to relieve aquifer pressure.")
+
+        if crop and crop.strip():
+            c_name = crop.strip()
+            profile_notes.append(f"Crop Advisory ({c_name}): Align irrigation intervals to critical growth stages and consider mulch application to reduce soil moisture evaporation.")
+
+        if water_reliability and "seasonal" in water_reliability.lower():
+            profile_notes.append("Seasonal Reliability: Build bunding and check-dam trenches to capture seasonal percolation runoff.")
+
+        methodology_desc = (
+            f"Deterministic hydrogeological projection from {evidence_mode} baseline "
+            f"with calibrated seasonal rate of change ({daily_change:+.4f} m/day)."
+        )
+
+        return LocationForecastResponse(
+            location_name=loc_name,
+            district=dist_name,
+            state=st_name,
+            latitude=target_lat,
+            longitude=target_lon,
+            evidence_mode=evidence_mode,
+            nearest_station_id=st_id,
+            nearest_station_name=st_display_name,
+            nearest_station_distance_km=round(dist, 1) if dist is not None else None,
+            current_depth=baseline_depth,
+            critical_threshold=crit_thresh,
+            projected_depth_30d=p30,
+            projected_depth_end=end_proj,
+            days_to_critical=days_crit,
+            days_to_critical_status=crit_status,
+            days_to_critical_urgency=crit_urgency,
+            forecast_risk=risk_class,
+            horizon_days=horizon_days,
+            daily_change_m=daily_change,
+            forecast_points=points,
+            confidence=round(max(0.70, 0.95 - 0.002 * horizon_days), 2),
+            farmer_guidance=guidance,
+            personalized_profile_notes=profile_notes if profile_notes else None,
+            provenance_label=prov_label,
+            methodology=methodology_desc,
+            data_mode=settings.DATA_MODE,
+            disclaimer=settings.DEMO_DISCLAIMER,
+        )
+
 
 forecasting_engine = GroundwaterForecastingEngine()
+

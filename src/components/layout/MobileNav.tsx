@@ -32,30 +32,56 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   const { user } = useAuth();
 
   const isFarmer =
+    !user ||
     user?.system_role === 'FARMER' ||
     user?.email === 'farmer@jalkrishi.in' ||
     (user?.role?.toUpperCase().includes('FARMER') && !user?.role?.toUpperCase().includes('OFFICIAL'));
 
-  const mainNav = [
-    { to: '/', label: 'Dashboard', emoji: '🌾' },
-    ...(!isFarmer ? [{ to: '/official', label: 'Command Center', emoji: '🏛️' }] : []),
-    { to: '/map', label: 'Groundwater Map', emoji: '🗺️' },
-    { to: '/forecast', label: 'Forecast & Predictions', emoji: '🔮' },
-    { to: '/crops', label: 'Crop Advisor', emoji: '🌱' },
-    { to: '/anomalies', label: 'Anomaly Detection', emoji: '⚠️', badge: anomalyCount },
+  interface MobileNavItem {
+    to: string;
+    label: string;
+    emoji: string;
+    badge?: number;
+  }
+
+  const farmerMainNav: MobileNavItem[] = [
+    { to: '/', label: 'My Farm', emoji: '🌾' },
+    { to: '/crops', label: 'Crop Advice', emoji: '🌱' },
+    { to: '/forecast', label: 'Forecast', emoji: '🔮' },
+    { to: '/whatsapp', label: 'Water Watch', emoji: '💬' },
+    { to: '/map', label: 'Nearby', emoji: '🗺️' },
   ];
 
-  const fullNav = [
-    { to: '/', icon: LayoutDashboard, label: 'Dashboard', emoji: '🌾' },
-    ...(!isFarmer ? [{ to: '/official', icon: Landmark, label: 'Official Command Center', emoji: '🏛️', badge: 'Command' }] : []),
-    { to: '/map', icon: MapPin, label: 'Groundwater Map', emoji: '🗺️' },
-    { to: '/forecast', icon: TrendingUp, label: 'Forecast & Predictions', emoji: '🔮' },
-    { to: '/anomalies', icon: AlertTriangle, label: 'Anomaly Detection', emoji: '⚠️', badge: anomalyCount },
-    { to: '/crops', icon: Sprout, label: 'Crop Advisor', emoji: '🌱' },
-    { to: '/analytics', icon: BarChart3, label: 'Regional Analytics', emoji: '📊' },
-    { to: '/whatsapp', icon: MessageSquare, label: 'WhatsApp Farmer', emoji: '💬', badge: 'Chat' },
+  const officialMainNav: MobileNavItem[] = [
+    { to: '/official', label: 'Command', emoji: '🏛️' },
+    { to: '/map', label: 'Network', emoji: '🗺️' },
+    { to: '/forecast', label: 'Forecast', emoji: '🔮' },
+    { to: '/anomalies', label: 'Anomalies', emoji: '⚠️', badge: anomalyCount },
+    { to: '/analytics', label: 'Analytics', emoji: '📊' },
+  ];
+
+  const farmerFullNav = [
+    { to: '/', icon: LayoutDashboard, label: 'My Farm', emoji: '🌾' },
+    { to: '/crops', icon: Sprout, label: 'Crop Advice', emoji: '🌱' },
+    { to: '/forecast', icon: TrendingUp, label: 'Forecast', emoji: '🔮' },
+    { to: '/whatsapp', icon: MessageSquare, label: 'Water Watch', emoji: '💬', badge: 'Advisories' },
+    { to: '/map', icon: MapPin, label: 'Nearby Monitoring', emoji: '🗺️' },
     { to: '/help', icon: HelpCircle, label: 'Help & Knowledge', emoji: '📚' },
   ];
+
+  const officialFullNav = [
+    { to: '/official', icon: Landmark, label: 'Official Command Center', emoji: '🏛️', badge: 'Executive' },
+    { to: '/map', icon: MapPin, label: 'Groundwater Network', emoji: '🗺️' },
+    { to: '/forecast', icon: TrendingUp, label: 'Forecast & Predictions', emoji: '🔮' },
+    { to: '/anomalies', icon: AlertTriangle, label: 'Anomaly Detection', emoji: '⚠️', badge: anomalyCount },
+    { to: '/analytics', icon: BarChart3, label: 'Regional Analytics', emoji: '📊' },
+    { to: '/crops', icon: Sprout, label: 'Crop Intelligence', emoji: '🌱' },
+    { to: '/whatsapp', icon: MessageSquare, label: 'WhatsApp Dispatcher', emoji: '💬' },
+    { to: '/help', icon: HelpCircle, label: 'Help & Knowledge', emoji: '📚' },
+  ];
+
+  const mainNav = isFarmer ? farmerMainNav : officialMainNav;
+  const fullNav = isFarmer ? farmerFullNav : officialFullNav;
 
   return (
     <>

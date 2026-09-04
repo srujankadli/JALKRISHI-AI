@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-def run_tests():
+def test_forecasting_pipeline():
     print("==================================================")
     print("JalKrishi AI -- Phase D Forecasting Validation")
     print("==================================================")
@@ -80,9 +80,24 @@ def run_tests():
     assert f_data["days_to_critical"] >= 0
     print(f"   [OK] Days-to-Critical for DWLR-PB-001: {f_data['days_to_critical']} days (Urgency: {f_data['days_to_critical_urgency']}).")
 
-    # 8. Network Forecast Summary Endpoint
-    print("8. Testing GET /api/v1/forecast/summary...")
-    res_sum = client.get("/api/v1/forecast/summary")
+    # 8. RBAC Guard on Official Forecast Endpoints
+    print("8. Testing RBAC Security Guard on /api/v1/forecast/summary, /top-risk, /regional...")
+    # Unauthenticated should receive 401 or 403
+    res_unauth = client.get("/api/v1/forecast/summary")
+    assert res_unauth.status_code in [401, 403], f"Expected 401/403 for unauth summary, got {res_unauth.status_code}"
+
+    # Farmer role should receive 403
+    res_farm_login = client.post("/api/v1/auth/login", json={"username_or_email": "farmer@jalkrishi.in", "password": "pass"})
+    farm_token = res_farm_login.json()["access_token"]
+    res_farm_blocked = client.get("/api/v1/forecast/summary", headers={"Authorization": f"Bearer {farm_token}"})
+    assert res_farm_blocked.status_code == 403, f"Expected 403 for farmer summary, got {res_farm_blocked.status_code}"
+
+    # Official role should receive 200
+    res_adm_login = client.post("/api/v1/auth/login", json={"username_or_email": "admin@jalkrishi.gov.in", "password": "pass"})
+    adm_token = res_adm_login.json()["access_token"]
+    adm_headers = {"Authorization": f"Bearer {adm_token}"}
+
+    res_sum = client.get("/api/v1/forecast/summary", headers=adm_headers)
     assert res_sum.status_code == 200
     sum_data = res_sum.json()
     assert sum_data["total_stations"] == 5260
@@ -91,11 +106,11 @@ def run_tests():
     i = sum_data["stations_projected_improving"]
     s = sum_data["stations_projected_stable"]
     assert w + i + s == 5260, f"Sum {w+i+s} != 5260"
-    print(f"   [OK] Forecast summary verified: {w} Worsening + {s} Stable + {i} Improving = 5260.")
+    print(f"   [OK] RBAC verified and forecast summary verified: {w} Worsening + {s} Stable + {i} Improving = 5260.")
 
-    # 9. Top-Risk Forecast Ranking
-    print("9. Testing GET /api/v1/forecast/top-risk (limit=10)...")
-    res_top = client.get("/api/v1/forecast/top-risk?limit=10&days=30")
+    # 9. Top-Risk Forecast Ranking (Official only)
+    print("9. Testing GET /api/v1/forecast/top-risk (limit=10) with official auth...")
+    res_top = client.get("/api/v1/forecast/top-risk?limit=10&days=30", headers=adm_headers)
     assert res_top.status_code == 200
     top_data = res_top.json()
     assert len(top_data["rankings"]) == 10
@@ -104,9 +119,9 @@ def run_tests():
         assert r["days_to_critical"] is not None
     print(f"   [OK] Top 10 At-Risk stations ranked (Rank #1: {top_data['rankings'][0]['station_id']}, {top_data['rankings'][0]['state']} - {top_data['rankings'][0]['days_to_critical']} days).")
 
-    # 10. Regional Forecast Endpoint
-    print("10. Testing GET /api/v1/forecast/regional (90d)...")
-    res_reg = client.get("/api/v1/forecast/regional?days=90")
+    # 10. Regional Forecast Endpoint (Official only)
+    print("10. Testing GET /api/v1/forecast/regional (90d) with official auth...")
+    res_reg = client.get("/api/v1/forecast/regional?days=90", headers=adm_headers)
     assert res_reg.status_code == 200
     reg_data = res_reg.json()
     assert reg_data["total_regions"] >= 13
@@ -114,8 +129,45 @@ def run_tests():
     assert total_reg_stations == 5260
     print(f"   [OK] Regional 90-day forecast verified across {reg_data['total_regions']} states summing to 5,260 stations.")
 
+    # 11. Location-Aware Farmer Forecast (Dynamic across distinct locations)
+    print("11. Testing Dynamic Location-Aware Farmer Forecast (/api/v1/forecast/location)...")
+    test_locations = ["Nashik", "Kochi", "Jaipur", "Ballari", "Bengaluru"]
+    forecast_results = {}
+
+    for loc in test_locations:
+        res_loc = client.get(f"/api/v1/forecast/location?location={loc}&days=30&crop=Wheat&water_sources=Borewell")
+        assert res_loc.status_code == 200, f"Failed for location {loc}: {res_loc.text}"
+        loc_data = res_loc.json()
+        assert loc_data["location_name"] is not None
+        assert loc_data["latitude"] is not None and loc_data["longitude"] is not None
+        assert loc_data["evidence_mode"] in ["DIRECT_DWLR", "REGIONAL_NEARBY_EVIDENCE", "SATELLITE_ASSISTED"]
+        assert len(loc_data["forecast_points"]) == 5
+        assert loc_data["current_depth"] is not None and loc_data["current_depth"] > 0
+        forecast_results[loc] = loc_data
+
+    # Ensure forecasts are dynamically distinct and not cloned/fallback
+    depth_nashik = forecast_results["Nashik"]["current_depth"]
+    depth_kochi = forecast_results["Kochi"]["current_depth"]
+    depth_jaipur = forecast_results["Jaipur"]["current_depth"]
+    depth_ballari = forecast_results["Ballari"]["current_depth"]
+
+    assert depth_nashik != depth_kochi, "Nashik and Kochi forecasts must be dynamically different"
+    assert depth_jaipur != depth_ballari, "Jaipur and Ballari forecasts must be dynamically different"
+    print(f"   [OK] Dynamic Location Verification: Nashik ({depth_nashik}m) vs Kochi ({depth_kochi}m) vs Jaipur ({depth_jaipur}m) vs Ballari ({depth_ballari}m)")
+
+    # 12. Profile Personalization in Location Forecast
+    print("12. Testing Farm Profile Personalization in Location Forecast...")
+    res_borewell = client.get("/api/v1/forecast/location?location=Nashik&days=30&water_sources=Borewell&groundwater_dependence=HIGH&crop=Grapes")
+    res_canal = client.get("/api/v1/forecast/location?location=Nashik&days=30&water_sources=Canal&groundwater_dependence=LOW&crop=Rice")
+    assert res_borewell.status_code == 200 and res_canal.status_code == 200
+    bw_data = res_borewell.json()
+    cn_data = res_canal.json()
+    assert bw_data.get("personalized_profile_notes") is not None
+    assert any("borewell" in n.lower() or "grapes" in n.lower() for n in bw_data["personalized_profile_notes"])
+    print("   [OK] Farm profile personalization validated in location forecast output.")
+
     print("\n==================================================")
-    print("ALL PHASE D FORECASTING TESTS PASSED CLEANLY (100%)")
+    print("ALL PHASE D & LOCATION FORECASTING TESTS PASSED (100%)")
     print("==================================================")
 
 

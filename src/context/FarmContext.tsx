@@ -16,6 +16,9 @@ export interface FarmWaterProfile {
   externalPercentage?: number | null;
   rainfallDependency?: string | null;
   rainfallPercentage?: number | null;
+  waterSources?: string[];
+  groundwaterDependence?: string;
+  waterReliability?: string;
 }
 
 export const DEFAULT_FARM_PROFILE: FarmWaterProfile = {
@@ -29,6 +32,9 @@ export const DEFAULT_FARM_PROFILE: FarmWaterProfile = {
   externalPercentage: null,
   rainfallDependency: null,
   rainfallPercentage: null,
+  waterSources: [],
+  groundwaterDependence: '',
+  waterReliability: '',
 };
 
 export interface ResolvedFarmLocation {

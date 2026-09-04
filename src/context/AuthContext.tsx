@@ -27,11 +27,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(storedUser);
       setToken(storedToken);
     } else {
-      // Default initial session as Dr. Rajesh Kumar Sharma (Chief Hydrogeologist) for instant access
-      const defaultUser = authService.getMockUserProfile('admin@jalkrishi.gov.in');
+      // Default initial session as Progressive Farmer for farmer-first experience
+      const defaultUser = authService.getMockUserProfile('farmer@jalkrishi.in');
       setUser(defaultUser);
-      setToken('jalkrishi-default-session-token');
-      authService.setStoredSession(defaultUser, 'jalkrishi-default-session-token');
+      setToken('jalkrishi-farmer-session-token');
+      authService.setStoredSession(defaultUser, 'jalkrishi-farmer-session-token');
     }
     setIsLoading(false);
   }, []);
