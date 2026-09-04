@@ -450,7 +450,9 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
             <div className="flex items-center gap-2">
               <Radio className="h-4 w-4 text-teal-600 animate-pulse" />
               <span className="text-xs font-extrabold uppercase text-teal-900 tracking-wider">
-                Farmer Advice ({response.farmer_response_language.toUpperCase()}):
+                {response.response_type === 'CONVERSATIONAL'
+                  ? 'JalKrishi Assistant Response:'
+                  : `Farmer Advice (${response.farmer_response_language.toUpperCase()}):`}
               </span>
             </div>
 
@@ -482,11 +484,13 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
             {response.text_response}
           </div>
 
-          {/* Scientific Data-Honesty Footer */}
+          {/* Data-Honesty / Intent Mode Footer */}
           <div className="flex items-center justify-between text-[11px] font-mono text-teal-800 pt-1">
             <span className="flex items-center gap-1">
               <Info className="h-3.5 w-3.5 text-teal-600" />
-              {response.intelligence.coverage_type} Mode ({response.intelligence.estimation_mode})
+              {response.response_type === 'CONVERSATIONAL'
+                ? `Intent: ${response.intent || 'CONVERSATIONAL'} (Conversational Assistant)`
+                : `${response.intelligence?.coverage_type || 'Hydrogeological'} Mode (${response.intelligence?.estimation_mode || 'INTELLIGENCE'})`}
             </span>
             <button
               onClick={handleReset}

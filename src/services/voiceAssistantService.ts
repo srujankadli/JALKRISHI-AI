@@ -43,6 +43,8 @@ export interface VoiceQueryResponse {
   query_text: string;
   detected_language: string;
   farmer_response_language: string;
+  intent?: string;
+  response_type?: string;
   text_response: string;
   intelligence: any;
   location?: LocationInfo | null;
