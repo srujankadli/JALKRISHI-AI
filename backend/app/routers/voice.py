@@ -55,14 +55,14 @@ async def transcribe_audio(
     }
 
 
-from app.engines.farmer_intelligence_dispatcher import farmer_intelligence_dispatcher
+from app.engines.farmer_conversation_manager import farmer_conversation_manager
 
 
 @router.post("/respond", response_model=VoiceQueryResponse)
 def respond_to_voice_query(request: VoiceQueryRequest):
     """
     Core Voice Assistant Query Endpoint:
-    Dispatches farmer query to intent-specific intelligence engine (Weather, Crop, Irrigation, Recharge, Groundwater, etc.).
+    Orchestrates farmer query through FarmerConversationManager.
     Translates decision support into requested/detected language while preserving data honesty.
     """
     raw_query = request.query.strip() if request.query else ""
@@ -70,7 +70,7 @@ def respond_to_voice_query(request: VoiceQueryRequest):
         raise HTTPException(status_code=400, detail="Query text or audio_base64 payload must be provided.")
 
     sess_id = request.session_id or "default"
-    return farmer_intelligence_dispatcher.dispatch_query(request, session_id=sess_id)
+    return farmer_conversation_manager.process_farmer_message(request, session_id=sess_id)
 
 
 @router.post("/synthesize", response_model=TTSResponse)

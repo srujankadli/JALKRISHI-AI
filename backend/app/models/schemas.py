@@ -1260,6 +1260,8 @@ class VoiceQueryResponse(BaseModel):
     location_required: bool = Field(False, description="Whether location is required to proceed")
     awaiting_location: bool = Field(False, description="Whether the assistant is awaiting location input")
     pending_intent: Optional[str] = Field(None, description="Pending intent awaiting location clarification")
+    crop: Optional[str] = Field(None, description="Established conversational crop context")
+    farmer_name: Optional[str] = Field(None, description="Established farmer name")
 
 
 class TTSRequest(BaseModel):

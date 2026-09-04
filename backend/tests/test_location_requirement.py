@@ -103,7 +103,7 @@ def test_location_only_without_pending_intent():
     d = r.json()
     assert d["response_type"] == "CONVERSATIONAL"
     assert d["location"]["name"] == "Bengaluru Urban"
-    assert "What would you like to know about Bengaluru" in d["text_response"]
+    assert "What would you like to know" in d["text_response"]
     assert d["intelligence"] is None
     print("   [PASS] 'Bengaluru' (no pending intent) -> CONVERSATIONAL prompt asking what farmer wants to know!")
 

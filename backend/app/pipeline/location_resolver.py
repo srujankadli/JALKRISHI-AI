@@ -59,6 +59,8 @@ KNOWN_REFERENCE_LOCATIONS: Dict[str, Tuple[float, float, str, str]] = {
     "jaisalmer": (26.9157, 70.9083, "Jaisalmer", "Rajasthan"),
     "barmer": (25.7532, 71.4181, "Barmer", "Rajasthan"),
     "wayanad": (11.6854, 76.1320, "Wayanad", "Kerala"),
+    "hassan": (13.0033, 76.1004, "Hassan", "Karnataka"),
+    "mandya": (12.5218, 76.8951, "Mandya", "Karnataka"),
     "kanyakumari": (8.0883, 77.5385, "Kanyakumari", "Tamil Nadu"),
     "mumbai": (19.0760, 72.8777, "Mumbai", "Maharashtra"),
     "bombay": (19.0760, 72.8777, "Mumbai", "Maharashtra"),
@@ -80,6 +82,8 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "pune": "pune",
     "mysore": "mysore",
     "mysuru": "mysore",
+    "hassan": "hassan",
+    "mandya": "mandya",
     "mumbai": "mumbai",
     "bombay": "mumbai",
     "delhi": "delhi",
@@ -97,6 +101,8 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "ಬೆಂಗಳೂರಿನಲ್ಲಿ": "bengaluru",
     "ಬೆಂಗಳೂರಿನ": "bengaluru",
     "ಮೈಸೂರು": "mysore",
+    "ಹಾಸನ": "hassan",
+    "ಮಂಡ್ಯ": "mandya",
     "ಮುಂಬೈ": "mumbai",
     "ದೆಹಲಿ": "delhi",
     "ಪುಣೆ": "pune",
@@ -113,6 +119,8 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "अमृतसर": "amritsar",
     "पुणे": "pune",
     "मैसूर": "mysore",
+    "हासन": "hassan",
+    "मांड्या": "mandya",
     "बेंगलुरु": "bengaluru",
     "बैंगलोर": "bengaluru",
     "बेंगलोर": "bengaluru",
@@ -235,15 +243,17 @@ def resolve_location(
     query_text: Optional[str] = None,
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
+    station_id: Optional[str] = None,
 ) -> LocationResolution:
     """
     Dynamically resolves place names to geographic coordinates.
     Priority:
-    1. Direct match on location_query or query_text in MULTILINGUAL_PLACE_MAP & KNOWN_REFERENCE_LOCATIONS
-    2. Station ID / station Code match in DWLR repository
-    3. District / Block / State match in DWLR repository
-    4. Explicit latitude & longitude coordinate match
-    5. Return is_resolved=False with clean limitation error message.
+    1. Direct match on station_id in DWLR repository
+    2. Direct match on location_query or query_text in MULTILINGUAL_PLACE_MAP & KNOWN_REFERENCE_LOCATIONS
+    3. Station ID / station Code match in DWLR repository
+    4. District / Block / State match in DWLR repository
+    5. Explicit latitude & longitude coordinate match
+    6. Return is_resolved=False with clean limitation error message.
     """
     import logging
     logger = logging.getLogger("app.location_resolver")

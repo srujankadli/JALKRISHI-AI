@@ -345,7 +345,7 @@ class FarmerIntentRouter:
             scores["RECHARGE_ADVICE"] += 0.8
         if any(w in clean for w in recharge_modifiers):
             scores["RECHARGE_ADVICE"] += 0.6
-        if "save groundwater" in clean or "how can i save groundwater" in clean or "improve groundwater" in clean or "increase groundwater" in clean:
+        if "save groundwater" in clean or "how can i save groundwater" in clean or "improve groundwater" in clean or "increase groundwater" in clean or "recharge" in clean:
             scores["RECHARGE_ADVICE"] += 1.0
 
         # --- D. GROUNDWATER_FORECAST SIGNALS ---
