@@ -3,6 +3,7 @@ import { Search, X, MapPin } from 'lucide-react';
 import type { DWLRStation } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatDepth } from '../../utils/formatters';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface MapSearchDropdownProps {
   stations: DWLRStation[];
@@ -13,8 +14,11 @@ interface MapSearchDropdownProps {
 export const MapSearchDropdown: React.FC<MapSearchDropdownProps> = ({
   stations,
   onSelectStation,
-  placeholder = 'Search by Station ID, Village, District, State or Block...',
+  placeholder,
 }) => {
+  const { t } = useLanguage();
+  const defaultPlaceholder = t('Search by Station ID, Village, District, State or Block...');
+  const searchPlaceholder = placeholder ? t(placeholder) : defaultPlaceholder;
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<DWLRStation[]>([]);
@@ -78,7 +82,7 @@ export const MapSearchDropdown: React.FC<MapSearchDropdownProps> = ({
           onFocus={() => {
             if (results.length > 0) setIsOpen(true);
           }}
-          placeholder={placeholder}
+          placeholder={searchPlaceholder}
           className="w-full rounded-xl border border-stone-300 bg-white py-2.5 pl-10 pr-10 text-sm text-stone-900 placeholder:text-stone-400 shadow-xs focus:border-agri-600 focus:outline-none focus:ring-2 focus:ring-agri-600/20"
         />
         {query && (

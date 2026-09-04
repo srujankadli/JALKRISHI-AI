@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface SectionHeaderProps {
   title: string;
@@ -15,6 +16,8 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   action,
   icon,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
       <div className="flex items-center gap-2.5">
@@ -22,12 +25,12 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold tracking-tight text-stone-900 sm:text-xl">
-              {title}
+              {t(title)}
             </h2>
             {badge}
           </div>
           {subtitle && (
-            <p className="text-xs text-stone-500 sm:text-sm">{subtitle}</p>
+            <p className="text-xs text-stone-500 sm:text-sm">{t(subtitle)}</p>
           )}
         </div>
       </div>

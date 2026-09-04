@@ -7,9 +7,11 @@ import {
   Radio,
   ArrowRight,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const QuickActionsGrid: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const cards = [
     {
@@ -70,16 +72,16 @@ export const QuickActionsGrid: React.FC = () => {
               </div>
 
               <h3 className="mt-3.5 text-base font-bold text-stone-900 group-hover:text-agri-800 transition-colors">
-                {card.title}
+                {t(card.title)}
               </h3>
 
               <p className="mt-1 text-xs text-stone-600 leading-relaxed">
-                {card.description}
+                {t(card.description)}
               </p>
             </div>
 
             <div className="mt-4 pt-3 border-t border-stone-100/80 flex items-center justify-between text-xs font-bold text-agri-700 group-hover:text-agri-900">
-              <span>Open Tool</span>
+              <span>{t('Open Tool')}</span>
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
             </div>
           </div>

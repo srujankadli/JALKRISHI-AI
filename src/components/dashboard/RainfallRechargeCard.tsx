@@ -12,8 +12,10 @@ import {
 import { CloudRain, Sprout } from 'lucide-react';
 import { ChartCard } from '../common/ChartCard';
 import { metricService } from '../../services/metricService';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const RainfallRechargeCard: React.FC = () => {
+  const { t } = useLanguage();
   const [trends, setTrends] = useState<any[]>([]);
 
   useEffect(() => {
@@ -26,12 +28,12 @@ export const RainfallRechargeCard: React.FC = () => {
 
   return (
     <ChartCard
-      title="Rainfall & Groundwater Recharge"
-      subtitle="Monthly precipitation (mm) against calculated aquifer recharge index"
+      title={t("Rainfall & Groundwater Recharge")}
+      subtitle={t("Monthly precipitation (mm) against calculated aquifer recharge index")}
       badge={
         <span className="inline-flex items-center gap-1 rounded-full bg-agri-100 px-2.5 py-0.5 text-xs font-bold text-agri-800">
           <CloudRain className="h-3 w-3 text-water-600" />
-          Monsoon Active
+          {t('Monsoon Active')}
         </span>
       }
     >
@@ -48,10 +50,10 @@ export const RainfallRechargeCard: React.FC = () => {
                   <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-lg text-xs space-y-1">
                     <p className="font-bold text-stone-900">{item.month} 2026</p>
                     <p className="text-water-700 font-semibold">
-                      Rainfall: {item.rainfall} mm
+                      {t('Rainfall:')} {item.rainfall} mm
                     </p>
                     <p className="text-agri-700 font-semibold">
-                      Recharge Index: {item.rechargeRate}
+                      {t('Recharge Index:')} {item.rechargeRate}
                     </p>
                   </div>
                 );
@@ -60,8 +62,8 @@ export const RainfallRechargeCard: React.FC = () => {
             }}
           />
           <Legend wrapperStyle={{ fontSize: 11, paddingTop: 6 }} />
-          <Bar dataKey="rainfall" name="Rainfall (mm)" fill="#38bdf8" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="rechargeRate" name="Recharge Index" fill="#16a34a" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="rainfall" name={t('Rainfall (mm)')} fill="#0284c7" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="rechargeRate" name={t('Recharge Index')} fill="#15803d" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
 
@@ -70,7 +72,7 @@ export const RainfallRechargeCard: React.FC = () => {
         <div className="flex items-start gap-2">
           <Sprout className="h-4 w-4 text-agri-700 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            <strong className="text-agri-950 font-bold">Hydrological Interpretation: </strong>
+            <strong className="text-agri-950 font-bold">{t('Hydrological Interpretation:')} </strong>
             Recent monsoon rainfall (180mm avg) is supporting steady groundwater recovery across central and eastern river basins. Water tables in alluvial zones are rebounding +0.3m this cycle.
           </p>
         </div>

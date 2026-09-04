@@ -34,7 +34,7 @@ interface OutletContextType {
 
 export const Dashboard: React.FC = () => {
   const { onSelectStation, selectedStation } = useOutletContext<OutletContextType>();
-  const { currentLanguage } = useLanguage();
+  const { currentLanguage, t } = useLanguage();
 
   const [metrics, setMetrics] = useState<DashboardSummary | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState('Just now');
@@ -75,13 +75,13 @@ export const Dashboard: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="h-3 w-3 rounded-full bg-agri-500 animate-pulse" />
           <span className="text-xs font-bold text-stone-700 uppercase tracking-wide">
-            System Operational &bull; 5,260 Telemetry Nodes Synchronized
+            {t('System Operational • 5,260 Telemetry Nodes Synchronized')}
           </span>
         </div>
         <div className="flex items-center gap-4 text-xs font-medium text-stone-500">
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
-            Updated: {lastUpdatedText}
+            {t('Updated:')} {t(lastUpdatedText)}
           </span>
           <button
             onClick={fetchSummary}
@@ -90,7 +90,7 @@ export const Dashboard: React.FC = () => {
             title="Refresh simulation telemetry data"
           >
             <RotateCcw className={`h-3 w-3 ${isRefreshing ? 'animate-spin text-agri-700' : ''}`} />
-            <span>Refresh</span>
+            <span>{t('Refresh')}</span>
           </button>
         </div>
       </div>
@@ -139,8 +139,8 @@ export const Dashboard: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-stone-900 text-lg">Quick Tools & Services</h3>
-            <p className="text-xs text-stone-500">Fast access to key groundwater and agricultural tools</p>
+            <h3 className="font-bold text-stone-900 text-lg">{t('Quick Tools & Services')}</h3>
+            <p className="text-xs text-stone-500">{t('Fast access to key groundwater and agricultural tools')}</p>
           </div>
         </div>
         <QuickActionsGrid />

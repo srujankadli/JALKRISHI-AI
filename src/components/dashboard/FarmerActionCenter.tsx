@@ -9,9 +9,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const FarmerActionCenter: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const actions = [
     {
@@ -91,22 +93,22 @@ export const FarmerActionCenter: React.FC = () => {
                     <Icon className={`h-6 w-6 ${act.iconColor}`} />
                   </div>
                   <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase ${act.badgeStyle}`}>
-                    {act.badge}
+                    {t(act.badge)}
                   </span>
                 </div>
 
                 <h3 className="mt-3.5 text-base font-bold text-stone-900 group-hover:text-agri-800 transition-colors">
-                  {act.title}
+                  {t(act.title)}
                 </h3>
 
                 <p className="mt-1 text-xs text-stone-600 leading-relaxed">
-                  {act.description}
+                  {t(act.description)}
                 </p>
               </div>
 
               <div className="mt-5 pt-3 border-t border-stone-100 flex items-center justify-between">
                 <span className="text-xs font-bold text-agri-700 group-hover:text-agri-900">
-                  {act.cta}
+                  {t(act.cta)}
                 </span>
                 <ArrowRight className="h-4 w-4 text-agri-700 transition-transform group-hover:translate-x-1" />
               </div>

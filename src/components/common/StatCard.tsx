@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface StatCardProps {
   title: string;
@@ -31,6 +32,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   highlightColor = 'default',
   onClick,
 }) => {
+  const { t } = useLanguage();
   const borderHighlight = {
     default: 'border-stone-200 hover:border-stone-300',
     healthy: 'border-emerald-200 hover:border-emerald-300 bg-emerald-50/20',
@@ -48,7 +50,7 @@ export const StatCard: React.FC<StatCardProps> = ({
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">{title}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">{t(title)}</p>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
               {value}
@@ -66,7 +68,7 @@ export const StatCard: React.FC<StatCardProps> = ({
                 {trend.direction === 'up' && <TrendingUp className="mr-0.5 h-3.5 w-3.5" />}
                 {trend.direction === 'down' && <TrendingDown className="mr-0.5 h-3.5 w-3.5" />}
                 {trend.direction === 'neutral' && <Minus className="mr-0.5 h-3.5 w-3.5" />}
-                {trend.value}
+                {t(trend.value)}
               </span>
             )}
           </div>
@@ -78,14 +80,14 @@ export const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       {subtitle && (
-        <p className="mt-2 text-xs font-medium text-stone-600">{subtitle}</p>
+        <p className="mt-2 text-xs font-medium text-stone-600">{t(subtitle)}</p>
       )}
 
       {farmerNote && (
         <div className="mt-3 border-t border-stone-100 pt-2.5">
           <p className="text-xs text-stone-700">
-            <span className="font-semibold text-agri-800">🌾 Insight: </span>
-            {farmerNote}
+            <span className="font-semibold text-agri-800">🌾 {t('Insight')}: </span>
+            {t(farmerNote)}
           </p>
         </div>
       )}

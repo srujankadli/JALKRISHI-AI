@@ -10,8 +10,10 @@ import {
   Globe,
 } from 'lucide-react';
 import { systemService, type SystemStatusData } from '../../services/systemService';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const SystemDiagnosticsCard: React.FC = () => {
+  const { t } = useLanguage();
   const [statusData, setStatusData] = useState<SystemStatusData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -56,15 +58,15 @@ export const SystemDiagnosticsCard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-black text-stone-900">
-                System Health & Engine Diagnostics
+                {t('System Health & Engine Diagnostics')}
               </h3>
               <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 border border-indigo-300 px-2.5 py-0.5 text-xs font-bold text-indigo-800">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                Phase J Production Hardened
+                {t('Production Hardened')}
               </span>
             </div>
             <p className="text-xs text-stone-500 font-medium">
-              Real-time observability of FastAPI microservices, intelligence engines, and data pipeline contracts
+              {t('Real-time observability of microservices, intelligence engines, and data pipelines')}
             </p>
           </div>
         </div>
@@ -74,7 +76,7 @@ export const SystemDiagnosticsCard: React.FC = () => {
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs transition-all cursor-pointer"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>Refresh Diagnostics</span>
+          <span>{t('Refresh Diagnostics')}</span>
         </button>
       </div>
 

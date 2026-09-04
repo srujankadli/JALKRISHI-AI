@@ -21,12 +21,14 @@ import { RainfallOutlookCard } from '../components/forecast/RainfallOutlookCard'
 import { RegionalForecastTable } from '../components/forecast/RegionalForecastTable';
 import { FarmerActionAdvice } from '../components/forecast/FarmerActionAdvice';
 import { ForecastMethodologyNote } from '../components/forecast/ForecastMethodologyNote';
+import { useLanguage } from '../context/LanguageContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
 }
 
 export const ForecastPage: React.FC = () => {
+  const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
 
@@ -92,27 +94,27 @@ export const ForecastPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-water-600 animate-pulse" />
           <span className="font-extrabold text-stone-900">
-            JalKrishi Predictive Intelligence Engine
+            {t('JalKrishi Predictive Intelligence Engine')}
           </span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">30–90 Day Hydrological Extrapolations</span>
+          <span className="text-stone-500 font-medium">{t('30–90 Day Hydrological Extrapolations')}</span>
         </div>
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-water-600" />
-          Reference Simulation Model
+          {t('Reference Simulation Model')}
         </span>
       </div>
 
       {/* 1. Page Header */}
       <PageHeader
-        title="Prediction & Forecasting Intelligence"
-        subtitle="Anticipate groundwater depletion trends and critical threshold margins before water stress impacts agricultural yield."
-        farmerNote="Predictions estimate when your water table might reach warning or critical limits, helping you choose the right crops and calibrate irrigation early."
+        title={t('Prediction & Forecasting Intelligence')}
+        subtitle={t('Anticipate groundwater depletion trends and critical threshold margins before water stress impacts agricultural yield.')}
+        farmerNote={t('Predictions estimate when your water table might reach warning or critical limits, helping you choose the right crops and calibrate irrigation early.')}
         badge={
           <span className="rounded-full bg-water-100 border border-water-200 px-3 py-1 text-xs font-bold text-water-800 flex items-center gap-1.5 shadow-xs">
             <Sparkles className="h-3.5 w-3.5 text-water-700" />
-            90-Day Projection AI Model
+            {t('90-Day Projection AI Model')}
           </span>
         }
       />

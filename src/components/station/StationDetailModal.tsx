@@ -11,6 +11,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import type { DWLRStation } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatDepth, formatRiskScore } from '../../utils/formatters';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface StationDetailModalProps {
   station: DWLRStation | null;
@@ -25,6 +26,7 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
   onNavigateToCropAdvisor,
   onNavigateToForecast,
 }) => {
+  const { t } = useLanguage();
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
 
   if (!station) return null;
@@ -65,7 +67,7 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
           </span>
           <span className="inline-flex items-center gap-1 text-xs text-stone-500">
             <Wifi className="h-3.5 w-3.5 text-emerald-600" />
-            Telemetry Online ({station.lastUpdated})
+            {t('Telemetry Online')} ({station.lastUpdated})
           </span>
         </div>
 
@@ -75,7 +77,7 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
           </h2>
           <p className="flex items-center gap-1.5 text-xs text-stone-500 sm:text-sm mt-0.5">
             <MapPin className="h-4 w-4 text-stone-400 shrink-0" />
-            {station.block} Block, {station.district} District, {station.state} &bull; Lat: {station.latitude.toFixed(4)}, Long: {station.longitude.toFixed(4)}
+            {station.block} {t('Block')}, {station.district} {t('District')}, {station.state} &bull; Lat: {station.latitude.toFixed(4)}, Long: {station.longitude.toFixed(4)}
           </p>
         </div>
 
@@ -84,13 +86,13 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
           <div className="flex items-start gap-2.5">
             <span className="text-xl">🌾</span>
             <div>
-              <h3 className="text-sm font-bold text-agri-900">Groundwater Situation for Farmers</h3>
+              <h3 className="text-sm font-bold text-agri-900">{t('Groundwater Situation for Farmers')}</h3>
               <p className="mt-1 text-xs sm:text-sm leading-relaxed text-agri-900">
-                {station.farmerSummary || 'Groundwater table is being continuously monitored by Central Ground Water Board telemetry.'}
+                {station.farmerSummary || t('Groundwater table is being continuously monitored by Central Ground Water Board telemetry.')}
               </p>
               {station.actionableAdvice && (
                 <p className="mt-2 text-xs sm:text-sm font-semibold text-agri-950 bg-white/70 rounded-lg p-2.5 border border-agri-200/60">
-                  🌱 Recommended Action: {station.actionableAdvice}
+                  🌱 {t('Recommended Action')}: {station.actionableAdvice}
                 </p>
               )}
             </div>
@@ -100,35 +102,35 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
         {/* Key Metrics Grid */}
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-xl border border-stone-200 bg-stone-50/60 p-3.5 text-center">
-            <span className="text-xs font-medium text-stone-500">Current Water Depth</span>
+            <span className="text-xs font-medium text-stone-500">{t('Current Water Depth')}</span>
             <p className="mt-1 text-xl font-extrabold text-stone-900">
               {formatDepth(station.waterLevel)}
             </p>
-            <span className="text-[11px] text-stone-400">meters below ground</span>
+            <span className="text-[11px] text-stone-400">{t('meters below ground')}</span>
           </div>
 
           <div className="rounded-xl border border-stone-200 bg-stone-50/60 p-3.5 text-center">
-            <span className="text-xs font-medium text-stone-500">Seasonal Average</span>
+            <span className="text-xs font-medium text-stone-500">{t('Seasonal Average')}</span>
             <p className="mt-1 text-xl font-extrabold text-stone-900">
               {formatDepth(station.seasonalAverage)}
             </p>
-            <span className="text-[11px] text-stone-400">historical benchmark</span>
+            <span className="text-[11px] text-stone-400">{t('historical benchmark')}</span>
           </div>
 
           <div className="rounded-xl border border-stone-200 bg-stone-50/60 p-3.5 text-center">
-            <span className="text-xs font-medium text-stone-500">Risk Assessment</span>
+            <span className="text-xs font-medium text-stone-500">{t('Risk Assessment')}</span>
             <p className="mt-1 text-xl font-extrabold text-stone-900">
               {formatRiskScore(station.riskScore)}
             </p>
-            <span className="text-[11px] text-stone-400">{station.status.toUpperCase()}</span>
+            <span className="text-[11px] text-stone-400">{t(station.status.toUpperCase())}</span>
           </div>
 
           <div className="rounded-xl border border-stone-200 bg-stone-50/60 p-3.5 text-center">
-            <span className="text-xs font-medium text-stone-500">Days to Critical</span>
+            <span className="text-xs font-medium text-stone-500">{t('Days to Critical')}</span>
             <p className="mt-1 text-xl font-extrabold text-rose-700">
-              {station.daysToCritical ? `${station.daysToCritical} Days` : 'Safe'}
+              {station.daysToCritical ? `${station.daysToCritical} ${t('Days')}` : t('Safe')}
             </p>
-            <span className="text-[11px] text-stone-400">at current draw rate</span>
+            <span className="text-[11px] text-stone-400">{t('at current draw rate')}</span>
           </div>
         </div>
 
@@ -137,9 +139,9 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-agri-700" />
-              <h4 className="text-sm font-bold text-stone-900">6-Month Water Level & Rainfall Profile</h4>
+              <h4 className="text-sm font-bold text-stone-900">{t('6-Month Water Level & Rainfall Profile')}</h4>
             </div>
-            <span className="text-xs text-stone-500">Depth in mbgl (Lower curve = deeper water)</span>
+            <span className="text-xs text-stone-500">{t('Depth in mbgl (Lower curve = deeper water)')}</span>
           </div>
 
           <div className="h-48 w-full">
@@ -160,9 +162,9 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
                       return (
                         <div className="rounded-lg border border-stone-200 bg-white p-2 text-xs shadow-md">
                           <p className="font-semibold text-stone-800">{payload[0].payload.date}</p>
-                          <p className="text-water-700">Depth: {payload[0].value} mbgl</p>
+                          <p className="text-water-700">{t('Depth')}: {payload[0].value} mbgl</p>
                           {payload[0].payload.rainfall && (
-                            <p className="text-agri-700">Rainfall: {payload[0].payload.rainfall} mm</p>
+                            <p className="text-agri-700">{t('Rainfall')}: {payload[0].payload.rainfall} mm</p>
                           )}
                         </div>
                       );
@@ -189,17 +191,17 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
             onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
             className="text-xs font-semibold text-stone-500 hover:text-stone-900 underline"
           >
-            {showTechnicalDetails ? '▼ Hide Technical & Hydrogeological Specs' : '▶ Show Technical & Hydrogeological Specs (For Researchers / Engineers)'}
+            {showTechnicalDetails ? t('▼ Hide Technical & Hydrogeological Specs') : t('▶ Show Technical & Hydrogeological Specs (For Researchers / Engineers)')}
           </button>
 
           {showTechnicalDetails && (
             <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-stone-50 p-3 text-xs text-stone-700 border border-stone-200">
-              <div><strong className="text-stone-900">Aquifer Type:</strong> {station.aquiferType || 'Unconfined Alluvial'}</div>
-              <div><strong className="text-stone-900">Soil Stratum:</strong> {station.soilType || 'Sandy Alluvium'}</div>
-              <div><strong className="text-stone-900">Critical Threshold:</strong> {station.criticalThreshold} mbgl</div>
-              <div><strong className="text-stone-900">Depletion Slope:</strong> {station.trendRateMetersPerMonth} m/month</div>
-              <div><strong className="text-stone-900">Telemetry Battery:</strong> {station.batteryLevel}% (Solar float)</div>
-              <div><strong className="text-stone-900">Hardware ID:</strong> {station.id}</div>
+              <div><strong className="text-stone-900">{t('Aquifer Type')}:</strong> {station.aquiferType || 'Unconfined Alluvial'}</div>
+              <div><strong className="text-stone-900">{t('Soil Stratum')}:</strong> {station.soilType || 'Sandy Alluvium'}</div>
+              <div><strong className="text-stone-900">{t('Critical Threshold')}:</strong> {station.criticalThreshold} mbgl</div>
+              <div><strong className="text-stone-900">{t('Depletion Slope')}:</strong> {station.trendRateMetersPerMonth} m/month</div>
+              <div><strong className="text-stone-900">{t('Telemetry Battery')}:</strong> {station.batteryLevel}% (Solar float)</div>
+              <div><strong className="text-stone-900">{t('Hardware ID')}:</strong> {station.id}</div>
             </div>
           )}
         </div>
@@ -210,7 +212,7 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
             onClick={onClose}
             className="rounded-xl border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-100"
           >
-            Close
+            {t('Close')}
           </button>
 
           <div className="flex items-center gap-2">
@@ -223,7 +225,7 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
                 className="inline-flex items-center gap-1.5 rounded-xl bg-agri-50 px-3.5 py-2 text-xs font-bold text-agri-800 border border-agri-200 hover:bg-agri-100"
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                View Crop Advice for this Well
+                {t('View Crop Advice for this Well')}
               </button>
             )}
 
@@ -235,7 +237,7 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
                 }}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-water-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-water-800"
               >
-                <span>30-90 Day Forecast</span>
+                <span>{t('30-90 Day Forecast')}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             )}

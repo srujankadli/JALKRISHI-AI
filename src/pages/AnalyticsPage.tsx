@@ -25,6 +25,7 @@ import { ReportExportPanel } from '../components/analytics/ReportExportPanel';
 import { DataQualityCard } from '../components/analytics/DataQualityCard';
 import { DataPipelineStatusCard } from '../components/data/DataPipelineStatusCard';
 import { CSVValidatorPanel } from '../components/data/CSVValidatorPanel';
+import { useLanguage } from '../context/LanguageContext';
 import type {
   StateComparisonRow,
   DistrictAnalysisRow,
@@ -36,6 +37,7 @@ interface OutletContextType {
 }
 
 export const AnalyticsPage: React.FC = () => {
+  const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
 
@@ -333,27 +335,27 @@ export const AnalyticsPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-agri-600 animate-pulse" />
           <span className="font-extrabold text-stone-900">
-            JalKrishi Policy & Hydrology Decision Engine
+            {t('JalKrishi Policy & Hydrology Decision Engine')}
           </span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">5,260 Simulated DWLR Telemetry Observation Wells</span>
+          <span className="text-stone-500 font-medium">{t('5,260 Simulated DWLR Telemetry Observation Wells')}</span>
         </div>
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-agri-600" />
-          Reference Simulation
+          {t('Reference Simulation')}
         </span>
       </div>
 
       {/* 1. Page Header */}
       <PageHeader
-        title="Groundwater Analytics & Decision Support"
-        subtitle="Compare groundwater conditions across states and districts, identify critical drawdown zones, and evaluate agricultural water security."
-        farmerNote="By aggregating thousands of telemetry nodes, policy planners and farmer cooperatives can proactively roster irrigation schedules and grant allocations."
+        title={t('Groundwater Analytics & Decision Support')}
+        subtitle={t('Compare groundwater conditions across states and districts, identify critical drawdown zones, and evaluate agricultural water security.')}
+        farmerNote={t('By aggregating thousands of telemetry nodes, policy planners and farmer cooperatives can proactively roster irrigation schedules and grant allocations.')}
         badge={
           <span className="rounded-full bg-stone-900 px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 shadow-xs">
             <BarChart3 className="h-3.5 w-3.5 text-amber-400" />
-            Decision Intelligence v2.6
+            {t('Decision Intelligence v2.6')}
           </span>
         }
       />

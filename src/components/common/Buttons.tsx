@@ -1,5 +1,6 @@
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -18,11 +19,14 @@ export const PrimaryButton: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
+  const { t } = useLanguage();
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2.5 text-sm font-semibold min-h-[44px]',
     lg: 'px-5 py-3 text-base font-bold min-h-[48px]',
   };
+
+  const labelText = typeof children === 'string' ? t(children) : children;
 
   return (
     <button
@@ -32,7 +36,7 @@ export const PrimaryButton: React.FC<ButtonProps> = ({
       {...props}
     >
       {Icon && iconPosition === 'left' && <Icon className="h-4 w-4 shrink-0" />}
-      <span>{children}</span>
+      <span>{labelText}</span>
       {Icon && iconPosition === 'right' && <Icon className="h-4 w-4 shrink-0" />}
     </button>
   );
@@ -47,11 +51,14 @@ export const SecondaryButton: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
+  const { t } = useLanguage();
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2.5 text-sm font-semibold min-h-[44px]',
     lg: 'px-5 py-3 text-base font-bold min-h-[48px]',
   };
+
+  const labelText = typeof children === 'string' ? t(children) : children;
 
   return (
     <button
@@ -61,7 +68,7 @@ export const SecondaryButton: React.FC<ButtonProps> = ({
       {...props}
     >
       {Icon && iconPosition === 'left' && <Icon className="h-4 w-4 shrink-0 text-stone-500" />}
-      <span>{children}</span>
+      <span>{labelText}</span>
       {Icon && iconPosition === 'right' && <Icon className="h-4 w-4 shrink-0 text-stone-500" />}
     </button>
   );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, AlertCircle, CheckCircle2, ArrowRight, Eye } from 'lucide-react';
 import type { GroundwaterAnomaly, AnomalySeverity } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface AlertCardProps {
   anomaly: GroundwaterAnomaly;
@@ -8,6 +9,8 @@ interface AlertCardProps {
 }
 
 export const AlertCard: React.FC<AlertCardProps> = ({ anomaly, onViewDetails }) => {
+  const { t } = useLanguage();
+
   const getSeverityStyle = (severity: AnomalySeverity) => {
     switch (severity) {
       case 'critical':
@@ -60,10 +63,10 @@ export const AlertCard: React.FC<AlertCardProps> = ({ anomaly, onViewDetails }) 
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className={`rounded-md border px-2 py-0.5 text-xs font-bold uppercase ${style.badge}`}>
-                {anomaly.severity}
+                {t(anomaly.severity)}
               </span>
               <span className="text-xs font-semibold text-stone-500">
-                {anomaly.anomalyType}
+                {t(anomaly.anomalyType)}
               </span>
             </div>
             <span className="text-xs text-stone-500">{anomaly.detectedAt}</span>
@@ -74,13 +77,13 @@ export const AlertCard: React.FC<AlertCardProps> = ({ anomaly, onViewDetails }) 
           </h3>
 
           <p className="mt-1.5 text-xs text-stone-800 sm:text-sm">
-            <span className="font-semibold text-agri-900">What happened: </span>
-            {anomaly.farmerExplanation}
+            <span className="font-semibold text-agri-900">{t('What happened:')} </span>
+            {t(anomaly.farmerExplanation)}
           </p>
 
           <div className="mt-2.5 rounded-lg border border-stone-200/70 bg-white/80 p-2.5 text-xs text-stone-700">
-            <span className="font-semibold text-agri-800">🌱 Farmer Action: </span>
-            {anomaly.suggestedAction}
+            <span className="font-semibold text-agri-800">🌱 {t('Farmer Action:')} </span>
+            {t(anomaly.suggestedAction)}
           </div>
 
           {onViewDetails && (
@@ -89,7 +92,7 @@ export const AlertCard: React.FC<AlertCardProps> = ({ anomaly, onViewDetails }) 
                 onClick={() => onViewDetails(anomaly)}
                 className="inline-flex items-center gap-1 text-xs font-bold text-agri-700 hover:text-agri-900 hover:underline"
               >
-                View Technical Analysis
+                {t('View Technical Analysis')}
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>

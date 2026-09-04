@@ -4,6 +4,7 @@ import { TrendingDown, ArrowRight, ShieldAlert } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 import { metricService } from '../../services/metricService';
 import { formatDepth } from '../../utils/formatters';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface AreasToWatchTableProps {
   onSelectStation: (stationId: string) => void;
@@ -11,6 +12,7 @@ interface AreasToWatchTableProps {
 
 export const AreasToWatchTable: React.FC<AreasToWatchTableProps> = ({ onSelectStation }) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [areas, setAreas] = useState<any[]>([]);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export const AreasToWatchTable: React.FC<AreasToWatchTableProps> = ({ onSelectSt
             onClick={() => navigate('/forecast')}
             className="text-xs font-bold text-agri-700 hover:text-agri-900 inline-flex items-center gap-1"
           >
-            View all risk areas <ArrowRight className="h-3.5 w-3.5" />
+            {t('View all risk areas')} <ArrowRight className="h-3.5 w-3.5" />
           </button>
         }
       />
@@ -42,13 +44,13 @@ export const AreasToWatchTable: React.FC<AreasToWatchTableProps> = ({ onSelectSt
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-stone-50 text-stone-600 uppercase text-[11px] font-bold border-b border-stone-200">
               <tr>
-                <th className="px-4 py-3">Rank</th>
-                <th className="px-4 py-3">District & State</th>
-                <th className="px-4 py-3">Current Depth</th>
-                <th className="px-4 py-3">Risk Level</th>
-                <th className="px-4 py-3">Trend</th>
-                <th className="px-4 py-3">Days to Critical</th>
-                <th className="px-4 py-3 text-right">Action</th>
+                <th className="px-4 py-3">{t('Rank')}</th>
+                <th className="px-4 py-3">{t('District & State')}</th>
+                <th className="px-4 py-3">{t('Current Depth')}</th>
+                <th className="px-4 py-3">{t('Risk Level')}</th>
+                <th className="px-4 py-3">{t('Trend')}</th>
+                <th className="px-4 py-3">{t('Days to Critical')}</th>
+                <th className="px-4 py-3 text-right">{t('Action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 font-medium text-stone-800">
@@ -80,7 +82,7 @@ export const AreasToWatchTable: React.FC<AreasToWatchTableProps> = ({ onSelectSt
                       }`}
                     >
                       <span className={`h-1.5 w-1.5 rounded-full ${item.risk === 'Critical' ? 'bg-rose-600' : 'bg-amber-600'}`} />
-                      {item.risk}
+                      {t(item.risk)}
                     </span>
                   </td>
 
@@ -93,7 +95,7 @@ export const AreasToWatchTable: React.FC<AreasToWatchTableProps> = ({ onSelectSt
 
                   <td className="px-4 py-3">
                     <span className="font-extrabold text-rose-700 bg-rose-50 border border-rose-100 rounded-md px-2 py-0.5 font-mono">
-                      {item.daysToCritical} days
+                      {item.daysToCritical} {t('days')}
                     </span>
                   </td>
 
@@ -105,7 +107,7 @@ export const AreasToWatchTable: React.FC<AreasToWatchTableProps> = ({ onSelectSt
                       }}
                       className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-bold text-stone-700 hover:bg-stone-100"
                     >
-                      Details
+                      {t('Details')}
                     </button>
                   </td>
                 </tr>

@@ -18,8 +18,10 @@ import { FeedbackForm } from '../components/help/FeedbackForm';
 import { DataIssueForm } from '../components/help/DataIssueForm';
 import { SystemDiagnosticsCard } from '../components/common/SystemDiagnosticsCard';
 import { AIIntelligencePipelineCard } from '../components/help/AIIntelligencePipelineCard';
+import { useLanguage } from '../context/LanguageContext';
 
 export const HelpPage: React.FC = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -49,27 +51,27 @@ export const HelpPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-agri-600 animate-pulse" />
           <span className="font-extrabold text-stone-900">
-            JalKrishi Knowledge Base &amp; System Documentation
+            {t('JalKrishi Knowledge Base & System Documentation')}
           </span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">JalKrishi Reference DWLR Network</span>
+          <span className="text-stone-500 font-medium">{t('JalKrishi Reference DWLR Network')}</span>
         </div>
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-agri-600" />
-          Reference Simulation Telemetry
+          {t('Reference Simulation Telemetry')}
         </span>
       </div>
 
       {/* 1. Page Header */}
       <PageHeader
-        title="Help & Knowledge Center"
-        subtitle="Understand JalKrishi AI, groundwater depth indicators, forecasting models, anomaly triage, and crop recommendation logic."
-        farmerNote="Everything you need to know about understanding your local water table, interpreting alerts, and choosing the right crop for your land."
+        title={t('Help & Knowledge Center')}
+        subtitle={t('Understand JalKrishi AI, groundwater depth indicators, forecasting models, anomaly triage, and crop recommendation logic.')}
+        farmerNote={t('Everything you need to know about understanding your local water table, interpreting alerts, and choosing the right crop for your land.')}
         badge={
           <span className="rounded-full bg-stone-900 px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 shadow-xs">
             <BookOpen className="h-3.5 w-3.5 text-amber-400" />
-            Documentation &amp; FAQ
+            {t('Documentation & FAQ')}
           </span>
         }
       />

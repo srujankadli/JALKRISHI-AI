@@ -14,12 +14,14 @@ import { PageHeader } from '../components/common/PageHeader';
 import { EmptyState, LoadingState } from '../components/common/States';
 import { STATE_CENTERS } from '../utils/geoUtils';
 import { UnifiedGroundwaterPanel } from '../components/groundwater/UnifiedGroundwaterPanel';
+import { useLanguage } from '../context/LanguageContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
 }
 
 export const GroundwaterMapPage: React.FC = () => {
+  const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
 
@@ -179,12 +181,12 @@ export const GroundwaterMapPage: React.FC = () => {
     <div className="space-y-6 animate-fadeIn pb-8">
       {/* 1. Page Header */}
       <PageHeader
-        title="Interactive Groundwater Map"
-        subtitle="Explore 5,260 simulated DWLR observation wells across India with cluster aggregation, telemetry depth gauges, and depletion alerts."
-        farmerNote="Click any colored cluster or pin (🟢 Healthy, 🟡 Moderate, 🟠 Warning, 🔴 Critical) to check local water depth and actionable irrigation advice."
+        title={t('Interactive Groundwater Map')}
+        subtitle={t('Explore 5,260 simulated DWLR observation wells across India with cluster aggregation, telemetry depth gauges, and depletion alerts.')}
+        farmerNote={t('Click any colored cluster or pin (🟢 Healthy, 🟡 Moderate, 🟠 Warning, 🔴 Critical) to check local water depth and actionable irrigation advice.')}
         badge={
           <span className="rounded-full bg-water-100 border border-water-200 px-3 py-1 text-xs font-bold text-water-800">
-            5,260 DWLR Stations
+            5,260 {t('DWLR Stations')}
           </span>
         }
       />
@@ -262,25 +264,25 @@ export const GroundwaterMapPage: React.FC = () => {
           <div className="flex items-center justify-between pb-3 border-b border-stone-100">
             <div>
               <h3 className="font-extrabold text-stone-900 text-sm">
-                Observation Wells
+                {t('Observation Wells')}
               </h3>
               <p className="text-[11px] text-stone-500">
-                Showing top {stationListPreview.length} of {filteredStations.length.toLocaleString('en-IN')}
+                {t('Showing top')} {stationListPreview.length} {t('of')} {filteredStations.length.toLocaleString('en-IN')}
               </p>
             </div>
             <span className="text-[11px] font-semibold text-agri-700 bg-agri-50 px-2 py-0.5 rounded">
-              Click to Inspect
+              {t('Click to Inspect')}
             </span>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-3 pt-3 pr-1">
             {loading ? (
-              <LoadingState message="Loading 5,260 DWLR telemetry nodes..." />
+              <LoadingState message={t('Loading 5,260 DWLR telemetry nodes...')} />
             ) : filteredStations.length === 0 ? (
               <EmptyState
-                title="No Stations Found"
-                description="No observation wells match your current search or filter combination. Try clearing some filters."
-                actionText="Clear All Filters"
+                title={t('No Stations Found')}
+                description={t('No observation wells match your current search or filter combination. Try clearing some filters.')}
+                actionText={t('Clear All Filters')}
                 onAction={handleResetFilters}
               />
             ) : (

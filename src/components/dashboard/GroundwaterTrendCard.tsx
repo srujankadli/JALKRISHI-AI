@@ -13,8 +13,10 @@ import {
 import { TrendingDown, Activity, Calendar } from 'lucide-react';
 import { ChartCard } from '../common/ChartCard';
 import { metricService } from '../../services/metricService';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const GroundwaterTrendCard: React.FC = () => {
+  const { t } = useLanguage();
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | '90d'>('30d');
   const [chartData, setChartData] = useState<any[]>([]);
 
@@ -33,22 +35,22 @@ export const GroundwaterTrendCard: React.FC = () => {
       badge={
         <span className="inline-flex items-center gap-1 rounded-full bg-water-100 px-2.5 py-0.5 text-xs font-bold text-water-800">
           <Activity className="h-3 w-3" />
-          14.80 mbgl Current
+          14.80 mbgl {t('Current')}
         </span>
       }
       actions={
         <div className="flex items-center rounded-lg border border-stone-200 bg-stone-100/80 p-0.5 text-xs font-semibold">
-          {(['7d', '30d', '90d'] as const).map((t) => (
+          {(['7d', '30d', '90d'] as const).map((timeVal) => (
             <button
-              key={t}
-              onClick={() => setTimeframe(t)}
+              key={timeVal}
+              onClick={() => setTimeframe(timeVal)}
               className={`rounded-md px-2.5 py-1 transition-all ${
-                timeframe === t
+                timeframe === timeVal
                   ? 'bg-white text-stone-900 shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              {t === '7d' ? '7 Days' : t === '30d' ? '30 Days' : '90 Days'}
+              {timeVal === '7d' ? `7 ${t('Days')}` : timeVal === '30d' ? `30 ${t('Days')}` : `90 ${t('Days')}`}
             </button>
           ))}
         </div>
@@ -57,13 +59,13 @@ export const GroundwaterTrendCard: React.FC = () => {
       {/* Top Trend Summary Header */}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2">
-          <span className="text-stone-500">Trend Direction:</span>
+          <span className="text-stone-500">{t('Trend Direction:')}</span>
           <span className="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
             <TrendingDown className="h-3 w-3" />
-            Water level is falling (-4.2% seasonal draw)
+            {t('Water level is falling (-4.2% seasonal draw)')}
           </span>
         </div>
-        <span className="text-stone-400">Lower curve = deeper water</span>
+        <span className="text-stone-400">{t('Lower curve = deeper water')}</span>
       </div>
 
       <ResponsiveContainer width="100%" height={260}>
@@ -89,13 +91,13 @@ export const GroundwaterTrendCard: React.FC = () => {
                     </p>
                     <div className="border-t border-stone-100 pt-1">
                       <p className="text-water-800 font-extrabold text-sm">
-                        Depth: {item.depth} mbgl
+                        {t('Depth:')} {item.depth} mbgl
                       </p>
                       <p className="text-stone-500">
-                        Historical Baseline: {item.baseline} mbgl
+                        {t('Historical Baseline:')} {item.baseline} mbgl
                       </p>
                       <p className={`font-semibold ${item.delta.startsWith('+') ? 'text-emerald-700' : 'text-rose-700'}`}>
-                        Change: {item.delta}
+                        {t('Change:')} {item.delta}
                       </p>
                     </div>
                   </div>
@@ -108,7 +110,7 @@ export const GroundwaterTrendCard: React.FC = () => {
           <Area
             type="monotone"
             dataKey="depth"
-            name="Current Water Level (mbgl)"
+            name={t('Current Water Level (mbgl)')}
             stroke="#0284c7"
             strokeWidth={3}
             fillOpacity={1}
@@ -117,7 +119,7 @@ export const GroundwaterTrendCard: React.FC = () => {
           <Line
             type="monotone"
             dataKey="baseline"
-            name="Historical Baseline (mbgl)"
+            name={t('Historical Baseline (mbgl)')}
             stroke="#a8a29e"
             strokeWidth={1.5}
             strokeDasharray="4 4"

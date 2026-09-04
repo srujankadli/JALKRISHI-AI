@@ -1,6 +1,7 @@
 import React from 'react';
 import { Filter, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 import type { StationStatus, TrendDirection } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface MapFilterPanelProps {
   states: string[];
@@ -37,6 +38,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
   totalFilteredCount,
   totalStationCount,
 }) => {
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   const hasActiveFilters =
@@ -55,7 +57,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
           {/* State Dropdown */}
           <div>
             <label className="text-[11px] font-bold text-stone-500 uppercase block mb-1">
-              Select State
+              {t('Select State')}
             </label>
             <select
               value={selectedState}
@@ -64,7 +66,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
             >
               {states.map((st) => (
                 <option key={st} value={st}>
-                  {st}
+                  {t(st)}
                 </option>
               ))}
             </select>
@@ -73,7 +75,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
           {/* District Dropdown */}
           <div>
             <label className="text-[11px] font-bold text-stone-500 uppercase block mb-1">
-              Select District
+              {t('Select District')}
             </label>
             <select
               value={selectedDistrict}
@@ -82,7 +84,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
             >
               {districts.map((d) => (
                 <option key={d} value={d}>
-                  {d}
+                  {t(d)}
                 </option>
               ))}
             </select>
@@ -95,11 +97,11 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
             {(['all', 'healthy', 'moderate', 'warning', 'critical'] as const).map((status) => {
               const isSelected = selectedStatus === status;
               const labels: Record<string, string> = {
-                all: 'All',
-                healthy: '🟢 Healthy',
-                moderate: '🟡 Moderate',
-                warning: '🟠 Warning',
-                critical: '🔴 Critical',
+                all: t('All'),
+                healthy: `🟢 ${t('Healthy')}`,
+                moderate: `🟡 ${t('Moderate')}`,
+                warning: `🟠 ${t('Warning')}`,
+                critical: `🔴 ${t('Critical')}`,
               };
 
               return (
@@ -124,7 +126,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
             className="inline-flex items-center justify-center gap-1 rounded-lg border border-stone-200 bg-stone-50 px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-100 cursor-pointer"
           >
             <Filter className="h-3.5 w-3.5 text-stone-500" />
-            <span>More Filters</span>
+            <span>{t('More Filters')}</span>
             {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           </button>
         </div>
@@ -135,7 +137,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-stone-100 pt-3 animate-fadeIn text-xs">
           {/* Trend Direction */}
           <div className="space-y-1.5">
-            <span className="font-bold text-stone-600 block">Water Trend:</span>
+            <span className="font-bold text-stone-600 block">{t('Water Trend:')}</span>
             <div className="flex flex-wrap gap-1.5">
               {(['all', 'rising', 'stable', 'falling'] as const).map((trend) => (
                 <button
@@ -147,7 +149,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
                       : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                   }`}
                 >
-                  {trend === 'rising' ? '↑ Rising' : trend === 'falling' ? '↓ Falling' : trend === 'stable' ? '→ Stable' : 'All Trends'}
+                  {trend === 'rising' ? `↑ ${t('Rising')}` : trend === 'falling' ? `↓ ${t('Falling')}` : trend === 'stable' ? `→ ${t('Stable')}` : t('All Trends')}
                 </button>
               ))}
             </div>
@@ -155,7 +157,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
 
           {/* Risk Level */}
           <div className="space-y-1.5">
-            <span className="font-bold text-stone-600 block">Risk Severity Index:</span>
+            <span className="font-bold text-stone-600 block">{t('Risk Severity Index:')}</span>
             <div className="flex flex-wrap gap-1.5">
               {(['all', 'low', 'medium', 'high', 'critical'] as const).map((risk) => (
                 <button
@@ -167,7 +169,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
                       : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                   }`}
                 >
-                  {risk === 'all' ? 'All Risk Levels' : risk}
+                  {risk === 'all' ? t('All Risk Levels') : t(risk)}
                 </button>
               ))}
             </div>
@@ -178,7 +180,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
       {/* Bottom Row: Results counter and Reset */}
       <div className="flex items-center justify-between border-t border-stone-100 pt-2.5 text-xs">
         <span className="text-stone-500 font-medium">
-          Showing <strong className="text-stone-900 font-bold">{totalFilteredCount.toLocaleString('en-IN')}</strong> of {totalStationCount.toLocaleString('en-IN')} stations
+          {t('Showing')} <strong className="text-stone-900 font-bold">{totalFilteredCount.toLocaleString('en-IN')}</strong> {t('of')} {totalStationCount.toLocaleString('en-IN')} {t('stations')}
         </span>
 
         {hasActiveFilters && (
@@ -187,7 +189,7 @@ export const MapFilterPanel: React.FC<MapFilterPanelProps> = ({
             className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold text-stone-600 hover:bg-stone-100 hover:text-stone-900 transition-colors cursor-pointer"
           >
             <RotateCcw className="h-3 w-3 text-stone-400" />
-            <span>Clear All Filters</span>
+            <span>{t('Clear All Filters')}</span>
           </button>
         )}
       </div>

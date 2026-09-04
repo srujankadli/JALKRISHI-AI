@@ -1,6 +1,7 @@
 import React from 'react';
 import { Info, MapPin } from 'lucide-react';
 import type { StateStationSummary } from '../../services/stationService';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface StateInsightCardProps {
   summary: StateStationSummary | null;
@@ -10,6 +11,7 @@ interface StateInsightCardProps {
 export const StateInsightCard: React.FC<StateInsightCardProps> = ({
   summary,
 }) => {
+  const { t } = useLanguage();
   if (!summary) return null;
 
   return (
@@ -21,17 +23,17 @@ export const StateInsightCard: React.FC<StateInsightCardProps> = ({
           </div>
           <div>
             <h3 className="text-base font-extrabold text-stone-900 leading-tight">
-              {summary.state} Hydrogeological Profile
+              {summary.state} {t('Hydrogeological Profile')}
             </h3>
             <p className="text-xs text-stone-500">
-              {summary.total} DWLR Monitored Observation Wells
+              {summary.total} {t('DWLR Monitored Observation Wells')}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-semibold">
           <span className="rounded-md bg-stone-100 px-2 py-0.5 text-stone-700">
-            Avg Depth: <strong>{summary.avgDepth} mbgl</strong>
+            {t('Avg Depth')}: <strong>{summary.avgDepth} mbgl</strong>
           </span>
         </div>
       </div>
@@ -39,19 +41,19 @@ export const StateInsightCard: React.FC<StateInsightCardProps> = ({
       {/* State status distribution mini-bar */}
       <div className="grid grid-cols-4 gap-2 text-center text-xs">
         <div className="rounded-lg bg-emerald-50 p-2 border border-emerald-200">
-          <span className="text-[10px] text-emerald-800 font-bold block uppercase">Healthy</span>
+          <span className="text-[10px] text-emerald-800 font-bold block uppercase">{t('Healthy')}</span>
           <span className="font-extrabold text-emerald-950 text-sm">{summary.healthy}</span>
         </div>
         <div className="rounded-lg bg-amber-50 p-2 border border-amber-200">
-          <span className="text-[10px] text-amber-800 font-bold block uppercase">Moderate</span>
+          <span className="text-[10px] text-amber-800 font-bold block uppercase">{t('Moderate')}</span>
           <span className="font-extrabold text-amber-950 text-sm">{summary.moderate}</span>
         </div>
         <div className="rounded-lg bg-orange-50 p-2 border border-orange-200">
-          <span className="text-[10px] text-orange-800 font-bold block uppercase">Warning</span>
+          <span className="text-[10px] text-orange-800 font-bold block uppercase">{t('Warning')}</span>
           <span className="font-extrabold text-orange-950 text-sm">{summary.warning}</span>
         </div>
         <div className="rounded-lg bg-rose-50 p-2 border border-rose-200">
-          <span className="text-[10px] text-rose-800 font-bold block uppercase">Critical</span>
+          <span className="text-[10px] text-rose-800 font-bold block uppercase">{t('Critical')}</span>
           <span className="font-extrabold text-rose-950 text-sm">{summary.critical}</span>
         </div>
       </div>
@@ -61,7 +63,7 @@ export const StateInsightCard: React.FC<StateInsightCardProps> = ({
         <div className="flex items-start gap-2">
           <Info className="h-4 w-4 text-agri-700 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            <strong className="font-bold text-agri-950">Regional Analysis: </strong>
+            <strong className="font-bold text-agri-950">{t('Regional Analysis')}: </strong>
             {summary.stressInsight}
           </p>
         </div>

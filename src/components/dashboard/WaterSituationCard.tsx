@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { DashboardSummary } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface WaterSituationCardProps {
   metrics: DashboardSummary | null;
@@ -16,6 +17,7 @@ interface WaterSituationCardProps {
 
 export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics }) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const total = metrics?.totalStationsMonitored || 5260;
   const healthy = metrics?.healthyCount || 2412;
@@ -35,17 +37,17 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
         <div>
           <span className="text-xs font-extrabold uppercase tracking-wider text-stone-500 flex items-center gap-1.5">
             <Droplets className="h-4 w-4 text-water-600" />
-            Your Water Situation
+            {t('Your Water Situation')}
           </span>
           <div className="mt-1 flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
               <span className="inline-flex h-3 w-3 rounded-full bg-amber-500 ring-4 ring-amber-100" />
               <h2 className="text-xl sm:text-2xl font-black text-stone-900">
-                Water Status: <span className="text-amber-700">Moderate (मध्यम)</span>
+                {t('Water Status:')} <span className="text-amber-700">{t('Moderate')}</span>
               </h2>
             </div>
             <span className="rounded-full bg-stone-100 px-3 py-0.5 text-xs font-semibold text-stone-600">
-              National Index
+              {t('National Index')}
             </span>
           </div>
         </div>
@@ -54,7 +56,7 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
           onClick={() => navigate('/map')}
           className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-agri-700 hover:text-agri-900 hover:underline self-start sm:self-auto"
         >
-          <span>View Station Map</span>
+          <span>{t('View Station Map')}</span>
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>
@@ -65,10 +67,10 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
           <Info className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <p className="text-sm font-semibold text-stone-900 sm:text-base">
-              Groundwater levels are stable overall, but some monitored areas are showing decline.
+              {t('Groundwater levels are stable overall, but some monitored areas are showing decline.')}
             </p>
             <p className="text-xs sm:text-sm text-stone-600">
-              Monsoon showers are actively recharging shallow aquifers in eastern and central states. However, intensive irrigation in North-West (Punjab, Haryana, Rajasthan) requires conservation caution.
+              {t('Monsoon showers are actively recharging shallow aquifers in eastern and central states. However, intensive irrigation in North-West (Punjab, Haryana, Rajasthan) requires conservation caution.')}
             </p>
           </div>
         </div>
@@ -77,8 +79,8 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
       {/* Visual Multi-Segment Distribution Bar */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between text-xs font-semibold text-stone-600">
-          <span>National Monitored Station Distribution</span>
-          <span className="font-mono text-stone-900">{total.toLocaleString('en-IN')} DWLR Stations</span>
+          <span>{t('National Monitored Station Distribution')}</span>
+          <span className="font-mono text-stone-900">{total.toLocaleString('en-IN')} {t('DWLR Stations')}</span>
         </div>
 
         {/* The Colored Segmented Bar */}
@@ -90,27 +92,27 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
           <div
             style={{ width: `${healthyPct}%` }}
             className="h-full rounded-l-full bg-emerald-600 transition-all duration-500"
-            title={`Healthy: ${healthy} stations (${healthyPct}%)`}
+            title={`${t('Healthy')}: ${healthy} stations (${healthyPct}%)`}
           />
           <div
             style={{ width: `${moderatePct}%` }}
             className="h-full bg-amber-500 transition-all duration-500"
-            title={`Moderate: ${moderate} stations (${moderatePct}%)`}
+            title={`${t('Moderate')}: ${moderate} stations (${moderatePct}%)`}
           />
           <div
             style={{ width: `${warningPct}%` }}
             className="h-full bg-orange-500 transition-all duration-500"
-            title={`Warning: ${warning} stations (${warningPct}%)`}
+            title={`${t('Warning')}: ${warning} stations (${warningPct}%)`}
           />
           <div
             style={{ width: `${criticalPct}%` }}
             className="h-full rounded-r-full bg-rose-600 transition-all duration-500"
-            title={`Critical: ${critical} stations (${criticalPct}%)`}
+            title={`${t('Critical')}: ${critical} stations (${criticalPct}%)`}
           />
         </div>
       </div>
 
-      {/* 4 Status Breakdown Blocks (Multi-modal with icons + text + counts + %) */}
+      {/* 4 Status Breakdown Blocks */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {/* Healthy */}
         <div
@@ -119,13 +121,13 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
         >
           <div className="flex items-center gap-1.5 text-emerald-800 text-xs font-bold uppercase">
             <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <span>Healthy</span>
+            <span>{t('Healthy')}</span>
           </div>
           <p className="mt-1.5 text-xl font-extrabold text-stone-900">
             {healthy.toLocaleString('en-IN')}
           </p>
           <p className="text-xs text-stone-500 font-medium">
-            <strong className="text-emerald-700">{healthyPct}%</strong> of total • Safe
+            <strong className="text-emerald-700">{healthyPct}%</strong> {t('of total')} • {t('Safe')}
           </p>
         </div>
 
@@ -136,13 +138,13 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
         >
           <div className="flex items-center gap-1.5 text-amber-800 text-xs font-bold uppercase">
             <Droplets className="h-4 w-4 text-amber-600" />
-            <span>Moderate</span>
+            <span>{t('Moderate')}</span>
           </div>
           <p className="mt-1.5 text-xl font-extrabold text-stone-900">
             {moderate.toLocaleString('en-IN')}
           </p>
           <p className="text-xs text-stone-500 font-medium">
-            <strong className="text-amber-700">{moderatePct}%</strong> • Manageable
+            <strong className="text-amber-700">{moderatePct}%</strong> • {t('Manageable')}
           </p>
         </div>
 
@@ -153,13 +155,13 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
         >
           <div className="flex items-center gap-1.5 text-orange-800 text-xs font-bold uppercase">
             <TrendingDown className="h-4 w-4 text-orange-600" />
-            <span>Warning</span>
+            <span>{t('Warning')}</span>
           </div>
           <p className="mt-1.5 text-xl font-extrabold text-stone-900">
             {warning.toLocaleString('en-IN')}
           </p>
           <p className="text-xs text-stone-500 font-medium">
-            <strong className="text-orange-700">{warningPct}%</strong> • Declining
+            <strong className="text-orange-700">{warningPct}%</strong> • {t('Declining')}
           </p>
         </div>
 
@@ -170,13 +172,13 @@ export const WaterSituationCard: React.FC<WaterSituationCardProps> = ({ metrics 
         >
           <div className="flex items-center gap-1.5 text-rose-800 text-xs font-bold uppercase">
             <ShieldAlert className="h-4 w-4 text-rose-600" />
-            <span>Critical</span>
+            <span>{t('Critical')}</span>
           </div>
           <p className="mt-1.5 text-xl font-extrabold text-rose-900">
             {critical.toLocaleString('en-IN')}
           </p>
           <p className="text-xs text-stone-500 font-medium">
-            <strong className="text-rose-700">{criticalPct}%</strong> • Urgent Action
+            <strong className="text-rose-700">{criticalPct}%</strong> • {t('Urgent Action')}
           </p>
         </div>
       </div>

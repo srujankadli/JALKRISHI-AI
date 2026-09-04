@@ -1,6 +1,7 @@
 import React from 'react';
 import type { StationStatus } from '../../types';
 import { getStatusLabel, getStatusTheme } from '../../utils/statusHelpers';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface StatusBadgeProps {
   status: StationStatus;
@@ -15,6 +16,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   showIcon = true,
   className = '',
 }) => {
+  const { t } = useLanguage();
   const theme = getStatusTheme(status);
   const label = getStatusLabel(status);
 
@@ -28,7 +30,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border shadow-sm ${theme.badge} ${sizeClasses[size]} ${className}`}
       role="status"
-      aria-label={`Groundwater status: ${label}`}
+      aria-label={`Groundwater status: ${t(label)}`}
     >
       {showIcon && (
         <span
@@ -36,7 +38,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
           aria-hidden="true"
         />
       )}
-      <span>{label}</span>
+      <span>{t(label)}</span>
     </span>
   );
 };

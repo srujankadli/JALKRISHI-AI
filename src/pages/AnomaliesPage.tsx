@@ -17,12 +17,14 @@ import { AnomalyDistributionCharts } from '../components/anomalies/AnomalyDistri
 import { StateAnomalyTable } from '../components/anomalies/StateAnomalyTable';
 import { AnomalyMeaningKnowledgeCards } from '../components/anomalies/AnomalyMeaningKnowledgeCards';
 import { FarmerAnomalyActionCenter } from '../components/anomalies/FarmerAnomalyActionCenter';
+import { useLanguage } from '../context/LanguageContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
 }
 
 export const AnomaliesPage: React.FC = () => {
+  const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
 
@@ -107,10 +109,10 @@ export const AnomaliesPage: React.FC = () => {
   };
 
   const severityChartData = [
-    { name: 'Critical Alert', count: severityCounts.critical, color: '#dc2626' },
-    { name: 'High Attention', count: severityCounts.high, color: '#ea580c' },
-    { name: 'Warning / Monitor', count: severityCounts.warning, color: '#d97706' },
-    { name: 'Info / Low', count: severityCounts.info, color: '#16a34a' },
+    { name: t('Critical Alert'), count: severityCounts.critical, color: '#dc2626' },
+    { name: t('High Attention'), count: severityCounts.high, color: '#ea580c' },
+    { name: t('Warning / Monitor'), count: severityCounts.warning, color: '#d97706' },
+    { name: t('Info / Low'), count: severityCounts.info, color: '#16a34a' },
   ];
 
   return (
@@ -120,27 +122,27 @@ export const AnomaliesPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-rose-600 animate-ping" />
           <span className="font-extrabold text-stone-900">
-            JalKrishi Automated Telemetry Quality & Hydrostatic Anomaly Engine
+            {t('JalKrishi Automated Telemetry Quality & Hydrostatic Anomaly Engine')}
           </span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">Real-Time Drawdown & Sensor Checks</span>
+          <span className="text-stone-500 font-medium">{t('Real-Time Drawdown & Sensor Checks')}</span>
         </div>
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-rose-600" />
-          Reference Simulation Model
+          {t('Reference Simulation Model')}
         </span>
       </div>
 
       {/* 1. Page Header */}
       <PageHeader
-        title="Anomaly Detection & Groundwater Alerts"
-        subtitle="Identify sudden localized drawdown spikes, abnormal extraction patterns, and telemetry sensor issues before crop water stress intensifies."
-        farmerNote="Anomalies alert you when water levels drop much faster than expected in your area, giving you advance notice to manage tube-wells and protect pumps."
+        title={t('Anomaly Detection & Groundwater Alerts')}
+        subtitle={t('Identify sudden localized drawdown spikes, abnormal extraction patterns, and telemetry sensor issues before crop water stress intensifies.')}
+        farmerNote={t('Anomalies alert you when water levels drop much faster than expected in your area, giving you advance notice to manage tube-wells and protect pumps.')}
         badge={
           <span className="rounded-full bg-rose-100 border border-rose-300 px-3 py-1 text-xs font-bold text-rose-800 flex items-center gap-1.5 shadow-xs">
             <ShieldAlert className="h-3.5 w-3.5 text-rose-600" />
-            {anomalies.length} Active Telemetry Alerts
+            {anomalies.length} {t('Active Telemetry Alerts')}
           </span>
         }
       />
@@ -186,9 +188,9 @@ export const AnomaliesPage: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-extrabold text-stone-900">
-            Recent Hydrostatic & Telemetry Alerts ({filteredAnomalies.length})
+            {t('Recent Hydrostatic & Telemetry Alerts')} ({filteredAnomalies.length})
           </h3>
-          <span className="text-xs text-stone-500">Sorted by detection time</span>
+          <span className="text-xs text-stone-500">{t('Sorted by detection time')}</span>
         </div>
 
         <AnomalyFeedList

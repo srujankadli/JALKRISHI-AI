@@ -4,6 +4,7 @@ import type { DWLRStation } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
 import { getTrendDetails } from '../../utils/statusHelpers';
 import { formatDepth, formatDaysToCritical } from '../../utils/formatters';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface StationCardProps {
   station: DWLRStation;
@@ -16,6 +17,7 @@ export const StationCard: React.FC<StationCardProps> = ({
   onSelect,
   isSelected = false,
 }) => {
+  const { t } = useLanguage();
   const trend = getTrendDetails(station.trend);
 
   return (
@@ -52,14 +54,14 @@ export const StationCard: React.FC<StationCardProps> = ({
           {station.stationName}
         </h3>
         <p className="text-xs text-stone-500">
-          {station.district}, {station.state} &bull; Block: {station.block}
+          {station.district}, {station.state} &bull; {t('Block:')} {station.block}
         </p>
       </div>
 
       {/* Water Depth and Trend Highlight */}
       <div className="mt-3.5 grid grid-cols-2 gap-2 rounded-lg bg-stone-50 p-2.5 border border-stone-100">
         <div>
-          <span className="text-[11px] font-medium text-stone-500">Depth to Water</span>
+          <span className="text-[11px] font-medium text-stone-500">{t('Depth to Water')}</span>
           <p className="text-lg font-extrabold text-stone-900">
             {formatDepth(station.waterLevel)}
             <span className="ml-1 text-[11px] font-normal text-stone-500">mbgl</span>
@@ -67,10 +69,10 @@ export const StationCard: React.FC<StationCardProps> = ({
         </div>
 
         <div>
-          <span className="text-[11px] font-medium text-stone-500">Trend</span>
+          <span className="text-[11px] font-medium text-stone-500">{t('Trend')}</span>
           <div className="flex items-center gap-1">
             <span className={`text-sm font-bold ${trend.color}`}>
-              {trend.arrow} {trend.label}
+              {trend.arrow} {t(trend.label)}
             </span>
           </div>
         </div>
@@ -79,8 +81,8 @@ export const StationCard: React.FC<StationCardProps> = ({
       {/* Farmer Summary Note */}
       {station.farmerSummary && (
         <p className="mt-2.5 text-xs text-stone-700 line-clamp-2">
-          <span className="font-semibold text-agri-900">Summary: </span>
-          {station.farmerSummary}
+          <span className="font-semibold text-agri-900">{t('Summary:')} </span>
+          {t(station.farmerSummary)}
         </p>
       )}
 
@@ -96,10 +98,10 @@ export const StationCard: React.FC<StationCardProps> = ({
       <div className="mt-3.5 flex items-center justify-between border-t border-stone-100 pt-2.5 text-xs">
         <span className="inline-flex items-center gap-1 text-stone-400">
           <Clock className="h-3 w-3" />
-          {station.lastUpdated}
+          {t(station.lastUpdated)}
         </span>
         <span className="inline-flex items-center gap-1 font-semibold text-agri-700 group-hover:text-agri-900">
-          View Station Details
+          {t('View Station Details')}
           <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </span>
       </div>

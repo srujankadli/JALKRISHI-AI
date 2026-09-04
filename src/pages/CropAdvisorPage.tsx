@@ -22,12 +22,14 @@ import { CropComparisonTable } from '../components/crops/CropComparisonTable';
 import { CropDetailModal } from '../components/crops/CropDetailModal';
 import { WaterSmartFarmingAdvice } from '../components/crops/WaterSmartFarmingAdvice';
 import { CropMethodologyNote } from '../components/crops/CropMethodologyNote';
+import { useLanguage } from '../context/LanguageContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
 }
 
 export const CropAdvisorPage: React.FC = () => {
+  const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
 
@@ -230,27 +232,27 @@ export const CropAdvisorPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-agri-600 animate-pulse" />
           <span className="font-extrabold text-stone-900">
-            JalKrishi Hydro-Agronomic Decision Engine
+            {t('JalKrishi Hydro-Agronomic Decision Engine')}
           </span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">Groundwater-Aligned Crop Sowing Optimizer</span>
+          <span className="text-stone-500 font-medium">{t('Groundwater-Aligned Crop Sowing Optimizer')}</span>
         </div>
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-agri-600" />
-          Demo Recommendation Engine
+          {t('Demo Recommendation Engine')}
         </span>
       </div>
 
       {/* 1. Page Header */}
       <PageHeader
-        title="Smart Crop Advisor"
-        subtitle="Choose crops that match your soil, season, weather forecast, and available groundwater reserves to secure your harvest."
-        farmerNote="By checking water table trends before sowing, you can avoid high-water crops that risk drying out your tube-well before harvest."
+        title={t('Smart Crop Advisor')}
+        subtitle={t('Choose crops that match your soil, season, weather forecast, and available groundwater reserves to secure your harvest.')}
+        farmerNote={t('By checking water table trends before sowing, you can avoid high-water crops that risk drying out your tube-well before harvest.')}
         badge={
           <span className="rounded-full bg-agri-100 border border-agri-300 px-3 py-1 text-xs font-bold text-agri-900 flex items-center gap-1.5 shadow-xs">
             <Sprout className="h-3.5 w-3.5 text-agri-700" />
-            Decision-Support v2.4
+            {t('Decision-Support v2.4')}
           </span>
         }
       />

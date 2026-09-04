@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Server, WifiOff, RefreshCw } from 'lucide-react';
 import { apiClient, type BackendConnectionStatus } from '../../services/apiClient';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface BackendStatusBadgeProps {
   className?: string;
@@ -11,6 +12,7 @@ export const BackendStatusBadge: React.FC<BackendStatusBadgeProps> = ({
   className = '',
   showDetails = false,
 }) => {
+  const { t } = useLanguage();
   const [status, setStatus] = useState<BackendConnectionStatus>(apiClient.getConnectionStatus());
   const [isChecking, setIsChecking] = useState(false);
 
@@ -41,10 +43,10 @@ export const BackendStatusBadge: React.FC<BackendStatusBadgeProps> = ({
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
         </span>
         <Server className="h-3 w-3 text-emerald-600" />
-        <span>Backend Connected</span>
+        <span>{t('Backend Connected')}</span>
         {showDetails && (
           <span className="text-[10px] text-emerald-600 font-normal border-l border-emerald-200 pl-1.5 ml-0.5">
-            Reference Data
+            {t('Reference Data')}
           </span>
         )}
         <button
@@ -66,7 +68,7 @@ export const BackendStatusBadge: React.FC<BackendStatusBadgeProps> = ({
       >
         <span className="h-2 w-2 rounded-full bg-amber-500"></span>
         <WifiOff className="h-3 w-3 text-amber-600" />
-        <span>Demo Fallback</span>
+        <span>{t('Demo Fallback')}</span>
         <button
           onClick={handleManualCheck}
           className="ml-1 text-amber-700 hover:text-amber-950 p-0.5 rounded"
@@ -84,7 +86,7 @@ export const BackendStatusBadge: React.FC<BackendStatusBadgeProps> = ({
       title="Checking backend connection..."
     >
       <span className="h-2 w-2 rounded-full bg-stone-400 animate-pulse"></span>
-      <span>Checking API...</span>
+      <span>{t('Checking API...')}</span>
     </div>
   );
 };

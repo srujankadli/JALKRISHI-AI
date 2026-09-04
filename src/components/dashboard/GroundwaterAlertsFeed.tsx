@@ -10,6 +10,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface GroundwaterAlertsFeedProps {
   onSelectStation: (stationId: string) => void;
@@ -17,6 +18,7 @@ interface GroundwaterAlertsFeedProps {
 
 export const GroundwaterAlertsFeed: React.FC<GroundwaterAlertsFeedProps> = ({ onSelectStation }) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const alerts = [
     {
@@ -96,7 +98,7 @@ export const GroundwaterAlertsFeed: React.FC<GroundwaterAlertsFeedProps> = ({ on
             onClick={() => navigate('/anomalies')}
             className="text-xs font-bold text-rose-700 hover:text-rose-900 inline-flex items-center gap-1"
           >
-            View all 4 anomalies <ArrowRight className="h-3.5 w-3.5" />
+            {t('View all 4 anomalies')} <ArrowRight className="h-3.5 w-3.5" />
           </button>
         }
       />
@@ -121,7 +123,7 @@ export const GroundwaterAlertsFeed: React.FC<GroundwaterAlertsFeedProps> = ({ on
                       <span
                         className={`rounded-md border px-2 py-0.5 text-[10px] font-extrabold tracking-wider ${alert.style.badge}`}
                       >
-                        {alert.severity}
+                        {t(alert.severity)}
                       </span>
                       <span className="flex items-center gap-1 text-xs font-bold text-stone-900">
                         <MapPin className="h-3.5 w-3.5 text-stone-400" />
@@ -131,28 +133,28 @@ export const GroundwaterAlertsFeed: React.FC<GroundwaterAlertsFeedProps> = ({ on
 
                     <span className="flex items-center gap-1 text-[11px] text-stone-500">
                       <Clock className="h-3 w-3" />
-                      {alert.timestamp}
+                      {t(alert.timestamp)}
                     </span>
                   </div>
 
                   {/* What Happened */}
                   <p className="mt-2 text-xs sm:text-sm font-bold text-stone-900">
-                    {alert.whatHappened}
+                    {t(alert.whatHappened)}
                   </p>
 
                   {/* Why it Matters */}
                   <p className="mt-1 text-xs text-stone-600 leading-relaxed">
-                    <strong className="text-stone-800">Why it matters: </strong>
-                    {alert.whyItMatters}
+                    <strong className="text-stone-800">{t('Why it matters:')} </strong>
+                    {t(alert.whyItMatters)}
                   </p>
 
                   {/* CTA */}
                   <div className="mt-3 flex items-center justify-end">
                     <button
                       onClick={() => onSelectStation(alert.stationId)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-stone-900 px-3 py-1 text-xs font-bold text-white hover:bg-stone-800 active:scale-95 transition-all shadow-xs"
+                      className="inline-flex items-center gap-1 rounded-lg bg-stone-900 px-3 py-1 text-xs font-bold text-white hover:bg-slate-800 active:scale-95 transition-all shadow-xs"
                     >
-                      <span>View Station Details</span>
+                      <span>{t('View Station Details')}</span>
                       <ArrowRight className="h-3.5 w-3.5" />
                     </button>
                   </div>

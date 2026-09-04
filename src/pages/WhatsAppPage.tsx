@@ -11,19 +11,21 @@ import {
 import { PageHeader } from '../components/common/PageHeader';
 import { WhatsAppSimulator } from '../components/whatsapp/WhatsAppSimulator';
 import { BackendStatusBadge } from '../components/common/BackendStatusBadge';
+import { useLanguage } from '../context/LanguageContext';
 
 export const WhatsAppPage: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-8 animate-fadeIn pb-10">
       {/* 1. Page Header */}
       <PageHeader
-        title="WhatsApp Farmer Interface"
-        subtitle="Accessible, low-bandwidth conversational AI for Indian farmers. Delivers localized DWLR groundwater telemetry, forecasts, and crop advice in Hindi & English."
-        farmerNote="Farmers don't need complex apps. A simple WhatsApp message like 'Kolar water' or 'फसल सलाह' delivers actionable groundwater guidance in seconds."
+        title={t('WhatsApp Farmer Interface')}
+        subtitle={t('Accessible, low-bandwidth conversational AI for Indian farmers. Delivers localized DWLR groundwater telemetry, forecasts, and crop advice in Hindi & English.')}
+        farmerNote={t("Farmers don't need complex apps. A simple WhatsApp message like 'Kolar water' or 'फसल सलाह' delivers actionable groundwater guidance in seconds.")}
         badge={
           <span className="rounded-full bg-emerald-700 px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 shadow-xs">
             <MessageSquare className="h-3.5 w-3.5 text-emerald-300" />
-            Conversational Engine v2.6
+            {t('Conversational Engine v2.6')}
           </span>
         }
       />
@@ -36,10 +38,10 @@ export const WhatsAppPage: React.FC = () => {
           </div>
           <div>
             <h4 className="font-extrabold text-stone-900 text-sm">
-              Live In-Browser WhatsApp Simulator
+              {t('Live In-Browser WhatsApp Simulator')}
             </h4>
             <p className="text-xs text-stone-500">
-              Connected directly to FastAPI `/api/v1/whatsapp/webhook` with local offline fallback
+              {t('Connected directly to FastAPI `/api/v1/whatsapp/webhook` with local offline fallback')}
             </p>
           </div>
         </div>
