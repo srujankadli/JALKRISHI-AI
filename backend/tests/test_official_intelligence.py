@@ -227,3 +227,16 @@ def test_region_comparison():
     assert data["region_a"]["name"] == "Sangrur"
     assert data["region_b"]["name"] == "Kolar"
     assert "comparative_interpretation" in data
+
+
+def test_read_only_official_read_access():
+    """READ_ONLY_OFFICIAL role can access official read and analytical endpoints."""
+    headers = {"Authorization": f"Bearer {OBSERVER_TOKEN}"}
+    res = client.get("/api/v1/official/overview", headers=headers)
+    assert res.status_code == 200
+    assert res.json()["user_role"] in ["READ_ONLY_OFFICIAL", "Observer"]
+
+    res_net = client.get("/api/v1/official/network", headers=headers)
+    assert res_net.status_code == 200
+    assert "missing_pings_count" in res_net.json()
+

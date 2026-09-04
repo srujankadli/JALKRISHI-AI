@@ -856,6 +856,14 @@ class DemoDWLRLoader(BaseDWLRLoader):
                         farmer_summary = f"Water table is healthy and shallow at {round(water_level, 1)}m depth with active recharge."
                         actionable_advice = "Favorable soil moisture for diversified cropping. Practice recharge maintenance."
 
+                    t_roll = rng.next()
+                    if t_roll < 0.88:
+                        tel_status = TelemetryStatus.ONLINE
+                    elif t_roll < 0.95:
+                        tel_status = TelemetryStatus.DELAYED
+                    else:
+                        tel_status = TelemetryStatus.OFFLINE
+
                     st_obj = DWLRStationSchema(
                         id=station_id,
                         stationCode=station_code,
@@ -875,7 +883,7 @@ class DemoDWLRLoader(BaseDWLRLoader):
                         trendRateMetersPerMonth=round(trend_rate, 2),
                         daysToCritical=days_to_critical,
                         batteryLevel=battery,
-                        telemetryStatus=TelemetryStatus.ONLINE,
+                        telemetryStatus=tel_status,
                         lastUpdated=f"{minutes_ago} mins ago",
                         soilType=soil,
                         aquiferType=aquifer,
@@ -894,6 +902,15 @@ class DemoDWLRLoader(BaseDWLRLoader):
             lng = dist["lngRange"][0] + rng.next() * (dist["lngRange"][1] - dist["lngRange"][0])
             seq = len(stations) + 1
             state_code = config["state"][:2].upper()
+            battery = round(80 + rng.next() * 20)
+
+            t_roll = rng.next()
+            if t_roll < 0.88:
+                tel_status = TelemetryStatus.ONLINE
+            elif t_roll < 0.95:
+                tel_status = TelemetryStatus.DELAYED
+            else:
+                tel_status = TelemetryStatus.OFFLINE
 
             st_obj = DWLRStationSchema(
                 id=f"DWLR-{state_code}-{str(seq).zfill(4)}",
@@ -913,8 +930,8 @@ class DemoDWLRLoader(BaseDWLRLoader):
                 trend=TrendDirection.STABLE,
                 trendRateMetersPerMonth=0.02,
                 daysToCritical=None,
-                batteryLevel=91,
-                telemetryStatus=TelemetryStatus.ONLINE,
+                batteryLevel=battery,
+                telemetryStatus=tel_status,
                 lastUpdated="12 mins ago",
                 soilType=dist["soil"][0],
                 aquiferType=dist["aquifer"][0],

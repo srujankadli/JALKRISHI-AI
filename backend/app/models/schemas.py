@@ -1412,6 +1412,8 @@ class NetworkStationItem(BaseModel):
     timestamp: str
     telemetry_status: str
     data_quality_status: str
+    battery_level: Optional[int] = None
+    sensor_status: Optional[str] = "CALIBRATED"
     trend: str
     risk_score: float
     data_source: str
@@ -1424,6 +1426,7 @@ class NetworkHealthResponse(BaseModel):
     online_stations: int
     delayed_stations: int
     offline_stations: int
+    missing_pings_count: int
     reporting_pct: float
     stations: List[NetworkStationItem]
     disclaimer: str

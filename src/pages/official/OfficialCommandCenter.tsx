@@ -87,7 +87,7 @@ export const OfficialCommandCenter: React.FC = () => {
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const [ov, mp, al, rk, tr, nw, it, ev] = await Promise.all([
+      const results = await Promise.allSettled([
         officialService.getOverview(),
         officialService.getIntelligenceMap(selectedLayer),
         officialService.getAlerts(),
@@ -98,19 +98,23 @@ export const OfficialCommandCenter: React.FC = () => {
         officialService.getEvidenceCenter(),
       ]);
 
-      setOverview(ov);
-      setMapData(mp);
-      setAlertsData(al);
-      setRankingData(rk);
-      setTrendsData(tr);
-      setNetworkData(nw);
-      setInterventionsData(it);
-      setEvidenceData(ev);
+      if (results[0].status === 'fulfilled') setOverview(results[0].value);
+      if (results[1].status === 'fulfilled') setMapData(results[1].value);
+      if (results[2].status === 'fulfilled') setAlertsData(results[2].value);
+      if (results[3].status === 'fulfilled') setRankingData(results[3].value);
+      if (results[4].status === 'fulfilled') setTrendsData(results[4].value);
+      if (results[5].status === 'fulfilled') setNetworkData(results[5].value);
+      if (results[6].status === 'fulfilled') setInterventionsData(results[6].value);
+      if (results[7].status === 'fulfilled') setEvidenceData(results[7].value);
 
-      // Default explain stress for first feature
-      if (mp.features.length > 0) {
-        const exp = await officialService.explainAreaStress(mp.features[0].id);
-        setExplainStress(exp);
+      const mp = results[1].status === 'fulfilled' ? results[1].value : null;
+      if (mp && mp.features && mp.features.length > 0) {
+        try {
+          const exp = await officialService.explainAreaStress(mp.features[0].id);
+          setExplainStress(exp);
+        } catch (e) {
+          console.warn('Explain stress load warning', e);
+        }
       }
     } catch (e) {
       console.error('Error loading official intelligence data', e);
@@ -185,7 +189,7 @@ export const OfficialCommandCenter: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-900 text-stone-100 font-sans p-4 lg:p-6 space-y-6">
+    <div className="min-h-screen bg-stone-900 text-stone-100 font-sans p-4 lg:p-6 space-y-6 max-w-full overflow-x-hidden">
       {/* Header Banner */}
       <div className="rounded-2xl border border-stone-700 bg-stone-850 p-5 shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
@@ -220,7 +224,7 @@ export const OfficialCommandCenter: React.FC = () => {
       </div>
 
       {/* Navigation Sub-Tabs */}
-      <div className="flex items-center gap-2 border-b border-stone-800 pb-2 overflow-x-auto select-none">
+      <div className="flex items-center gap-2 border-b border-stone-800 pb-2 overflow-x-auto whitespace-nowrap max-w-full select-none shrink-0 scrollbar-thin">
         {[
           { id: 'overview', label: t('Overview'), icon: Activity },
           { id: 'map', label: t('Intelligence Map'), icon: MapPin },
@@ -623,7 +627,7 @@ export const OfficialCommandCenter: React.FC = () => {
           {/* TAB 6: DWLR NETWORK HEALTH */}
           {activeTab === 'network' && networkData && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div className="p-4 rounded-xl border border-stone-750 bg-stone-850">
                   <span className="text-xs text-stone-400">{t('Total Telemetry Nodes')}</span>
                   <span className="text-2xl font-extrabold text-white block font-mono">{networkData.total_stations}</span>
@@ -640,6 +644,10 @@ export const OfficialCommandCenter: React.FC = () => {
                   <span className="text-xs text-rose-400">{t('Offline Nodes')}</span>
                   <span className="text-2xl font-extrabold text-rose-400 block font-mono">{networkData.offline_stations}</span>
                 </div>
+                <div className="p-4 rounded-xl border border-stone-750 bg-stone-850">
+                  <span className="text-xs text-purple-400">{t('Missing Pings')}</span>
+                  <span className="text-2xl font-extrabold text-purple-400 block font-mono">{networkData.missing_pings_count}</span>
+                </div>
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-stone-750 bg-stone-850">
@@ -651,6 +659,8 @@ export const OfficialCommandCenter: React.FC = () => {
                       <th className="p-3.5">{t('District')}</th>
                       <th className="p-3.5">{t('Latest Reading')}</th>
                       <th className="p-3.5">{t('Telemetry Status')}</th>
+                      <th className="p-3.5">{t('Battery')}</th>
+                      <th className="p-3.5">{t('Sensor Calibration')}</th>
                       <th className="p-3.5">{t('Quality Status')}</th>
                     </tr>
                   </thead>
@@ -666,6 +676,16 @@ export const OfficialCommandCenter: React.FC = () => {
                             st.telemetry_status === 'online' ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'
                           }`}>
                             {st.telemetry_status}
+                          </span>
+                        </td>
+                        <td className="p-3.5 font-mono font-bold text-stone-200">
+                          {st.battery_level ? `${st.battery_level}%` : 'N/A'}
+                        </td>
+                        <td className="p-3.5">
+                          <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold ${
+                            st.sensor_status === 'CALIBRATED' ? 'bg-blue-950 text-blue-300' : 'bg-amber-950 text-amber-300'
+                          }`}>
+                            {st.sensor_status || 'CALIBRATED'}
                           </span>
                         </td>
                         <td className="p-3.5 font-semibold uppercase">{st.data_quality_status}</td>

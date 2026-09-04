@@ -147,7 +147,7 @@ class OfficialIntelligenceEngine:
         stations = self.validate_and_filter_stations(user)
         total_st = len(stations)
 
-        online_st = sum(1 for s in stations if (hash(s.id) % 10) != 0)
+        online_st = sum(1 for s in stations if self._get_status_str(s.telemetryStatus).lower() == "online")
         reporting_pct = round((online_st / max(total_st, 1)) * 100, 1)
 
         critical_st = sum(1 for s in stations if s.waterLevel > 22.0 or self._get_status_str(s.status).lower() == "critical")
@@ -224,7 +224,7 @@ class OfficialIntelligenceEngine:
                 groundwater_condition=st_str,
                 trend=t_str.upper(),
                 risk_score=risk_score,
-                anomaly_status="Detected" if (hash(s.id) % 7 == 0) else "Normal",
+                anomaly_status="Detected" if (s.waterLevel > 22.0 or abs(s.trendRateMetersPerMonth) > 0.25) else "Normal",
                 rainfall_signal=rf_signal,
                 recharge_opportunity=recharge_opp,
                 crop_demand_signal=crop_demand,
@@ -280,30 +280,34 @@ class OfficialIntelligenceEngine:
 
         risk_score = round(min(98.0, max(20.0, (depth / 32.0) * 75.0 + (20.0 if t_str == "falling" else 5.0))), 1)
 
+        soil_info = matched.soilType or "Alluvial Loam"
+        aquifer_info = matched.aquiferType or "Unconfined Aquifer"
+        drawdown_rate = abs(matched.trendRateMetersPerMonth)
+
         contributors = [
             StressContributor(
-                factor="Persistent Groundwater Decline",
+                factor="Persistent Groundwater Decline & Drawdown",
                 weight_pct=35,
-                description=f"Local water table depth is currently {depth:.1f} m bgl with a persistent downward trajectory over recent monitoring cycles.",
+                description=f"Water table depth is {depth:.1f} m bgl with an observed drawdown rate of {drawdown_rate:.2f} m/month.",
                 evidence_type="DWLR Telemetry Time-Series",
             ),
             StressContributor(
-                factor="Rainfall Deficit Signal",
+                factor=f"Aquifer Formation ({aquifer_info})",
                 weight_pct=25,
-                description="Seasonal precipitation input signal indicates below-normal moisture infiltration.",
-                evidence_type="Meteorological Signal & DWLR Infiltration",
-            ),
-            StressContributor(
-                factor="Agricultural Extraction Pressure",
-                weight_pct=25,
-                description="High seasonal tube-well pumping for water-intensive Kharif/Rabi crops in surrounding agricultural blocks.",
-                evidence_type="Remote Sensing Vegetation Index & Crop Water Demand Model",
-            ),
-            StressContributor(
-                factor="Aquifer Geological Storage Limit",
-                weight_pct=15,
-                description="Hard-rock fractured aquifer formation in local geological block exhibits low specific yield storage capacity.",
+                description=f"Hydrogeological storage characteristics of {aquifer_info} in {matched.block} block.",
                 evidence_type="CGWB Aquifer Mapping hydro-geological layer",
+            ),
+            StressContributor(
+                factor=f"Soil Infiltration Profile ({soil_info})",
+                weight_pct=25,
+                description=f"Local soil permeability profile ({soil_info}) influences surface-to-subsurface percolation dynamics.",
+                evidence_type="Soil Survey Infiltration Analysis",
+            ),
+            StressContributor(
+                factor="Agricultural Extraction Demand",
+                weight_pct=15,
+                description=f"Seasonal tube-well extraction pressure in {matched.district} agricultural zone.",
+                evidence_type="Crop Water Requirement & Telemetry Signal Model",
             ),
         ]
 
@@ -514,12 +518,10 @@ class OfficialIntelligenceEngine:
         offline_c = 0
 
         for s in stations:
-            mod_val = hash(s.id) % 10
-            if mod_val == 0:
-                t_status = "offline"
+            t_status = self._get_status_str(s.telemetryStatus).lower()
+            if t_status == "offline":
                 offline_c += 1
-            elif mod_val in [1, 2]:
-                t_status = "delayed"
+            elif t_status == "delayed":
                 delayed_c += 1
             else:
                 t_status = "online"
@@ -527,6 +529,14 @@ class OfficialIntelligenceEngine:
 
             q_status = "critical" if s.waterLevel > 24.0 else ("warning" if s.waterLevel > 18.0 else "healthy")
             risk_val = round(min(100.0, (s.waterLevel / 32.0) * 100.0), 1)
+
+            batt = s.batteryLevel if hasattr(s, "batteryLevel") and s.batteryLevel is not None else 90
+            if t_status == "offline":
+                calib_status = "NO_PING"
+            elif batt < 85:
+                calib_status = "CALIBRATION_DUE"
+            else:
+                calib_status = "CALIBRATED"
 
             item = NetworkStationItem(
                 station_id=s.id,
@@ -538,6 +548,8 @@ class OfficialIntelligenceEngine:
                 timestamp=s.lastUpdated or datetime.now(timezone.utc).isoformat(),
                 telemetry_status=t_status,
                 data_quality_status=q_status,
+                battery_level=batt,
+                sensor_status=calib_status,
                 trend=self._get_trend_str(s.trend).upper(),
                 risk_score=risk_val,
                 data_source="DWLR Automatic Telemetry",
@@ -545,6 +557,7 @@ class OfficialIntelligenceEngine:
             items.append(item)
 
         reporting_pct = round((online_c / max(total, 1)) * 100, 1)
+        missing_pings = delayed_c + offline_c
 
         return NetworkHealthResponse(
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -553,6 +566,7 @@ class OfficialIntelligenceEngine:
             online_stations=online_c,
             delayed_stations=delayed_c,
             offline_stations=offline_c,
+            missing_pings_count=missing_pings,
             reporting_pct=reporting_pct,
             stations=items,
             disclaimer=self._disclaimer,
@@ -686,10 +700,12 @@ class OfficialIntelligenceEngine:
             ]
 
         elif "gap" in q_clean or "coverage" in q_clean or "monitoring" in q_clean:
-            offline_st = [s.stationName for s in stations if (hash(s.id) % 10) == 0][:3]
+            offline_st = [s.stationName for s in stations if self._get_status_str(s.telemetryStatus).lower() in ["offline", "delayed"]][:3]
+            reporting_count = sum(1 for s in stations if self._get_status_str(s.telemetryStatus).lower() == "online")
+            reporting_pct = round((reporting_count / max(len(stations), 1)) * 100, 1)
             answer = (
                 f"Monitoring coverage in {target_name} is currently operating at "
-                f"{round((sum(1 for s in stations if (hash(s.id)%10)!=0)/max(len(stations),1))*100, 1)}% telemetry reporting. "
+                f"{reporting_pct}% telemetry reporting. "
                 f"Key areas requiring sensor telemetry inspection include: {', '.join(offline_st or ['Block 4 Sensor Node'])}."
             )
             evidence = [
