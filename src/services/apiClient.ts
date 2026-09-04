@@ -30,9 +30,9 @@ class ApiClient {
       this.baseUrl = envUrl.replace(/\/$/, '');
     } else if (typeof window !== 'undefined' && window.location && window.location.origin) {
       const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      this.baseUrl = isLocalDev ? 'http://127.0.0.1:8000/api/v1' : `${window.location.origin}/api/v1`;
+      this.baseUrl = isLocalDev ? 'http://127.0.0.1:8000/api/v1' : 'https://jalkrishi-ai.onrender.com/api/v1';
     } else {
-      this.baseUrl = 'http://127.0.0.1:8000/api/v1';
+      this.baseUrl = 'https://jalkrishi-ai.onrender.com/api/v1';
     }
   }
 
@@ -68,7 +68,8 @@ class ApiClient {
     this.lastHealthCheckTime = now;
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 2500);
+      // Allow 8s timeout to accommodate Render cloud instance wake-up / latency
+      const timeout = setTimeout(() => controller.abort(), 8000);
 
       const healthUrl = `${this.baseUrl}/health`;
       const res = await fetch(healthUrl, {
@@ -80,7 +81,7 @@ class ApiClient {
 
       if (res.ok) {
         const data: ApiHealthResponse = await res.json();
-        this.lastHealthCheckResult = data.status === 'healthy';
+        this.lastHealthCheckResult = data.status === 'healthy' || !!data.app_name;
         this.setStatus(this.lastHealthCheckResult ? 'connected' : 'fallback');
         return this.lastHealthCheckResult;
       }

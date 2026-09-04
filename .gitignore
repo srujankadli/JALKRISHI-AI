@@ -16,8 +16,10 @@ ENV/
 
 # Environment files & secrets
 .env
-.env.production
+.env.local
+.env.*.local
 !.env.example
+!.env.production
 
 # IDE & OS files
 .DS_Store

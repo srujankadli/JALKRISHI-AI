@@ -22,7 +22,7 @@
 ### A. Frontend Environment (`.env` or Cloud Hosting Settings)
 ```env
 # Production Deployed FastAPI Base URL
-VITE_API_BASE_URL=https://jalkrishi-api.onrender.com/api/v1
+VITE_API_BASE_URL=https://jalkrishi-ai.onrender.com/api/v1
 ```
 *Note: In local development, leave unset or set to `http://127.0.0.1:8000/api/v1`.*
 
@@ -34,7 +34,7 @@ PORT=8000
 DEBUG=false
 LOG_LEVEL=INFO
 DATA_MODE=DEMO_SIMULATION
-CORS_ORIGINS=https://jalkrishi-ai.vercel.app,https://jalkrishi.gov.in
+CORS_ORIGINS=https://jalkrishi-ai-1.onrender.com,https://jalkrishi-ai.onrender.com,https://jalkrishi-ai.vercel.app
 CSV_MAX_SIZE_BYTES=5242880
 MAX_PAGINATION_LIMIT=10000
 ```

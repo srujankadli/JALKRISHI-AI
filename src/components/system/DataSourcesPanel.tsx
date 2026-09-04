@@ -10,8 +10,9 @@ import {
   Layers,
   FileSpreadsheet,
 } from 'lucide-react';
+import { apiClient } from '../../services/apiClient';
 
-const API_BASE_URL = '/api/v1';
+const getApiBaseUrl = () => apiClient.getBaseUrl();
 
 export interface ProviderMetadata {
   provider_name: string;
@@ -47,7 +48,7 @@ export const DataSourcesPanel: React.FC = () => {
   const fetchProviderStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/providers/status`);
+      const res = await fetch(`${getApiBaseUrl()}/providers/status`);
       if (res.ok) {
         const data = await res.json();
         setMatrix(data);
@@ -72,7 +73,7 @@ export const DataSourcesPanel: React.FC = () => {
     setUploadSuccess(null);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/providers/upload-dataset`, {
+      const res = await fetch(`${getApiBaseUrl()}/providers/upload-dataset`, {
         method: 'POST',
         body: formData,
       });
@@ -95,7 +96,7 @@ export const DataSourcesPanel: React.FC = () => {
   const handleClearDataset = async () => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/providers/clear-dataset`, { method: 'POST' });
+      await fetch(`${getApiBaseUrl()}/providers/clear-dataset`, { method: 'POST' });
       setUploadSuccess('Custom dataset cleared. Reverted to Reference Simulation.');
       fetchProviderStatus();
     } catch {
