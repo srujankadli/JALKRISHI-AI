@@ -1065,15 +1065,31 @@ class ProactiveGroundwaterIntelligenceEngine:
             nearest_dict, dist = satellite_groundwater_engine.find_nearest_dwlr_station(lat, lon)
             if nearest_dict and "stationId" in nearest_dict:
                 st = station_repo.get_by_id(nearest_dict["stationId"])
+        elif location_name and location_name.strip():
+            from app.pipeline.location_resolver import resolve_location
+            loc_res = resolve_location(location_query=location_name.strip())
+            if loc_res.is_resolved:
+                if loc_res.matched_station_id:
+                    st = station_repo.get_by_id(loc_res.matched_station_id)
+                elif loc_res.latitude is not None and loc_res.longitude is not None:
+                    nearest_dict, dist = satellite_groundwater_engine.find_nearest_dwlr_station(loc_res.latitude, loc_res.longitude)
+                    if nearest_dict and "stationId" in nearest_dict:
+                        st = station_repo.get_by_id(nearest_dict["stationId"])
 
         if not st:
             loc_label = location_name or "your area"
             return {
+                "location": loc_label,
+                "status": "STABLE",
                 "has_warning": False,
                 "risk_state": "STABLE",
+                "station_id": "",
+                "station_name": "",
                 "summary": f"No active groundwater warning is currently flagged for {loc_label}. Groundwater conditions appear relatively stable in the available reference simulation data.",
-                "what_changed": "Groundwater conditions remain relatively stable.",
-                "what_to_do": "Continue regular efficient irrigation and follow standard crop water management.",
+                "what_changed": "Groundwater conditions are currently stable in this area.",
+                "why_it_matters": "Aquifer storage remains within normal seasonal baseline range.",
+                "recommended_action": "Continue efficient water use and monitor groundwater conditions.",
+                "what_to_do": "Continue efficient water use and monitor groundwater conditions.",
                 "confidence": "MODERATE",
                 "provenance": "JalKrishi Reference Simulation Dataset",
             }
@@ -1118,14 +1134,17 @@ class ProactiveGroundwaterIntelligenceEngine:
             )
 
         return {
+            "location": loc_label,
+            "status": alert.risk_state.value,
             "has_warning": alert.risk_state in [ProactiveRiskState.CRITICAL_RISK, ProactiveRiskState.ESCALATING_RISK, ProactiveRiskState.EMERGING_RISK],
             "risk_state": alert.risk_state.value,
             "station_id": getattr(st, "stationCode", getattr(st, "id", getattr(st, "stationId", ""))),
             "station_name": st.stationName,
             "summary": summary,
-            "what_changed": alert.explainability.what_changed,
-            "why_it_matters": alert.explainability.why_it_matters,
-            "what_to_do": alert.explainability.what_to_do,
+            "what_changed": alert.explainability.what_changed or "Groundwater conditions are currently stable in this area.",
+            "why_it_matters": alert.explainability.why_it_matters or "Aquifer storage remains within normal seasonal baseline range.",
+            "recommended_action": alert.explainability.what_to_do or "Continue efficient water use and monitor groundwater conditions.",
+            "what_to_do": alert.explainability.what_to_do or "Continue efficient water use and monitor groundwater conditions.",
             "confidence": alert.confidence,
             "provenance": alert.provenance,
         }

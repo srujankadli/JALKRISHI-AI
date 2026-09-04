@@ -66,6 +66,8 @@ KNOWN_REFERENCE_LOCATIONS: Dict[str, Tuple[float, float, str, str]] = {
     "bombay": (19.0760, 72.8777, "Mumbai", "Maharashtra"),
     "delhi": (28.6139, 77.2090, "Delhi", "Delhi"),
     "new delhi": (28.6139, 77.2090, "Delhi", "Delhi"),
+    "shivamogga": (13.9299, 75.5681, "Shivamogga", "Karnataka"),
+    "shimoga": (13.9299, 75.5681, "Shivamogga", "Karnataka"),
 }
 
 # Multilingual Location Dictionary Mapping across 13 Indian regional scripts
@@ -73,6 +75,8 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     # English
     "bengaluru": "bengaluru",
     "bangalore": "bengaluru",
+    "shivamogga": "shivamogga",
+    "shimoga": "shivamogga",
     "thanjavur": "thanjavur",
     "tanjore": "thanjavur",
     "kolar": "kolar",
@@ -90,6 +94,9 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "leh": "leh",
     "ladakh": "leh",
     # Kannada (kn)
+    "ಶಿವಮೊಗ್ಗ": "shivamogga",
+    "ಶಿವಮೊಗ್ಗದಲ್ಲಿ": "shivamogga",
+    "ಶಿವಮೊಗ್ಗದ": "shivamogga",
     "ಕೋಲಾರ": "kolar",
     "ಕೋಲಾರದಲ್ಲಿ": "kolar",
     "ಸಂಗ್ರೂರು": "sangrur",

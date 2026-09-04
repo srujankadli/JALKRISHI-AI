@@ -22,16 +22,29 @@ from app.models.schemas import (
 from app.engines.proactive_intelligence import proactive_intelligence_engine
 from app.routers.auth import get_current_user
 
+from typing import Optional, List, Any, Union
+
 router = APIRouter(prefix="/proactive", tags=["Proactive Groundwater Intelligence"])
 
 
 @router.get(
     "/overview",
-    response_model=ProactiveOverviewResponse,
-    summary="Get Proactive Intelligence Network Overview",
-    description="Returns high-level proactive risk statistics, distribution of risk states, top critical alerts, and spatial highlights.",
+    summary="Get Proactive Intelligence Network Overview or Location Status",
+    description="Returns high-level proactive risk statistics, or location-specific proactive brief if location/coordinates provided.",
 )
-def get_proactive_overview() -> ProactiveOverviewResponse:
+def get_proactive_overview(
+    location: Optional[str] = Query(None, description="Location query (e.g. Shivamogga, Bengaluru, Thanjavur)"),
+    latitude: Optional[float] = Query(None, description="Farm latitude coordinate"),
+    longitude: Optional[float] = Query(None, description="Farm longitude coordinate"),
+    station_id: Optional[str] = Query(None, description="DWLR Station ID"),
+) -> Any:
+    if (location and location.strip()) or (latitude is not None and longitude is not None) or (station_id and station_id.strip()):
+        return proactive_intelligence_engine.get_farmer_proactive_brief(
+            lat=latitude,
+            lon=longitude,
+            station_id=station_id,
+            location_name=location,
+        )
     return proactive_intelligence_engine.get_overview()
 
 

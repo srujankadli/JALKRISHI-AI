@@ -12567,26 +12567,37 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const tFunc = (key: any, fallback?: string): string => {
     if (!key) return fallback || '';
-    const strKey = String(key);
+    const strKey = String(key).trim();
 
-    // 1. Check i18n t() resolver for standard TranslationKey FIRST (ensures clean humanized labels)
+    // 1. Check i18n t() resolver for standard TranslationKey FIRST (when clean localized value exists)
     const i18nResult = tI18n(strKey as TranslationKey, currentLanguage);
     if (i18nResult && i18nResult !== strKey && !i18nResult.includes('_')) {
       return i18nResult;
     }
 
-    // 2. Check UI_DICTIONARIES for exact navigation / header UI key string
-    const targetUiDict = UI_DICTIONARIES[currentLanguage] || UI_DICTIONARIES['en'];
+    // 2. Check UI_DICTIONARIES for exact navigation / header UI key string in current language
+    const targetUiDict = UI_DICTIONARIES[currentLanguage];
     if (targetUiDict && targetUiDict[strKey] && targetUiDict[strKey] !== strKey) {
       return targetUiDict[strKey];
     }
 
-    // 3. Fall back to English UI dictionary or raw key string
+    // 3. Fall back to English UI dictionary
     const enVal = UI_DICTIONARIES['en']?.[strKey];
     if (enVal && enVal !== strKey) {
       return enVal;
     }
-    return i18nResult || fallback || strKey;
+
+    // 4. If an explicit fallback string was provided, use it!
+    if (fallback && fallback.trim()) {
+      return fallback;
+    }
+
+    // 5. If strKey is an internal key (e.g. proactive_*, default_*, *_stable), humanize it cleanly
+    if (strKey.includes('_') || strKey.startsWith('default') || strKey.startsWith('proactive')) {
+      return strKey.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    return strKey;
   };
 
   return (

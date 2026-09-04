@@ -30,6 +30,7 @@ interface FarmerVoiceAssistantProps {
   selectedLat?: number;
   selectedLng?: number;
   locationName?: string;
+  onLocationEstablished?: (location: string) => void;
   onClose?: () => void;
 }
 
@@ -39,6 +40,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
   selectedLat: _selectedLat,
   selectedLng: _selectedLng,
   locationName: _locationName,
+  onLocationEstablished,
 }) => {
   const { t } = useLanguage();
   const [state, setState] = useState<AssistantState>('IDLE');
@@ -174,6 +176,12 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
     const currentReqId = ++activeRequestIdRef.current;
 
+    // Fast-path: if text looks like a place name (1-3 words, no punctuation), update location state immediately
+    const cleanWordCount = text.trim().split(/\s+/).length;
+    if (cleanWordCount <= 3 && !text.includes('?') && !text.includes('!')) {
+      onLocationEstablished?.(text.trim());
+    }
+
     // Immediately reset response state to clear previous assessment card!
     setResponse(null);
     setState('PROCESSING');
@@ -199,6 +207,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
       if (currentReqId === activeRequestIdRef.current) {
         if (res.location?.name) {
           setConversationalLocation(res.location.name);
+          onLocationEstablished?.(res.location.name);
         }
         setResponse(res);
         setState('RESPONDING');

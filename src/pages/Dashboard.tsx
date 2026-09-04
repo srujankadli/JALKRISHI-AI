@@ -40,6 +40,13 @@ export const Dashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<DashboardSummary | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState('Just now');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [conversationalLocation, setConversationalLocation] = useState<string | null>(null);
+
+  const effectiveLocation = conversationalLocation || (
+    selectedStation
+      ? `${selectedStation.block ? selectedStation.block + ', ' : ''}${selectedStation.district} (${selectedStation.state})`
+      : null
+  );
 
   const fetchSummary = async () => {
     try {
@@ -103,10 +110,17 @@ export const Dashboard: React.FC = () => {
       <ExecutiveWaterBrief />
 
       {/* 2.5 Phase P Multilingual Farmer Voice Assistant */}
-      <FarmerVoiceAssistant currentLanguage={currentLanguage} selectedStation={selectedStation} />
+      <FarmerVoiceAssistant
+        currentLanguage={currentLanguage}
+        selectedStation={selectedStation}
+        onLocationEstablished={(loc) => setConversationalLocation(loc)}
+      />
 
       {/* 2.8 Proactive Groundwater Intelligence & Water Watch */}
-      <JalKrishiWaterWatchCard selectedStation={selectedStation} />
+      <JalKrishiWaterWatchCard
+        location={effectiveLocation}
+        selectedStation={selectedStation}
+      />
 
       {/* 3. Your Water Situation Card */}
       <WaterSituationCard metrics={metrics} />

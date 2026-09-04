@@ -125,6 +125,22 @@ export interface ProactiveFilterParams {
   offset?: number;
 }
 
+export interface FarmerProactiveStatus {
+  location: string;
+  status: ProactiveRiskState;
+  has_warning: boolean;
+  risk_state: ProactiveRiskState;
+  station_id?: string;
+  station_name?: string;
+  summary: string;
+  what_changed: string;
+  why_it_matters?: string;
+  recommended_action: string;
+  what_to_do: string;
+  confidence: 'LOW' | 'MODERATE' | 'HIGH';
+  provenance: string;
+}
+
 class ProactiveService {
   public async getOverview(): Promise<ProactiveOverview> {
     try {
@@ -187,6 +203,30 @@ class ProactiveService {
       });
     } catch (err) {
       console.warn(`Failed evaluating proactive station ${stationId}:`, err);
+      return null;
+    }
+  }
+
+  public async getLocationStatus(
+    location?: string,
+    lat?: number,
+    lon?: number,
+    stationId?: string
+  ): Promise<FarmerProactiveStatus | null> {
+    try {
+      const params: Record<string, any> = {};
+      if (location && location.trim()) params.location = location.trim();
+      if (lat !== undefined && lat !== null) params.latitude = lat;
+      if (lon !== undefined && lon !== null) params.longitude = lon;
+      if (stationId && stationId.trim()) params.station_id = stationId.trim();
+
+      return await apiClient.get<FarmerProactiveStatus>('/proactive/overview', params, {
+        useCache: true,
+        cacheTtlMs: 15000,
+        timeoutMs: 6000,
+      });
+    } catch (err) {
+      console.warn('Failed getting location proactive status:', err);
       return null;
     }
   }
