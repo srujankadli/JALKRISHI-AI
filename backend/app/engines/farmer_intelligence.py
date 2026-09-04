@@ -98,10 +98,75 @@ class FarmerIntelligenceEngine:
             else:
                 return self._build_mode_b_satellite_assisted(lat, lon, nearest, dist, r, loc_name=loc_name, district_name=d_name, state_name=s_name)
 
-        # PRIORITY 4: Fallback general reference location
-        default_lat, default_lon = 13.1367, 78.1291
-        nearest, dist = satellite_groundwater_engine.find_nearest_dwlr_station(default_lat, default_lon)
-        return self._build_mode_a_direct_dwlr(default_lat, default_lon, nearest, dist, r, loc_name="Reference DWLR Location")
+        # PRIORITY 4: No location supplied by farmer -> Request location
+        return self._build_location_required_schema(
+            error_msg="Enter your farm location to continue."
+        )
+
+    def _build_location_required_schema(
+        self,
+        error_msg: str = "Enter your farm location to continue."
+    ) -> GroundwaterIntelligenceSchema:
+        loc_schema = LocationInfoSchema(
+            name="Location Required",
+            district=None,
+            state=None,
+            latitude=0.0,
+            longitude=0.0
+        )
+        cov_schema = CoverageInfoSchema(
+            mode="LOCATION_REQUIRED",
+            nearest_station_id=None,
+            nearest_station_name=None,
+            distance_km=0.0
+        )
+        gw_schema = GroundwaterLevelSchema(
+            level_value=None,
+            level_min=None,
+            level_max=None,
+            unit="m bgl",
+            is_direct_measurement=False,
+            confidence="LOW"
+        )
+        prov_schema = ProvenanceInfoSchema(
+            primary_source="JALKRISHI_LOCATION_RESOLVER",
+            data_mode=settings.DATA_MODE
+        )
+        return GroundwaterIntelligenceSchema(
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            nearest_station_id=None,
+            nearest_station_name=None,
+            nearest_station_distance_km=0.0,
+            latitude=0.0,
+            longitude=0.0,
+            coverage_type="Location Required",
+            estimation_mode="LOCATION_REQUIRED",
+            groundwater_condition="LOCATION_REQUIRED",
+            current_groundwater_signal=error_msg,
+            trend="UNKNOWN",
+            forecast_summary=error_msg,
+            forecast_30d_water_level=0.0,
+            estimated_depth_range="Location Required",
+            forecast_confidence="LOW",
+            stress_score=0.5,
+            recharge_outlook="MODERATE_RECHARGE",
+            recharge_score=0.5,
+            remote_sensing_indicators={},
+            rainfall_signal="Location Required",
+            risk_alerts=[error_msg],
+            crop_implications="Enter your farm location to obtain tailored crop recommendations.",
+            irrigation_implications="Enter your farm location to obtain irrigation recommendations.",
+            farmer_recommendations=["Enter your farm location (e.g., Nashik, Pune, Jaipur, Kochi) to view groundwater status."],
+            recommended_crops=[],
+            confidence="LOW",
+            confidence_score=0.0,
+            data_sources=["JALKRISHI_LOCATION_RESOLVER"],
+            disclaimer=error_msg,
+            location_info=loc_schema,
+            coverage_info=cov_schema,
+            groundwater_info=gw_schema,
+            provenance_info=prov_schema,
+        )
 
     def _build_unresolved_location_schema(
         self,

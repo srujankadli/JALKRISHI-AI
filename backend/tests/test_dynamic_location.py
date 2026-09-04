@@ -81,7 +81,7 @@ def test_scenario_d_unresolvable_location():
     from app.pipeline.location_resolver import resolve_location
     res = resolve_location(location_query="NonExistentCity12345")
     assert res.is_resolved is False
-    assert "Location could not be resolved" in res.error_message
+    assert "Location not recognized" in res.error_message or "Location could not be resolved" in res.error_message
     print("   [PASS] Scenario D: Unresolvable location handled with limitation message")
 
 

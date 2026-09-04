@@ -37,12 +37,12 @@ export const CropAdvisorPage: React.FC = () => {
   // Location & Form States
   const [statesList, setStatesList] = useState<string[]>(['All States']);
   const [districtsList, setDistrictsList] = useState<string[]>(['All Districts']);
-  const [selectedState, setSelectedState] = useState<string>('Punjab');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('Sangrur');
+  const [selectedState, setSelectedState] = useState<string>('All States');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('All Districts');
   const [soilType, setSoilType] = useState<SoilType>('Alluvial');
   const [season, setSeason] = useState<CropSeason>('Rabi');
-  const [waterAvailability, setWaterAvailability] = useState<WaterAvailabilityLevel>('Stressed');
-  const [rainfallCondition, setRainfallCondition] = useState<RainfallCondition>('Low');
+  const [waterAvailability, setWaterAvailability] = useState<WaterAvailabilityLevel>('Moderate');
+  const [rainfallCondition, setRainfallCondition] = useState<RainfallCondition>('Normal');
 
   // Connected Nearby Station Context
   const [nearbyStation, setNearbyStation] = useState<DWLRStation | null>(null);
@@ -72,32 +72,50 @@ export const CropAdvisorPage: React.FC = () => {
     }
   };
 
-  // Initial Load: Populate States & evaluate default plan
+  // Initial Load: Populate States & evaluate plan
   useEffect(() => {
     async function init() {
       const states = await stationService.getDistinctStates();
       setStatesList(states);
 
-      const districts = await stationService.getDistinctDistricts('Punjab');
-      setDistrictsList(districts);
-      if (districts.length > 0) setSelectedDistrict(districts[0]);
+      // Check if user has an active farm profile location or selected location
+      const savedLoc = farmWaterProfile?.location || localStorage.getItem('jalkrishi_selected_location');
+      if (savedLoc && savedLoc.trim()) {
+        const allStations = await stationService.getAllStations();
+        const found = allStations.find(
+          (s) =>
+            s.district.toLowerCase() === savedLoc.toLowerCase().trim() ||
+            s.stationName.toLowerCase().includes(savedLoc.toLowerCase().trim()) ||
+            s.state.toLowerCase() === savedLoc.toLowerCase().trim()
+        );
+        if (found) {
+          setSelectedState(found.state);
+          const districts = await stationService.getDistinctDistricts(found.state);
+          setDistrictsList(districts);
+          setSelectedDistrict(found.district);
+          setNearbyStation(found);
+          const plan = await cropService.evaluateCrops({
+            soilType: (found.soilType as SoilType) || 'Alluvial',
+            season: 'Rabi',
+            waterAvailability: found.status === 'critical' ? 'Stressed' : found.status === 'warning' ? 'Limited' : 'Moderate',
+            rainfallCondition: 'Normal',
+            groundwaterTrend: found.trend,
+            state: found.state,
+            district: found.district,
+          });
+          setRecommendations(plan);
+          return;
+        }
+      }
 
-      // Load station context for initial district
-      const allStations = await stationService.getAllStations();
-      const st = allStations.find((s) => s.district.toLowerCase() === 'sangrur') || allStations[0];
-      setNearbyStation(st);
-
-      // Run initial crop evaluation
-      const initialPlan = await cropService.evaluateCrops({
+      // Default nationwide baseline evaluation without hardcoded district
+      const plan = await cropService.evaluateCrops({
         soilType: 'Alluvial',
         season: 'Rabi',
-        waterAvailability: 'Stressed',
-        rainfallCondition: 'Low',
-        groundwaterTrend: st.trend,
-        state: 'Punjab',
-        district: 'Sangrur',
+        waterAvailability: 'Moderate',
+        rainfallCondition: 'Normal',
       });
-      setRecommendations(initialPlan);
+      setRecommendations(plan);
     }
     init();
   }, []);

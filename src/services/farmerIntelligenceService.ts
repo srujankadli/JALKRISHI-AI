@@ -115,8 +115,8 @@ function generateLocalFallbackIntelligence(
       stress_score: stressScore,
       recharge_outlook: stressScore < 0.4 ? 'EXCELLENT' : stressScore < 0.65 ? 'GOOD' : 'POOR',
       recharge_score: roundTo(1.0 - stressScore, 2),
-      nearest_station_id: 'DWLR-KA-012',
-      nearest_station_name: 'Kolar Central Well',
+      nearest_station_id: isDwlrAvailable ? `DWLR-STN-${Math.abs(Math.round(lat * 100)) % 1000}` : null,
+      nearest_station_name: isDwlrAvailable ? `Observation Well (${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E)` : null,
       nearest_station_distance_km: rawDist,
       remote_sensing_indicators: {},
       rainfall_signal: '94 mm (30d) - Seasonal Normal',
@@ -124,7 +124,7 @@ function generateLocalFallbackIntelligence(
       crop_implications: 'Direct DWLR telemetry confirms water table depth. Recommended crops align to measured drawdowns.',
       irrigation_implications: 'Direct well measurement available. Maintain planned micro-irrigation schedule.',
       farmer_recommendations: [
-        `Direct DWLR station Kolar Central Well is ${rawDist} km away. Current depth is ${roundTo(10.0 + stressScore * 12.0, 1)} mbgl.`,
+        `Direct DWLR station is ${rawDist} km away. Current depth is ${roundTo(10.0 + stressScore * 12.0, 1)} mbgl.`,
         `Recommended crops: ${recCrops.join(', ')}.`,
         'Apply scheduled furrow/drip irrigation to protect storage.',
       ],
@@ -133,7 +133,7 @@ function generateLocalFallbackIntelligence(
       confidence_score: 0.92,
       data_sources: ['DIRECT_DWLR_NETWORK', "CGWB_PIEZOMETER_GRID"],
       timestamp: new Date().toISOString(),
-      disclaimer: `Direct DWLR Telemetry. Observed at well Kolar Central Well (DWLR-KA-012), ${rawDist} km away.`,
+      disclaimer: `Direct DWLR Telemetry. Observed at nearest well (${rawDist} km away).`,
       data_mode: 'DEMO_SIMULATION',
     };
   }
@@ -157,8 +157,8 @@ function generateLocalFallbackIntelligence(
     stress_score: stressScore,
     recharge_outlook: stressScore < 0.45 ? 'GOOD' : stressScore < 0.7 ? 'MODERATE' : 'POOR',
     recharge_score: roundTo(1.0 - stressScore, 2),
-    nearest_station_id: 'DWLR-KA-014',
-    nearest_station_name: 'Malur Border Well',
+    nearest_station_id: null,
+    nearest_station_name: null,
     nearest_station_distance_km: rawDist,
     remote_sensing_indicators: {
       canopy_moisture: {

@@ -59,7 +59,7 @@ export const WhatsAppPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Interactive WhatsApp Simulator (lg:col-span-7) */}
         <div className="lg:col-span-7">
-          <WhatsAppSimulator initialDistrict="Kolar" />
+          <WhatsAppSimulator initialDistrict={localStorage.getItem('jalkrishi_selected_location') || ''} />
         </div>
 
         {/* Right Column: Farmer Voice & Conversational Guide (lg:col-span-5) */}
@@ -76,12 +76,12 @@ export const WhatsAppPage: React.FC = () => {
             <div className="space-y-2.5 text-xs text-stone-700">
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <span className="font-bold text-emerald-800">💧 Water Level & Risk:</span>
-                <p className="text-stone-600 font-mono text-[11px]">“Kolar water” or “Water level status”</p>
+                <p className="text-stone-600 font-mono text-[11px]">“Nashik water” or “Water level status”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <span className="font-bold text-water-800">🔮 30-Day Forward Forecast:</span>
-                <p className="text-stone-600 font-mono text-[11px]">“Kolar forecast” or “Future groundwater outlook”</p>
+                <p className="text-stone-600 font-mono text-[11px]">“Pune forecast” or “Future groundwater outlook”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">

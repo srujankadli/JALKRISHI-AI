@@ -77,8 +77,8 @@ class FarmerIntelligenceDispatcher:
                     name=intent_res.extracted_location.name,
                     district=intent_res.extracted_location.district,
                     state=intent_res.extracted_location.state,
-                    latitude=intent_res.extracted_location.latitude or 12.9716,
-                    longitude=intent_res.extracted_location.longitude or 77.5946,
+                    latitude=intent_res.extracted_location.latitude or 0.0,
+                    longitude=intent_res.extracted_location.longitude or 0.0,
                 )
             return VoiceQueryResponse(
                 query_text=raw_query or "Spoken Voice Query",
@@ -365,15 +365,15 @@ class FarmerIntelligenceDispatcher:
     # --- Multilingual Helper Formatting ---
     def _format_multilingual_no_location_weather(self, lang: str) -> str:
         if lang == "hi":
-            return "आप किस स्थान के लिए बारिश का अनुमान देखना चाहते हैं? (जैसे बेंगलुरु, तंजावुर, कोलार, मुंबई)"
+            return "आप किस स्थान के लिए बारिश का अनुमान देखना चाहते हैं? (जैसे नासिक, पुणे, जयपुर, कोच्चि)"
         elif lang == "kn":
-            return "ನೀವು ಯಾವ ಸ್ಥಳದ ಮಳೆ ಮುನ್ಸೂಚನೆಯನ್ನು ನೋಡಲು ಬಯಸುತ್ತೀರಿ? (ಉದಾ. ಬೆಂಗಳೂರು, ತಂಜಾವೂರು, ಕೋಲಾರ, ಮುಂಬೈ)"
+            return "ನೀವು ಯಾವ ಸ್ಥಳದ ಮಳೆ ಮುನ್ಸೂಚನೆಯನ್ನು ನೋಡಲು ಬಯಸುತ್ತೀರಿ? (ಉದಾ. ನಾಸಿಕ್, ಪುಣೆ, ಜೈಪುರ, ಕೊಚ್ಚಿ)"
         elif lang == "ta":
-            return "எந்த இடத்திற்கான மழை முன்னறிவிப்பைப் பார்க்க விரும்புகிறீர்கள்? (எ.கா. பெங்களூர், தஞ்சாவூர், கோலார், மும்பை)"
+            return "எந்த இடத்திற்கான மழை முன்னறிவிப்பைப் பார்க்க விரும்புகிறீர்கள்? (எ.கா. நாசிக், புனே, ஜெய்ப்பூர், கொச்சி)"
         elif lang == "te":
-            return "మీరు ఏ ప్రాంత వర్షపాతం అంచనా చూడాలనుకుంటున్నారు? (ఉదా. బెంగళూరు, తంజావూరు, కోలార్, ముంబై)"
+            return "మీరు ఏ ప్రాంత వర్షపాతం అంచనా చూడాలనుకుంటున్నారు? (ఉదా. నాసిక్, పూణే, జైపూర్, కొచ్చి)"
         else:
-            return "Which location would you like to check the rainfall outlook for? (e.g. Bengaluru, Thanjavur, Kolar, Mumbai)"
+            return "Which location would you like to check the rainfall outlook for? (e.g. Nashik, Pune, Jaipur, Kochi)"
 
     def _format_multilingual_weather_response(self, loc: LocationInfoSchema, lang: str) -> str:
         if lang == "hi":

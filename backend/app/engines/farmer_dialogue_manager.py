@@ -109,8 +109,8 @@ class FarmerDialogueManager:
             name=loc.name,
             district=loc.district,
             state=loc.state,
-            latitude=loc.latitude or 12.9716,
-            longitude=loc.longitude or 77.5946,
+            latitude=loc.latitude or 0.0,
+            longitude=loc.longitude or 0.0,
         )
 
     def _format_multilingual_prompt(self, key: str, lang: str, **kwargs) -> str:

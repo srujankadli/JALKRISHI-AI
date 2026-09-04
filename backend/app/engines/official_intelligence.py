@@ -264,14 +264,10 @@ class OfficialIntelligenceEngine:
     def explain_area_stress(self, user: UserProfile, area_id: str) -> ExplainStressResponse:
         stations = self.validate_and_filter_stations(user)
         matched = next((s for s in stations if s.id.lower() == area_id.lower() or s.district.lower() == area_id.lower()), None)
-
         if not matched:
-            matched = stations[0] if stations else DWLRStationSchema(
-                id="DWLR-REF-001", stationCode="REF01", stationName="Reference Monitor",
-                state="Karnataka", district="Kolar", block="Kolar", latitude=13.13, longitude=78.12,
-                waterLevel=24.5, previousWaterLevel=23.0, seasonalAverage=20.0, criticalThreshold=30.0,
-                riskScore=75.0, status="warning", trend="falling", trendRateMetersPerMonth=-0.2,
-                batteryLevel=90, telemetryStatus="online", lastUpdated=datetime.now(timezone.utc).isoformat()
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Monitoring area or station '{area_id}' not found in authorized jurisdiction.",
             )
 
         depth = matched.waterLevel

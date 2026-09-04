@@ -22,7 +22,7 @@ interface WhatsAppSimulatorProps {
 
 export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
   className = '',
-  initialDistrict = 'Kolar',
+  initialDistrict = '',
 }) => {
   const { t } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -42,19 +42,21 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
   // Initial Greeting on mount
   useEffect(() => {
+    const locLabel = initialDistrict || 'your area';
+    const locLabelHi = initialDistrict || 'आपके क्षेत्र';
     const welcomeMsg: ChatMessage = {
       id: 'msg-welcome-1',
       sender: 'jalkrishi',
       text:
         currentLang === 'hi'
-          ? `🌾 *जलकृषि एआई (JalKrishi AI) में आपका स्वागत है!*\n“अपना पानी जानें, समझदारी से फसल उगाएं।”\n\nनमस्ते किसान भाई! मैं आपके क्षेत्र (${initialDistrict}) का रियल-टाइम भूजल स्तर, 30-दिन का पूर्वानुमान और फसल सलाह बता सकता हूँ।\n\n👉 *आप यह पूछ सकते हैं:*\n• “${initialDistrict} में पानी”\n• “पूर्वानुमान”\n• “कम पानी वाली फसलें”\n• “कोई चेतावनी है?”\n\n⚡ *तुरंत शॉर्टकट:*\n*1* पानी  |  *2* पूर्वानुमान  |  *3* फसल  |  *4* अलर्ट`
-          : `🌾 *Welcome to JalKrishi AI Farmer Assistant!*\n“Know Your Water. Grow Smarter.”\n\nHello Farmer! I can check real-time DWLR groundwater levels, 30-day depletion forecasts, and recommend water-smart crops for your district (${initialDistrict}).\n\n👉 *Try asking:*\n• “${initialDistrict} water status”\n• “${initialDistrict} forecast”\n• “What crop should I grow?”\n• “Any warnings or alerts?”\n\n⚡ *Quick Shortcuts:*\n*1* Water  |  *2* Forecast  |  *3* Crop Advice  |  *4* Alerts`,
+          ? `🌾 *जलकृषि एआई (JalKrishi AI) में आपका स्वागत है!*\n“अपना पानी जानें, समझदारी से फसल उगाएं।”\n\nनमस्ते किसान भाई! मैं आपके क्षेत्र (${locLabelHi}) का रियल-टाइम भूजल स्तर, 30-दिन का पूर्वानुमान और फसल सलाह बता सकता हूँ।\n\n👉 *आप यह पूछ सकते हैं:*\n• “${locLabel} में पानी”\n• “पूर्वानुमान”\n• “कम पानी वाली फसलें”\n• “कोई चेतावनी है?”\n\n⚡ *तुरंत शॉर्टकट:*\n*1* पानी  |  *2* पूर्वानुमान  |  *3* फसल  |  *4* अलर्ट`
+          : `🌾 *Welcome to JalKrishi AI Farmer Assistant!*\n“Know Your Water. Grow Smarter.”\n\nHello Farmer! I can check real-time DWLR groundwater levels, 30-day depletion forecasts, and recommend water-smart crops for ${locLabel}.\n\n👉 *Try asking:*\n• “${locLabel} water status”\n• “${locLabel} forecast”\n• “What crop should I grow?”\n• “Any warnings or alerts?”\n\n⚡ *Quick Shortcuts:*\n*1* Water  |  *2* Forecast  |  *3* Crop Advice  |  *4* Alerts`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       actions: [
-        { label: '💧 Water Status', action: 'water', payload: { district: initialDistrict } },
-        { label: '🔮 30d Forecast', action: 'forecast', payload: { district: initialDistrict } },
-        { label: '🌱 Crop Advice', action: 'crop', payload: { district: initialDistrict } },
-        { label: '⚠️ Alerts', action: 'alerts', payload: { district: initialDistrict } },
+        { label: '💧 Water Status', action: 'water', payload: { district: initialDistrict || undefined } },
+        { label: '🔮 30d Forecast', action: 'forecast', payload: { district: initialDistrict || undefined } },
+        { label: '🌱 Crop Advice', action: 'crop', payload: { district: initialDistrict || undefined } },
+        { label: '⚠️ Alerts', action: 'alerts', payload: { district: initialDistrict || undefined } },
       ],
       intent: 'GREETING',
       dataMode: 'DEMO_SIMULATION',

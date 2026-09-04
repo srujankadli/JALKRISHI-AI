@@ -45,8 +45,8 @@ export const cropService = {
   async evaluateCrops(criteria: CropEvaluationCriteria): Promise<CropRecommendationResult> {
     try {
       const payload = {
-        state: criteria.state || 'Karnataka',
-        district: criteria.district || 'Kolar',
+        state: criteria.state || undefined,
+        district: criteria.district || undefined,
         station_id: criteria.stationId || undefined,
         soil_type: criteria.soilType,
         season: criteria.season,

@@ -1059,6 +1059,23 @@ class ProactiveGroundwaterIntelligenceEngine:
         """
         st: Optional[DWLRStationSchema] = None
 
+        if not (station_id or (lat is not None and lon is not None) or (location_name and location_name.strip())):
+            return {
+                "location": "Unspecified",
+                "status": "LOCATION_REQUIRED",
+                "has_warning": False,
+                "risk_state": "LOCATION_REQUIRED",
+                "station_id": "",
+                "station_name": "",
+                "summary": "Enter your farm location to view proactive groundwater status and warnings.",
+                "what_changed": "Select your location to see Water Watch.",
+                "why_it_matters": "Proactive groundwater warnings and stress signals are calculated specifically for your local aquifer.",
+                "recommended_action": "Enter your village, town, district, or PIN code.",
+                "what_to_do": "Enter your village, town, district, or PIN code.",
+                "confidence": "NONE",
+                "provenance": "Location Resolver",
+            }
+
         if station_id:
             st = station_repo.get_by_id(station_id.strip())
         elif lat is not None and lon is not None:
@@ -1068,6 +1085,38 @@ class ProactiveGroundwaterIntelligenceEngine:
         elif location_name and location_name.strip():
             from app.pipeline.location_resolver import resolve_location
             loc_res = resolve_location(location_query=location_name.strip())
+            if loc_res.is_international:
+                return {
+                    "location": location_name.strip(),
+                    "status": "UNSUPPORTED",
+                    "has_warning": False,
+                    "risk_state": "UNSUPPORTED",
+                    "station_id": "",
+                    "station_name": "",
+                    "summary": "JalKrishi currently supports locations in India.",
+                    "what_changed": "JalKrishi currently supports locations in India.",
+                    "why_it_matters": "Groundwater models are calibrated for Indian hydrogeological formations and CGWB/DWLR monitoring frameworks.",
+                    "recommended_action": "Please enter an Indian farm location, village, town, district, or PIN code.",
+                    "what_to_do": "Please enter an Indian farm location, village, town, district, or PIN code.",
+                    "confidence": "NONE",
+                    "provenance": "Location Resolver",
+                }
+            if not loc_res.is_resolved:
+                return {
+                    "location": location_name.strip(),
+                    "status": "UNRESOLVED",
+                    "has_warning": False,
+                    "risk_state": "UNRESOLVED",
+                    "station_id": "",
+                    "station_name": "",
+                    "summary": "Location not recognized. Please enter a valid village, town, district, or PIN code.",
+                    "what_changed": "Location not recognized. Please enter a valid village, town, district, or PIN code.",
+                    "why_it_matters": "Accurate location is necessary to determine local groundwater trends and aquifer conditions.",
+                    "recommended_action": "Check spelling or search by nearest town, taluk, district, or 6-digit PIN code.",
+                    "what_to_do": "Check spelling or search by nearest town, taluk, district, or 6-digit PIN code.",
+                    "confidence": "NONE",
+                    "provenance": "Location Resolver",
+                }
             if loc_res.is_resolved:
                 if loc_res.matched_station_id:
                     st = station_repo.get_by_id(loc_res.matched_station_id)

@@ -103,7 +103,7 @@ export const FarmWaterProfileSection: React.FC<FarmWaterProfileSectionProps> = (
   const { t } = useLanguage();
 
   const [isEditing, setIsEditing] = useState<boolean>(!profile);
-  const [location, setLocation] = useState<string>(profile?.location || 'Shivamogga');
+  const [location, setLocation] = useState<string>(profile?.location || '');
   const [facilities, setFacilities] = useState<string[]>(profile?.facilities || ['Borewell / Tube well']);
   const [reliability, setReliability] = useState<string>(profile?.reliability || 'Available most of the year');
   const [groundwaterRange, setGroundwaterRange] = useState<string>(profile?.groundwaterDependencyRange || '51-75');
@@ -223,7 +223,7 @@ export const FarmWaterProfileSection: React.FC<FarmWaterProfileSectionProps> = (
                   setLocation(e.target.value);
                   if (locationError) setLocationError(null);
                 }}
-                placeholder={t('Enter village, town, block, or district (e.g. Shivamogga, Bengaluru, Thanjavur)')}
+                placeholder={t('Enter village, town, block, district, or PIN code (e.g. Nashik, Patiala, Kochi)')}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all outline-hidden"
               />
             </div>
