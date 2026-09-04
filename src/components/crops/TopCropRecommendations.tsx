@@ -10,17 +10,21 @@ import {
 } from 'lucide-react';
 import type { CropRecommendation } from '../../types';
 import { SectionHeader } from '../common/SectionHeader';
+import type { FarmWaterProfile } from './FarmWaterProfileSection';
 
 interface TopCropRecommendationsProps {
   crops: CropRecommendation[];
   onSelectCrop: (crop: CropRecommendation) => void;
+  profile?: FarmWaterProfile | null;
 }
 
 export const TopCropRecommendations: React.FC<TopCropRecommendationsProps> = ({
   crops,
-onSelectCrop,
+  onSelectCrop,
+  profile,
 }) => {
   const { t } = useLanguage();
+
   const getRankBadge = (index: number) => {
     switch (index) {
       case 0:
@@ -28,7 +32,7 @@ onSelectCrop,
           rank: 'Rank #1',
           medal: '🥇',
           bg: 'bg-amber-50 border-amber-300 text-amber-900',
-          accent: 'border-agri-600 ring-2 ring-agri-500/20 shadow-elevated',
+          accent: 'border-emerald-600 ring-2 ring-emerald-500/20 shadow-elevated',
         };
       case 1:
         return {
@@ -52,13 +56,13 @@ onSelectCrop,
     switch (water) {
       case 'Low':
         return {
-          label: 'Low Water Draw',
+          label: t('Low Water Draw'),
           color: 'text-emerald-700 bg-emerald-50 border-emerald-200',
           bars: 1,
         };
       case 'Medium':
         return {
-          label: 'Medium Water Need',
+          label: t('Medium Water Need'),
           color: 'text-amber-700 bg-amber-50 border-amber-200',
           bars: 2,
         };
@@ -66,7 +70,7 @@ onSelectCrop,
       case 'Very High':
       default:
         return {
-          label: 'High Water Demand',
+          label: t('High Water Demand'),
           color: 'text-rose-700 bg-rose-50 border-rose-200',
           bars: 3,
         };
@@ -76,8 +80,12 @@ onSelectCrop,
   return (
     <div className="space-y-4">
       <SectionHeader
-        title={t('Top 3 Recommended Crops for Your Farm')}
-        subtitle={t('Ranked options delivering optimal harvest stability and lowest groundwater depletion risk')}
+        title={t('Recommended Crops for Your Farm')}
+        subtitle={
+          profile
+            ? `${t('Tailored recommendations considering your available irrigation, water reliability, and dependence profile for')} ${profile.location}`
+            : t('Ranked options delivering optimal harvest stability and lowest groundwater depletion risk')
+        }
         icon={<Award className="h-5 w-5 text-amber-600" />}
       />
 
@@ -103,10 +111,10 @@ onSelectCrop,
                   </span>
 
                   <div className="flex items-center gap-1">
-                    <span className="text-xl font-black text-agri-800 font-mono">
+                    <span className="text-xl font-black text-emerald-800 font-mono">
                       {crop.suitabilityScore}%
                     </span>
-                    <span className="text-[10px] font-bold text-stone-500 uppercase">Match</span>
+                    <span className="text-[10px] font-bold text-stone-500 uppercase">{t('Suitability')}</span>
                   </div>
                 </div>
 
@@ -116,7 +124,7 @@ onSelectCrop,
                     {crop.name}
                   </h3>
                   {crop.hindiName && (
-                    <span className="text-xs font-semibold text-agri-700">{crop.hindiName}</span>
+                    <span className="text-xs font-semibold text-emerald-700">{crop.hindiName}</span>
                   )}
                 </div>
 
@@ -133,26 +141,60 @@ onSelectCrop,
                   </span>
                 </div>
 
-                {/* Dynamic Reasons Bullet Points */}
+                {/* Why it may suit your farm */}
                 <div className="mt-4 space-y-2 rounded-2xl bg-stone-50/80 p-3.5 text-xs border border-stone-200/80">
                   <span className="text-[10px] font-extrabold text-stone-500 uppercase tracking-wider block">
-                    Why We Recommend This Crop:
+                    {t('Why it may suit your farm')}:
                   </span>
                   <ul className="space-y-1.5 text-stone-700 font-medium">
-                    {(crop.bulletReasons || [crop.reason]).slice(0, 3).map((r, i) => (
-                      <li key={i} className="flex items-start gap-1.5 leading-snug">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <span>{r}</span>
-                      </li>
-                    ))}
+                    {profile ? (
+                      <>
+                        <li className="flex items-start gap-1.5 leading-snug">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>
+                            {t('Suitable for your available irrigation')}: {profile.facilities.slice(0, 2).map((f) => t(f)).join(', ')}
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-1.5 leading-snug">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>
+                            {t('Compatible with your water reliability')} ({t(profile.reliability)})
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-1.5 leading-snug">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>
+                            {t('Water requirement is appropriate for your situation')}
+                          </span>
+                        </li>
+                      </>
+                    ) : (
+                      (crop.bulletReasons || [crop.reason]).slice(0, 3).map((r, i) => (
+                        <li key={i} className="flex items-start gap-1.5 leading-snug">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{r}</span>
+                        </li>
+                      ))
+                    )}
                   </ul>
+
+                  <div className="pt-2 border-t border-stone-200/60 text-[11px] text-stone-600">
+                    <strong>{t('Water Consideration')}:</strong>{' '}
+                    <span>
+                      {crop.waterRequirement === 'Low'
+                        ? t('Low water draw preserves aquifer storage and protects high groundwater dependency.')
+                        : crop.waterRequirement === 'Medium'
+                        ? t('Moderate water requirement manageable with balanced seasonal irrigation.')
+                        : t('Higher water requirement; best suited if canal or reliable storage is available.')}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Footer CTA */}
               <div className="mt-5 pt-3 border-t border-stone-100 flex items-center justify-between">
                 <span className="text-[11px] font-bold text-stone-500 flex items-center gap-1">
-                  <ShieldCheck className="h-3.5 w-3.5 text-agri-700" />
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
                   {crop.groundwaterImpact}
                 </span>
 

@@ -16,6 +16,7 @@ import { stationService } from '../services/stationService';
 // Crop Advisor UI Components
 import { PageHeader } from '../components/common/PageHeader';
 import { FarmProfileForm } from '../components/crops/FarmProfileForm';
+import { FarmWaterProfileSection, type FarmWaterProfile } from '../components/crops/FarmWaterProfileSection';
 import { TopCropRecommendations } from '../components/crops/TopCropRecommendations';
 import { NotRecommendedCrops } from '../components/crops/NotRecommendedCrops';
 import { CropComparisonTable } from '../components/crops/CropComparisonTable';
@@ -51,6 +52,25 @@ export const CropAdvisorPage: React.FC = () => {
   const [recommendations, setRecommendations] = useState<CropRecommendationResult | null>(null);
   const [selectedCrop, setSelectedCrop] = useState<CropRecommendation | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Farm Water-Source & Irrigation Profile
+  const [farmWaterProfile, setFarmWaterProfile] = useState<FarmWaterProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem('jalkrishi_crop_farm_water_profile');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleSaveFarmWaterProfile = (newProfile: FarmWaterProfile) => {
+    setFarmWaterProfile(newProfile);
+    try {
+      localStorage.setItem('jalkrishi_crop_farm_water_profile', JSON.stringify(newProfile));
+    } catch (e) {
+      console.warn('Could not persist farm water profile', e);
+    }
+  };
 
   // Initial Load: Populate States & evaluate default plan
   useEffect(() => {
@@ -297,11 +317,28 @@ export const CropAdvisorPage: React.FC = () => {
         isGenerating={isGenerating}
       />
 
+      {/* 2b. Personalized Farm Water-Source & Irrigation Profile */}
+      <FarmWaterProfileSection
+        profile={farmWaterProfile}
+        onSaveProfile={handleSaveFarmWaterProfile}
+        jalkrishiGroundwaterStatus={
+          nearbyStation?.status === 'critical'
+            ? 'Critical Deficit'
+            : nearbyStation?.status === 'warning'
+            ? 'Declining'
+            : nearbyStation?.status === 'moderate'
+            ? 'Moderately Stressed'
+            : 'Stable'
+        }
+        isGenerating={isGenerating}
+      />
+
       {/* 3. Top 3 Recommended Crops */}
       {recommendations && (
         <TopCropRecommendations
           crops={recommendations.top3}
           onSelectCrop={(c) => setSelectedCrop(c)}
+          profile={farmWaterProfile}
         />
       )}
 
