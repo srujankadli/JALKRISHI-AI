@@ -703,10 +703,60 @@ class FarmerDialogueManager:
             )
 
         elif intent == "CROP_WATER_REQUIREMENT":
-            msg = (
-                f"Water requirement for {crop_name}: Most seasonal crops require 400–600 mm of water throughout the lifecycle, equivalent to 4–6 cm depth per irrigation cycle. "
-                "Maintain soil moisture at field capacity during flowering and fruit setting stages to avoid yield loss."
-            )
+            from app.engines.crop_recommender import CROP_CATALOGUE_DATA, crop_engine
+            from app.models.schemas import CropRecommendationRequest, SoilType, CropSeason, WaterAvailabilityLevel, RainfallCondition
+            matched_crop = None
+            if crop_name:
+                c_low = crop_name.lower()
+                for c in CROP_CATALOGUE_DATA:
+                    if c["crop_name"].lower() in c_low or c_low in c["crop_name"].lower() or (c.get("local_name") and c["local_name"] in crop_name):
+                        matched_crop = c
+                        break
+
+            if matched_crop:
+                w_mm = matched_crop["water_requirement_mm"]
+                tier = matched_crop["water_demand_tier"]
+                mat = matched_crop["maturity_days"]
+                notes = matched_crop.get("farmer_notes", "Maintain adequate root-zone moisture during critical growth stages.")
+                msg = (
+                    f"Water requirement for {matched_crop['crop_name']}: {w_mm} mm total lifecycle requirement ({tier} demand tier, {mat} duration). "
+                    f"Guidance: {notes}"
+                )
+            elif loc_name:
+                # Retrieve top recommended crop for this district
+                loc_state = ctx.location.state if ctx.location and ctx.location.state else ""
+                loc_dist = ctx.location.district if ctx.location and ctx.location.district else loc_name
+                try:
+                    rec_res = crop_engine.evaluate_recommendations(CropRecommendationRequest(
+                        state=loc_state,
+                        district=loc_dist,
+                        soil_type=SoilType.LOAMY,
+                        season=CropSeason.RABI,
+                        water_availability=WaterAvailabilityLevel.MODERATE,
+                        rainfall_condition=RainfallCondition.NORMAL
+                    ))
+                    top_rec = rec_res.top_recommendations[0] if rec_res.top_recommendations else None
+                    if top_rec:
+                        msg = (
+                            f"Water requirement in {loc_name}: Recommended crop {top_rec.crop_name} requires {top_rec.water_requirement_mm} mm over {top_rec.maturity_days}. "
+                            f"General seasonal crop water demand ranges from 280 mm (pulses/millets) to 700 mm (cotton/maize). "
+                            "Maintain soil moisture at field capacity during flowering and fruit setting stages."
+                        )
+                    else:
+                        msg = (
+                            f"Water requirement for {crop_name or loc_name}: Seasonal crops range from 280–350 mm (pulses/millets) to 450–600 mm (cereals/oilseeds). "
+                            "Apply scheduled micro-irrigation to maintain root-zone moisture without waterlogging."
+                        )
+                except Exception:
+                    msg = (
+                        f"Water requirement for {crop_name or loc_name}: Seasonal crops range from 280–350 mm (pulses/millets) to 450–600 mm (cereals/oilseeds). "
+                        "Apply scheduled micro-irrigation to maintain root-zone moisture without waterlogging."
+                    )
+            else:
+                msg = (
+                    f"Water requirement for {crop_name or 'seasonal crops'}: Pulses and millets (chana, bajra, ragi) require 280–350 mm, oilseeds (mustard, groundnut) require 300–500 mm, and cereals (wheat, maize) require 450–650 mm. "
+                    "Which specific crop or farm location would you like detailed water numbers for?"
+                )
 
         elif intent == "WEATHER_IMPACT_ON_CROP":
             msg = (

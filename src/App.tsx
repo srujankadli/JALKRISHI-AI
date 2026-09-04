@@ -12,6 +12,7 @@ import { WhatsAppPage } from './pages/WhatsAppPage';
 import { HelpPage } from './pages/HelpPage';
 
 import { LanguageProvider } from './context/LanguageContext';
+import { FarmProvider } from './context/FarmContext';
 
 import { OfficialCommandCenter } from './pages/official/OfficialCommandCenter';
 import { ProtectedOfficialRoute } from './components/auth/ProtectedOfficialRoute';
@@ -20,7 +21,8 @@ export function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <BrowserRouter>
+        <FarmProvider>
+          <BrowserRouter>
           <Routes>
             {/* Standalone Login Route */}
             <Route path="/login" element={<LoginPage />} />
@@ -48,6 +50,7 @@ export function App() {
             </Route>
           </Routes>
         </BrowserRouter>
+        </FarmProvider>
       </AuthProvider>
     </LanguageProvider>
   );

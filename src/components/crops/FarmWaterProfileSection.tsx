@@ -15,6 +15,7 @@ import { useLanguage } from '../../context/LanguageContext';
 
 export interface FarmWaterProfile {
   location: string;
+  crop?: string | null;
   facilities: string[];
   reliability: string;
   groundwaterDependencyRange: string;

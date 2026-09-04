@@ -9,6 +9,7 @@ export interface WhatsAppActionItem {
 
 export interface WhatsAppMessagePayload {
   from_number?: string;
+  district?: string;
   message: string;
   language?: string;
   conversation_id?: string;
@@ -56,19 +57,27 @@ export const whatsappService = {
   getLocalFallbackResponse(payload: WhatsAppMessagePayload): WhatsAppMessageResponse {
     const text = (payload.message || '').trim().toLowerCase();
     const isHindi = /[\u0900-\u097f]/.test(text) || payload.language === 'hi';
+    let targetDistrict = payload.district || '';
+    if (!targetDistrict) {
+      try {
+        targetDistrict = localStorage.getItem('jalkrishi_selected_location') || 'Your Region';
+      } catch {
+        targetDistrict = 'Your Region';
+      }
+    }
 
-    if (text === '1' || text.includes('water') || text.includes('पानी') || text.includes('kolar') || text.includes('sangrur')) {
+    if (text === '1' || text.includes('water') || text.includes('पानी')) {
       return {
         success: true,
         conversation_id: payload.conversation_id || 'demo-offline-session',
         intent: 'WATER_STATUS',
         language: isHindi ? 'hi' : 'en',
         reply: isHindi
-          ? '💧 *जलकृषि एआई — कोलार (कर्नाटक)*\n\nभूजल स्थिति: 🟠 *मध्यम / सतर्कता*\n📊 औसत गहराई: *28.4 मीटर mbgl*\n📉 वर्तमान रुझान: *नीचे गिर रहा है (-0.2 m/mo)*\n⚠️ जोखिम सूचकांक: *58/100* (निगरानी: 82 कुएं)\n\n💡 *सलाह:* भूजल स्तर घट रहा है। कम पानी वाली दलहन फसलें चुनें।\n\n_ऑफ़लाइन डेमो फ़ॉलबैक मोड_'
-          : '💧 *JalKrishi AI — Kolar (Karnataka)*\n\nWater Status: 🟠 *Moderate / Warning*\n📊 Current Depth: *28.4 m mbgl*\n📉 Groundwater Trend: *Falling (-0.2 m/mo)*\n⚠️ Risk Index: *58/100* (Monitored wells: 82)\n\n💡 *What this means:* Water table is depleting. Prioritize water-smart crops (Gram, Millets) and schedule night-time irrigation.\n\n_Offline Demo Fallback Mode_',
+          ? `💧 *जलकृषि एआई — ${targetDistrict}*\n\nभूजल स्थिति: 🟠 *मध्यम / सतर्कता*\n📊 औसत गहराई: *18.4 मीटर mbgl*\n📉 वर्तमान रुझान: *नीचे गिर रहा है (-0.2 m/mo)*\n⚠️ जोखिम सूचकांक: *52/100*\n\n💡 *सलाह:* भूजल स्तर घट रहा है। कम पानी वाली दलहन फसलें चुनें।\n\n_ऑफ़लाइन डेमो फ़ॉलबैक मोड_`
+          : `💧 *JalKrishi AI — ${targetDistrict}*\n\nWater Status: 🟠 *Moderate / Warning*\n📊 Current Depth: *18.4 m mbgl*\n📉 Groundwater Trend: *Falling (-0.2 m/mo)*\n⚠️ Risk Index: *52/100*\n\n💡 *What this means:* Water table is depleting. Prioritize water-smart crops (Gram, Millets) and schedule night-time irrigation.\n\n_Offline Demo Fallback Mode_`,
         actions: [
-          { label: '🔮 30-Day Forecast', action: 'forecast', payload: { district: 'Kolar' } },
-          { label: '🌱 Crop Advice', action: 'crop', payload: { district: 'Kolar' } },
+          { label: '🔮 30-Day Forecast', action: 'forecast', payload: { district: targetDistrict } },
+          { label: '🌱 Crop Advice', action: 'crop', payload: { district: targetDistrict } },
         ],
         data_mode: 'DEMO_FALLBACK',
         disclaimer: 'Offline Fallback: Local deterministic simulation response.',
@@ -82,8 +91,8 @@ export const whatsappService = {
         intent: 'FORECAST',
         language: isHindi ? 'hi' : 'en',
         reply: isHindi
-          ? '🔮 *जलकृषि 30-दिवसीय भूजल पूर्वानुमान — कोलार*\n\n📊 वर्तमान गहराई: *28.4 मीटर*\n📉 30 दिन बाद अनुमानित गहराई: *28.9 मीटर mbgl*\n⏳ संकट में बचे दिन: *115 दिन*\n🎯 मॉडल विश्वसनीयता: *88%*\n\n🌾 *सलाह:* भूजल में निरंतर गिरावट है। ड्रिप सिंचाई अपनाएं।\n\n_ऑफ़लाइन डेमो फ़ॉलबैक_'
-          : '🔮 *JalKrishi 30-Day Groundwater Forecast — Kolar*\n\n📊 Current Depth: *28.4 m mbgl*\n📉 Projected Depth (30d): *28.9 m mbgl*\n⏳ Days to Critical: *115 Days* (60+ Days Watch Zone)\n🎯 Model Confidence: *88%*\n\n🌾 *Farmer Advice:* Steady drawdown detected. Switch to micro-irrigation and night hours pumping.\n\n_Offline Demo Fallback_',
+          ? `🔮 *जलकृषि 30-दिवसीय भूजल पूर्वानुमान — ${targetDistrict}*\n\n📊 वर्तमान गहराई: *18.4 मीटर*\n📉 30 दिन बाद अनुमानित गहराई: *18.9 मीटर mbgl*\n⏳ संकट में बचे दिन: *115 दिन*\n🎯 मॉडल विश्वसनीयता: *88%*\n\n🌾 *सलाह:* भूजल में निरंतर गिरावट है। ड्रिप सिंचाई अपनाएं।\n\n_ऑफ़लाइन डेमो फ़ॉलबैक_`
+          : `🔮 *JalKrishi 30-Day Groundwater Forecast — ${targetDistrict}*\n\n📊 Current Depth: *18.4 m mbgl*\n📉 Projected Depth (30d): *18.9 m mbgl*\n⏳ Days to Critical: *115 Days* (60+ Days Watch Zone)\n🎯 Model Confidence: *88%*\n\n🌾 *Farmer Advice:* Steady drawdown detected. Switch to micro-irrigation and night hours pumping.\n\n_Offline Demo Fallback_`,
         actions: [
           { label: '🌱 Suitable Crops', action: 'crop' },
           { label: '💧 Water Status', action: 'water' },
@@ -100,8 +109,8 @@ export const whatsappService = {
         intent: 'CROP_RECOMMENDATION',
         language: isHindi ? 'hi' : 'en',
         reply: isHindi
-          ? '🌱 *जलकृषि फसल सलाहकार — कोलार (कर्नाटक)*\nमौसम: रबी (Rabi) | पानी: सीमित\n\n🥇 *1. चना / बंगाल ग्राम* (स्कोर: *93/100*)\n   • पानी: 280 मिमी | कम पानी में उत्तम पैदावार\n\n🥈 *2. सरसों (Mustard)* (स्कोर: *88/100*)\n   • पानी: 310 मिमी | सीमित जल में अनुकूल\n\n⚠️ *इनसे बचें:* ❌ गन्ना (Sugarcane) — अत्यधिक जल मांग।\n\n_ऑफ़लाइन डेमो फ़ॉलबैक_'
-          : '🌱 *JalKrishi Crop Advisor — Kolar (Karnataka)*\nSeason: Rabi | Water: Limited\n\n🥇 *1. Chickpea / Bengal Gram (Chana)* — Score: *93/100*\n   • Water Need: 280 mm (Low water footprint)\n\n🥈 *2. Mustard (Sarson)* — Score: *88/100*\n   • Water Need: 310 mm (High drought tolerance)\n\n⚠️ *Crops to Avoid:* ❌ Sugarcane (1800mm) — High risk of borewell dry-up.\n\n_Offline Demo Fallback_',
+          ? `🌱 *जलकृषि फसल सलाहकार — ${targetDistrict}*\nमौसम: रबी (Rabi) | पानी: सीमित\n\n🥇 *1. चना / बंगाल ग्राम* (स्कोर: *93/100*)\n   • पानी: 280 मिमी | कम पानी में उत्तम पैदावार\n\n🥈 *2. सरसों (Mustard)* (स्कोर: *88/100*)\n   • पानी: 310 मिमी | सीमित जल में अनुकूल\n\n⚠️ *इनसे बचें:* ❌ गन्ना (Sugarcane) — अत्यधिक जल मांग।\n\n_ऑफ़लाइन डेमो फ़ॉलबैक_`
+          : `🌱 *JalKrishi Crop Advisor — ${targetDistrict}*\nSeason: Rabi | Water: Limited\n\n🥇 *1. Chickpea / Bengal Gram (Chana)* — Score: *93/100*\n   • Water Need: 280 mm (Low water footprint)\n\n🥈 *2. Mustard (Sarson)* — Score: *88/100*\n   • Water Need: 310 mm (High drought tolerance)\n\n⚠️ *Crops to Avoid:* ❌ Sugarcane (1800mm) — High risk of borewell dry-up.\n\n_Offline Demo Fallback_`,
         actions: [
           { label: '🔮 Forecast', action: 'forecast' },
           { label: '💧 Water Status', action: 'water' },

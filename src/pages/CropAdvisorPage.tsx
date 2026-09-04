@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { Sprout, Radio } from 'lucide-react';
+import { Sprout, Radio, MapPin, Droplets } from 'lucide-react';
 import type {
   DWLRStation,
   SoilType,
@@ -24,6 +24,7 @@ import { CropDetailModal } from '../components/crops/CropDetailModal';
 import { WaterSmartFarmingAdvice } from '../components/crops/WaterSmartFarmingAdvice';
 import { CropMethodologyNote } from '../components/crops/CropMethodologyNote';
 import { useLanguage } from '../context/LanguageContext';
+import { useFarm } from '../context/FarmContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
@@ -33,6 +34,14 @@ export const CropAdvisorPage: React.FC = () => {
   const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
+  const {
+    location: farmLocation,
+    profile: farmWaterProfile,
+    updateFarmProfile,
+    setFarmLocation,
+    resolvedLocation,
+    nearestStation: farmNearestStation,
+  } = useFarm();
 
   // Location & Form States
   const [statesList, setStatesList] = useState<string[]>(['All States']);
@@ -53,24 +62,21 @@ export const CropAdvisorPage: React.FC = () => {
   const [selectedCrop, setSelectedCrop] = useState<CropRecommendation | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Farm Water-Source & Irrigation Profile
-  const [farmWaterProfile, setFarmWaterProfile] = useState<FarmWaterProfile | null>(() => {
-    try {
-      const saved = localStorage.getItem('jalkrishi_crop_farm_water_profile');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-
   const handleSaveFarmWaterProfile = (newProfile: FarmWaterProfile) => {
-    setFarmWaterProfile(newProfile);
-    try {
-      localStorage.setItem('jalkrishi_crop_farm_water_profile', JSON.stringify(newProfile));
-    } catch (e) {
-      console.warn('Could not persist farm water profile', e);
+    updateFarmProfile(newProfile);
+    if (newProfile.location && newProfile.location !== farmLocation) {
+      setFarmLocation(newProfile.location);
     }
   };
+
+  const profileSummary = [
+    farmWaterProfile.crop ? `${t('Crop')}: ${farmWaterProfile.crop}` : null,
+    farmWaterProfile.facilities.length ? farmWaterProfile.facilities.map((item) => item.replace(/_/g, ' ')).join(', ') : null,
+    farmWaterProfile.reliability || null,
+    farmWaterProfile.groundwaterDependencyRange ? `${t('Groundwater')}: ${farmWaterProfile.groundwaterDependencyRange}` : null,
+    farmWaterProfile.externalWaterDependencyRange ? `${t('External water')}: ${farmWaterProfile.externalWaterDependencyRange}` : null,
+    farmWaterProfile.rainfallDependency ? `${t('Rainfall')}: ${farmWaterProfile.rainfallDependency}` : null,
+  ].filter(Boolean);
 
   // Initial Load: Populate States & evaluate plan
   useEffect(() => {
@@ -78,8 +84,8 @@ export const CropAdvisorPage: React.FC = () => {
       const states = await stationService.getDistinctStates();
       setStatesList(states);
 
-      // Check if user has an active farm profile location or selected location
-      const savedLoc = farmWaterProfile?.location || localStorage.getItem('jalkrishi_selected_location');
+      // Check if user has an active farm profile location
+      const savedLoc = farmWaterProfile?.location || farmLocation;
       if (savedLoc && savedLoc.trim()) {
         const allStations = await stationService.getAllStations();
         const found = allStations.find(
@@ -108,7 +114,7 @@ export const CropAdvisorPage: React.FC = () => {
         }
       }
 
-      // Default nationwide baseline evaluation without hardcoded district
+      // Baseline plan if no location set yet
       const plan = await cropService.evaluateCrops({
         soilType: 'Alluvial',
         season: 'Rabi',
@@ -312,6 +318,37 @@ export const CropAdvisorPage: React.FC = () => {
         </div>
       )}
 
+      {/* The crop plan reads this same FarmContext used by Dashboard and Water Advisor. */}
+      <section className="rounded-2xl border border-agri-200 bg-agri-50/60 p-4 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex gap-3">
+            <div className="rounded-xl bg-white p-2 text-agri-700 shadow-sm"><MapPin className="h-5 w-5" /></div>
+            <div>
+              <h2 className="font-bold text-stone-900">{t('Your saved Farm Water Profile')}</h2>
+              {farmLocation ? (
+                <p className="mt-1 text-sm font-medium text-stone-700">
+                  {resolvedLocation?.name || farmLocation}
+                  {resolvedLocation?.state ? `, ${resolvedLocation.state}` : ''}
+                </p>
+              ) : (
+                <p className="mt-1 text-sm text-stone-600">{t('Add your farm location below to personalise crop advice.')}</p>
+              )}
+              {profileSummary.length ? (
+                <p className="mt-2 text-xs text-stone-600">{profileSummary.join(' • ')}</p>
+              ) : farmLocation ? (
+                <p className="mt-2 text-xs text-stone-600">{t('Water sources and reliability are not added yet. Complete the profile below for more relevant advice.')}</p>
+              ) : null}
+            </div>
+          </div>
+          {farmNearestStation && (
+            <div className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-medium text-stone-700 shadow-sm">
+              <Droplets className="h-3.5 w-3.5 text-water-700" />
+              {t('Farm-area water evidence is included')}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* 2. Interactive Farm Profile Input Form */}
       <FarmProfileForm
         states={statesList}
@@ -355,7 +392,10 @@ export const CropAdvisorPage: React.FC = () => {
       {recommendations && (
         <TopCropRecommendations
           crops={recommendations.top3}
-          onSelectCrop={(c) => setSelectedCrop(c)}
+          onSelectCrop={(c) => {
+            setSelectedCrop(c);
+            updateFarmProfile({ crop: c.name });
+          }}
           profile={farmWaterProfile}
         />
       )}

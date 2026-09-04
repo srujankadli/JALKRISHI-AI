@@ -385,7 +385,8 @@ class HydroAgronomicTranslator:
             # English Default
             cov_label = "Direct DWLR Measurement" if is_dwlr else "Satellite-Assisted Groundwater Outlook"
             cond_label = intel.groundwater_condition.replace("_", " ")
-            trend_label = intel.trend
+            trend_raw = str(intel.trend.value if hasattr(intel.trend, "value") else intel.trend).replace("TrendDirection.", "")
+            trend_label = trend_raw.capitalize() if trend_raw else "Stable"
             recharge_label = intel.recharge_outlook
             crops_str = ", ".join(intel.recommended_crops[:3])
 

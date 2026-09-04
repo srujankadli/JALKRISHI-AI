@@ -22,6 +22,7 @@ import { RegionalForecastTable } from '../components/forecast/RegionalForecastTa
 import { FarmerActionAdvice } from '../components/forecast/FarmerActionAdvice';
 import { ForecastMethodologyNote } from '../components/forecast/ForecastMethodologyNote';
 import { useLanguage } from '../context/LanguageContext';
+import { useFarm } from '../context/FarmContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
@@ -31,12 +32,17 @@ export const ForecastPage: React.FC = () => {
   const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
+  const { location: farmLocation, nearestStation: farmNearestStation } = useFarm();
 
   // State
   const [stations, setStations] = useState<DWLRStation[]>([]);
   const [statesList, setStatesList] = useState<string[]>(['All States']);
-  const [selectedStationId, setSelectedStationId] = useState<string>('DWLR-PB-001');
-  const [selectedState, setSelectedState] = useState<string>('Punjab');
+  const [selectedStationId, setSelectedStationId] = useState<string>(() => {
+    return farmNearestStation?.station.id || 'DWLR-PB-001';
+  });
+  const [selectedState, setSelectedState] = useState<string>(() => {
+    return farmNearestStation?.station.state || 'All States';
+  });
   const [forecastData, setForecastData] = useState<StationForecast | null>(null);
 
   const [daysToCriticalBrackets, setDaysToCriticalBrackets] = useState<DaysToCriticalBreakdown[]>([]);
@@ -69,9 +75,17 @@ export const ForecastPage: React.FC = () => {
       setTopRiskStations(topRisk);
       setTopStableStations(topStable);
       setRegionalOutlooks(outlooks);
+
+      if (farmNearestStation?.station) {
+        setSelectedStationId(farmNearestStation.station.id);
+        setSelectedState(farmNearestStation.station.state);
+      } else if (allSt.length > 0 && !farmLocation) {
+        setSelectedStationId(allSt[0].id);
+        setSelectedState(allSt[0].state);
+      }
     }
     loadData();
-  }, []);
+  }, [farmNearestStation, farmLocation]);
 
   // Update Station Forecast when selectedStationId changes
   useEffect(() => {

@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, Link } from 'react-router-dom';
 import {
   RotateCcw,
   Clock,
+  Landmark,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import type { DWLRStation, DashboardSummary } from '../types';
 import { metricService } from '../services/metricService';
 import { stationService } from '../services/stationService';
+
+// Farm Context & Personalized Components
+import { useFarm } from '../context/FarmContext';
+import { MyFarmOverviewCard } from '../components/dashboard/MyFarmOverviewCard';
+import { FarmerOnboardingCard } from '../components/dashboard/FarmerOnboardingCard';
 
 // Dashboard Components
 import { HeroSection } from '../components/dashboard/HeroSection';
@@ -36,17 +44,12 @@ interface OutletContextType {
 export const Dashboard: React.FC = () => {
   const { onSelectStation, selectedStation } = useOutletContext<OutletContextType>();
   const { t } = useLanguage();
+  const { location: farmLocation } = useFarm();
 
   const [metrics, setMetrics] = useState<DashboardSummary | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState('Just now');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [conversationalLocation, setConversationalLocation] = useState<string | null>(null);
-
-  const effectiveLocation = conversationalLocation || (
-    selectedStation
-      ? `${selectedStation.block ? selectedStation.block + ', ' : ''}${selectedStation.district} (${selectedStation.state})`
-      : null
-  );
+  const [showFullNetworkTelemetry, setShowFullNetworkTelemetry] = useState(false);
 
   const fetchSummary = async () => {
     try {
@@ -86,7 +89,7 @@ export const Dashboard: React.FC = () => {
             {t('System Operational • 5,260 Telemetry Nodes Synchronized')}
           </span>
         </div>
-        <div className="flex items-center gap-4 text-xs font-medium text-stone-500">
+        <div className="flex items-center gap-3 text-xs font-medium text-stone-500">
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
             {t('Updated:')} {t(lastUpdatedText)}
@@ -103,53 +106,91 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. Hero Section */}
-      <HeroSection />
+      {/* 1. Personalized Farmer Mode vs Clean Onboarding */}
+      {farmLocation ? (
+        <>
+          {/* Personalized "My Farm" Overview Card */}
+          <MyFarmOverviewCard onOpenStation={onSelectStation} />
 
-      {/* 2. Executive Water Situation Brief */}
-      <ExecutiveWaterBrief />
+          {/* Localized Farmer Water Advisor with Adaptive Questions */}
+          <FarmerWaterAdvisor initialLocation={farmLocation} />
 
-      {/* 2.5 Rebuilt Farmer Water Advisor */}
-      <FarmerWaterAdvisor
-        initialLocation={effectiveLocation}
-        onLocationChange={(loc) => setConversationalLocation(loc)}
-      />
+          {/* Localized Proactive Water Watch Card */}
+          <JalKrishiWaterWatchCard location={farmLocation} selectedStation={selectedStation} />
 
-      {/* 2.8 Proactive Groundwater Intelligence & Water Watch */}
-      <JalKrishiWaterWatchCard
-        location={effectiveLocation}
-        selectedStation={selectedStation}
-      />
+          {/* Recommended Farmer Actions */}
+          <FarmerActionCenter />
+        </>
+      ) : (
+        <>
+          {/* First-Time Onboarding Card */}
+          <FarmerOnboardingCard />
 
-      {/* 4. Four Simplified Stat Cards */}
-      <StatCardsGrid metrics={metrics} />
+          {/* Simple Farmer Water Advisor (with clean location prompt) */}
+          <FarmerWaterAdvisor />
 
-      {/* 5. Farmer Action Center (Recommended Actions) */}
-      <FarmerActionCenter />
+          {/* Overview Hero Section */}
+          <HeroSection />
+        </>
+      )}
 
-      {/* 6. Charts Section: Groundwater Trend & Rainfall Correlation */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <GroundwaterTrendCard />
-        <RainfallRechargeCard />
+      {/* 2. Nationwide Telemetry & Hydrologist Exploration Toggle */}
+      <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <Landmark className="h-5 w-5 text-stone-700" />
+            <div>
+              <h3 className="text-sm font-bold text-stone-900">
+                {t('Nationwide Groundwater Network & Analytics')}
+              </h3>
+              <p className="text-xs text-stone-500">
+                {t('Access all 5,260 DWLR telemetry nodes, stress rankings, and hydrologist tools')}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/official"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2 text-xs font-bold text-stone-800 hover:bg-stone-100 transition-colors"
+            >
+              <span>{t('Official Command Center')}</span>
+            </Link>
+            <button
+              onClick={() => setShowFullNetworkTelemetry((prev) => !prev)}
+              className="inline-flex items-center gap-1 rounded-xl bg-stone-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-stone-800 transition-colors cursor-pointer"
+            >
+              <span>{showFullNetworkTelemetry ? t('Collapse Network View') : t('View Network Analytics')}</span>
+              {showFullNetworkTelemetry ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Expandable Full Telemetry View */}
+        {showFullNetworkTelemetry && (
+          <div className="mt-5 space-y-6 border-t border-stone-200/60 pt-5">
+            <ExecutiveWaterBrief />
+            <StatCardsGrid metrics={metrics} />
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <GroundwaterTrendCard />
+              <RainfallRechargeCard />
+            </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+              <div className="lg:col-span-6">
+                <GroundwaterAlertsFeed onSelectStation={handleOpenStationById} />
+              </div>
+              <div className="lg:col-span-6">
+                <AreasToWatchTable onSelectStation={handleOpenStationById} />
+              </div>
+            </div>
+            <GroundwaterCoverageCard />
+          </div>
+        )}
       </div>
 
-      {/* 7. Decision Support: Groundwater Alerts & Areas to Watch */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <div className="lg:col-span-6">
-          <GroundwaterAlertsFeed onSelectStation={handleOpenStationById} />
-        </div>
-        <div className="lg:col-span-6">
-          <AreasToWatchTable onSelectStation={handleOpenStationById} />
-        </div>
-      </div>
-
-      {/* 7.5 Spatial Groundwater Intelligence Coverage (Phase N) */}
-      <GroundwaterCoverageCard />
-
-      {/* 8. Mini Map Preview */}
+      {/* 3. Mini Map Preview */}
       <MiniMapPreview onSelectStation={onSelectStation} />
 
-      {/* 9. Quick Actions Launchpad */}
+      {/* 4. Quick Actions Launchpad */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>

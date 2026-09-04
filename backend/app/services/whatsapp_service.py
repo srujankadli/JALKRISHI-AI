@@ -462,8 +462,26 @@ class WhatsAppConversationalService:
 
     def _build_station_details_response(self, session: ConversationSession, station_id: Optional[str], is_hindi: bool) -> WhatsAppWebhookResponse:
         st = station_repo.get_by_id(station_id) if station_id else None
+        if not st and session.district:
+            d_stations = station_repo.filter_stations(district=session.district)
+            if d_stations:
+                st = d_stations[0]
+
         if not st:
-            st = station_repo.get_all()[0]
+            reply = (
+                "📍 *स्टेशन विवरण नहीं मिला*\n\nकृपया मान्य स्टेशन आईडी या जिले का नाम प्रदान करें।"
+                if is_hindi
+                else "📍 *Station Details Not Found*\n\nPlease provide a valid station ID or district name."
+            )
+            return WhatsAppWebhookResponse(
+                conversation_id=session.conversation_id,
+                intent=WhatsAppIntentEnum.STATION_DETAILS,
+                language="hi" if is_hindi else "en",
+                reply=reply,
+                actions=[
+                    WhatsAppAction(label="💧 Water Status", action="water"),
+                ],
+            )
 
         session.station_id = st.id
         session.district = st.district
@@ -566,9 +584,41 @@ class WhatsAppConversationalService:
 
     def _build_forecast_response(self, session: ConversationSession, district: str, station_id: Optional[str], is_hindi: bool) -> WhatsAppWebhookResponse:
         st = station_repo.get_by_id(station_id) if station_id else None
-        if not st:
+        if not st and district:
             d_stations = station_repo.filter_stations(district=district)
-            st = d_stations[0] if d_stations else station_repo.get_all()[0]
+            if d_stations:
+                st = d_stations[0]
+            else:
+                from app.pipeline.location_resolver import resolve_location
+                loc_res = resolve_location(location_query=district)
+                if loc_res.is_resolved and loc_res.latitude and loc_res.longitude:
+                    # Find nearest station
+                    all_st = station_repo.get_all()
+                    if all_st:
+                        import math
+                        def dist_fn(s):
+                            dlat = math.radians(s.latitude - loc_res.latitude)
+                            dlon = math.radians(s.longitude - loc_res.longitude)
+                            a = math.sin(dlat/2)**2 + math.cos(math.radians(loc_res.latitude)) * math.cos(math.radians(s.latitude)) * math.sin(dlon/2)**2
+                            return 6371.0 * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+                        all_st_sorted = sorted(all_st, key=dist_fn)
+                        st = all_st_sorted[0]
+
+        if not st:
+            reply = (
+                "🔮 *भूजल पूर्वानुमान کے लिए क्षेत्र दर्ज करें*\n\nकृपया अपने जिले, ब्लॉक या गांव का नाम लिखें।"
+                if is_hindi
+                else "🔮 *Select Area for Groundwater Forecast*\n\nPlease provide your district, block, or village name."
+            )
+            return WhatsAppWebhookResponse(
+                conversation_id=session.conversation_id,
+                intent=WhatsAppIntentEnum.FORECAST,
+                language="hi" if is_hindi else "en",
+                reply=reply,
+                actions=[
+                    WhatsAppAction(label="💧 Water Status", action="water"),
+                ],
+            )
 
         fc = forecasting_engine.forecast_station(st.id, horizon_days=30)
         p30 = fc.forecast_points[-1].predicted_depth if fc.forecast_points else st.waterLevel + 0.3
