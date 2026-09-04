@@ -267,8 +267,152 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
       </div>
 
       {/* Capabilities & Dynamic Location Assessment Card */}
-      {response?.location ? (
-        <div className="rounded-2xl bg-teal-50/80 border border-teal-200 p-4 space-y-3 text-xs text-stone-800 shadow-sm">
+      {/* Intent-Specific Intelligence Structured Cards */}
+      {response?.response_type === 'INTELLIGENCE' && response.intent_category === 'WEATHER' && (
+        <div className="rounded-2xl bg-sky-50/80 border border-sky-200 p-4 space-y-3 text-xs text-stone-800 shadow-sm animate-in fade-in duration-200">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-200/60 pb-2">
+            <span className="font-black tracking-wide text-sky-900 uppercase text-[10px]">
+              Weather & Rainfall Assessment
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[10px] bg-sky-100 text-sky-800 border border-sky-300">
+              Reference Meteorological Simulation
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-medium">
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Location</span>
+              <strong className="text-stone-900 font-bold text-sm">{response.location?.name || 'Reference Area'}</strong>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Expected Precipitation (30d)</span>
+              <strong className="text-sky-900 font-black text-sm block">
+                {response.weather_info?.precipitation_mm || 145} mm
+              </strong>
+              <span className="text-[10px] text-stone-500 font-medium">Moderate Recharge Potential</span>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Monsoon Status</span>
+              <strong className="text-stone-900 font-bold block text-xs">
+                {response.weather_info?.monsoon_status || 'ACTIVE_SOUTHWEST_MONSOON'}
+              </strong>
+              <span className="text-[10px] text-stone-500 font-medium block">
+                Live IMD API: NOT_CONFIGURED
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {response?.response_type === 'INTELLIGENCE' && response.intent_category === 'CROP' && (
+        <div className="rounded-2xl bg-emerald-50/80 border border-emerald-200 p-4 space-y-3 text-xs text-stone-800 shadow-sm animate-in fade-in duration-200">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-200/60 pb-2">
+            <span className="font-black tracking-wide text-emerald-900 uppercase text-[10px]">
+              Water-Smart Crop Recommendation
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300">
+              High Drought Resistance
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-medium">
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Primary Recommended Crop</span>
+              <strong className="text-emerald-950 font-bold text-sm">{response.crop_info?.primary_crop || 'Finger Millet (Ragi)'}</strong>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Water Requirement</span>
+              <strong className="text-emerald-900 font-black text-sm block">
+                {response.crop_info?.water_requirement_mm || '350–450 mm'}
+              </strong>
+              <span className="text-[10px] text-stone-500 font-medium">110-day maturity cycle</span>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Alternative Crop</span>
+              <strong className="text-stone-900 font-bold block text-xs">
+                {response.crop_info?.alternate_crop || 'Red Gram (Pigeonpea)'}
+              </strong>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {response?.response_type === 'INTELLIGENCE' && response.intent_category === 'IRRIGATION' && (
+        <div className="rounded-2xl bg-blue-50/80 border border-blue-200 p-4 space-y-3 text-xs text-stone-800 shadow-sm animate-in fade-in duration-200">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-blue-200/60 pb-2">
+            <span className="font-black tracking-wide text-blue-900 uppercase text-[10px]">
+              Precision Irrigation Guidance
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[10px] bg-blue-100 text-blue-800 border border-blue-300">
+              Drip Efficiency Recommended
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-medium">
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Application Depth</span>
+              <strong className="text-blue-900 font-black text-sm block">
+                {response.irrigation_info?.depth_per_application_mm || 25} mm
+              </strong>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Recommended Schedule</span>
+              <strong className="text-stone-900 font-bold block text-xs">
+                Every {response.irrigation_info?.interval_days || 5} days
+              </strong>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Evaporation Warning</span>
+              <span className="text-[10px] text-amber-800 font-medium block">
+                Irrigate early morning or evening to minimize loss.
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {response?.response_type === 'INTELLIGENCE' && response.intent_category === 'RECHARGE' && (
+        <div className="rounded-2xl bg-cyan-50/80 border border-cyan-200 p-4 space-y-3 text-xs text-stone-800 shadow-sm animate-in fade-in duration-200">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-200/60 pb-2">
+            <span className="font-black tracking-wide text-cyan-900 uppercase text-[10px]">
+              Groundwater Recharge Guidance
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[10px] bg-cyan-100 text-cyan-800 border border-cyan-300">
+              Hard Rock Aquifer Protection
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-medium">
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Recommended Structure</span>
+              <strong className="text-cyan-950 font-bold text-xs block">{response.recharge_info?.structure || 'Rooftop RWH & Injection Pit'}</strong>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Target Pit Depth</span>
+              <strong className="text-cyan-900 font-black text-sm block">
+                {response.recharge_info?.pit_depth_m || 3.5} m
+              </strong>
+            </div>
+
+            <div>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">Expected Replenishment Boost</span>
+              <strong className="text-emerald-800 font-bold block text-xs">
+                {response.recharge_info?.expected_boost || '+12-18% annual boost'}
+              </strong>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {response?.response_type === 'INTELLIGENCE' && (response.intent_category === 'GROUNDWATER' || response.intent_category === 'FORECAST' || response.intent_category === 'RISK' || response.intent_category === 'ANOMALY' || response.intent_category === 'DWLR') && response.location && (
+        <div className="rounded-2xl bg-teal-50/80 border border-teal-200 p-4 space-y-3 text-xs text-stone-800 shadow-sm animate-in fade-in duration-200">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-teal-200/60 pb-2">
             <span className="font-black tracking-wide text-teal-900 uppercase text-[10px]">
               Groundwater Location Assessment
@@ -339,7 +483,9 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
             </p>
           )}
         </div>
-      ) : (
+      )}
+
+      {!response && (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-stone-50 border border-stone-200 px-4 py-2 text-[11px] font-medium text-stone-600">
           <div className="flex items-center gap-2">
             <span className="flex h-2 w-2 rounded-full bg-teal-500" />

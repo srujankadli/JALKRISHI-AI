@@ -44,6 +44,7 @@ export interface VoiceQueryResponse {
   detected_language: string;
   farmer_response_language: string;
   intent?: string;
+  intent_category?: string;
   response_type?: string;
   text_response: string;
   intelligence: any;
@@ -51,6 +52,10 @@ export interface VoiceQueryResponse {
   coverage?: CoverageInfo | null;
   groundwater?: GroundwaterLevelInfo | null;
   provenance?: ProvenanceInfo | null;
+  weather_info?: any;
+  crop_info?: any;
+  irrigation_info?: any;
+  recharge_info?: any;
   audio_url: string | null;
   voice_playback_available: boolean;
   stt_provider_status: string;

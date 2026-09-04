@@ -149,7 +149,8 @@ def test_api_endpoint_conversational_vs_intelligence():
     d2 = r2.json()
     assert d2["intent"] == "CROP_RECOMMENDATION"
     assert d2["response_type"] == "INTELLIGENCE"
-    assert d2["intelligence"] is not None
+    assert d2["crop_info"] is not None
+    assert d2["intelligence"] is None
     print("   [PASS] 2. 'crop advisor' -> INTELLIGENCE mode, CROP_RECOMMENDATION returned.")
 
     # 3. BENGALURU GROUNDWATER (Must return INTELLIGENCE mode & location card!)
@@ -194,6 +195,9 @@ def test_sequential_10_step_farmer_conversation():
 
         if exp_type == "CONVERSATIONAL":
             assert data["intelligence"] is None
+        elif exp_intent in ["CROP_RECOMMENDATION", "WEATHER_OR_RAINFALL", "IRRIGATION_ADVICE", "RECHARGE_ADVICE"]:
+            assert data["intelligence"] is None
+            assert data["intent_category"] in ["CROP", "WEATHER", "IRRIGATION", "RECHARGE"]
         else:
             assert data["intelligence"] is not None
 

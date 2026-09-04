@@ -341,6 +341,6 @@ def resolve_location(
     logger.warning(f"[LOCATION RESOLVER UNRESOLVED] Could not resolve location from text: '{clean_text}'")
     return LocationResolution(
         is_resolved=False,
-        name=text_to_search,
+        name=None,
         error_message="Location could not be resolved. Please provide a district, state, or select a location on the map."
     )
