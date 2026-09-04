@@ -1,16 +1,18 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, TrendingDown, MapPin, Sprout, Radio } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 
 export const FarmerAnomalyActionCenter: React.FC = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="What Should You Do? (Anomaly Action Center)"
-        subtitle="Recommended immediate steps based on the anomaly category detected in your block"
+        title={t('What Should You Do? (Anomaly Action Center)')}
+        subtitle={t('Recommended immediate steps based on the anomaly category detected in your block')}
         icon={<CheckCircle2 className="h-5 w-5 text-agri-700" />}
       />
 
@@ -34,7 +36,7 @@ export const FarmerAnomalyActionCenter: React.FC = () => {
             className="w-full flex items-center justify-center gap-1 rounded-xl bg-rose-700 py-2 text-xs font-bold text-white hover:bg-rose-800 transition-all shadow-xs cursor-pointer"
           >
             <TrendingDown className="h-3.5 w-3.5" />
-            <span>Open Forecast</span>
+            <span>{t('Open Forecast')}</span>
           </button>
         </div>
 
@@ -57,7 +59,7 @@ export const FarmerAnomalyActionCenter: React.FC = () => {
             className="w-full flex items-center justify-center gap-1 rounded-xl bg-orange-700 py-2 text-xs font-bold text-white hover:bg-orange-800 transition-all shadow-xs cursor-pointer"
           >
             <MapPin className="h-3.5 w-3.5" />
-            <span>View on Map</span>
+            <span>{t('View on Map')}</span>
           </button>
         </div>
 
@@ -80,7 +82,7 @@ export const FarmerAnomalyActionCenter: React.FC = () => {
             className="w-full flex items-center justify-center gap-1 rounded-xl bg-amber-700 py-2 text-xs font-bold text-white hover:bg-amber-800 transition-all shadow-xs cursor-pointer"
           >
             <Radio className="h-3.5 w-3.5" />
-            <span>Check Telemetry</span>
+            <span>{t('Check Telemetry')}</span>
           </button>
         </div>
 
@@ -103,7 +105,7 @@ export const FarmerAnomalyActionCenter: React.FC = () => {
             className="w-full flex items-center justify-center gap-1 rounded-xl bg-emerald-800 py-2 text-xs font-bold text-white hover:bg-emerald-900 transition-all shadow-xs cursor-pointer"
           >
             <Sprout className="h-3.5 w-3.5" />
-            <span>Crop Advisor</span>
+            <span>{t('Crop Advisor')}</span>
           </button>
         </div>
       </div>

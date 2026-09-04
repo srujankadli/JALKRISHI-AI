@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { AlertOctagon, TrendingDown, ArrowRight } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
@@ -12,6 +13,7 @@ export const StateRiskRanking: React.FC<StateRiskRankingProps> = ({
   stateData,
   onSelectState,
 }) => {
+  const { t } = useLanguage();
   // Sort states by composite risk descending
   const rankedStates = [...stateData]
     .sort((a, b) => b.avgRisk - a.avgRisk)
@@ -39,8 +41,8 @@ export const StateRiskRanking: React.FC<StateRiskRankingProps> = ({
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Top 10 States Requiring Hydrological Intervention"
-        subtitle="Priority ranking based on critical drawdown percentage, depletion velocity, and aquifer vulnerability"
+        title={t('Top 10 States Requiring Hydrological Intervention')}
+        subtitle={t('Priority ranking based on critical drawdown percentage, depletion velocity, and aquifer vulnerability')}
         icon={<AlertOctagon className="h-5 w-5 text-rose-600" />}
       />
 
@@ -74,17 +76,17 @@ export const StateRiskRanking: React.FC<StateRiskRankingProps> = ({
                 {/* Metrics */}
                 <div className="mt-2 space-y-1 text-xs">
                   <div className="flex justify-between text-stone-600">
-                    <span>Critical Wells:</span>
+                    <span>{t('Critical Wells:')}</span>
                     <strong className="text-rose-700 font-mono">
                       {Math.round((st.criticalPct / 100) * st.totalStations)} ({st.criticalPct}%)
                     </strong>
                   </div>
                   <div className="flex justify-between text-stone-600">
-                    <span>Avg Depth:</span>
+                    <span>{t('Avg Depth:')}</span>
                     <strong className="text-stone-900 font-mono">{st.avgDepth} m</strong>
                   </div>
                   <div className="flex justify-between text-stone-600">
-                    <span>Risk Index:</span>
+                    <span>{t('Risk Index:')}</span>
                     <strong className="text-rose-700 font-mono">
                       {Math.round(st.avgRisk * 100)}/100
                     </strong>
@@ -106,7 +108,7 @@ export const StateRiskRanking: React.FC<StateRiskRankingProps> = ({
                   }}
                   className="inline-flex items-center gap-1 font-bold text-stone-900 hover:text-agri-700 cursor-pointer text-[11px]"
                 >
-                  <span>Filter</span>
+                  <span>{t('Filter')}</span>
                   <ArrowRight className="h-3 w-3" />
                 </button>
               </div>

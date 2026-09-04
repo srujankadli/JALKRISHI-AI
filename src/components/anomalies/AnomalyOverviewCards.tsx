@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { AlertTriangle, ShieldAlert, Radio, Wrench } from 'lucide-react';
 import { StatCard } from '../common/StatCard';
@@ -21,13 +22,14 @@ export const AnomalyOverviewCards: React.FC<AnomalyOverviewCardsProps> = ({
   onFilterExtraction,
   onFilterTelemetry,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* 1. Total Active Anomalies */}
       <StatCard
-        title="Active Anomaly Alerts"
+        title={t('Active Anomaly Alerts')}
         value={totalAnomalies.toLocaleString('en-IN')}
-        subtitle="Across 5,260 DWLR network"
+        subtitle={t('Across 5,260 DWLR network')}
         icon={AlertTriangle}
         iconBgColor="bg-amber-100"
         iconColor="text-amber-700"
@@ -37,9 +39,9 @@ export const AnomalyOverviewCards: React.FC<AnomalyOverviewCardsProps> = ({
 
       {/* 2. Critical Depletion Anomalies */}
       <StatCard
-        title="Critical Drawdown Alerts"
+        title={t('Critical Drawdown Alerts')}
         value={criticalCount.toLocaleString('en-IN')}
-        subtitle="Urgent investigation required"
+        subtitle={t('Urgent investigation required')}
         icon={ShieldAlert}
         iconBgColor="bg-rose-100"
         iconColor="text-rose-700"
@@ -50,9 +52,9 @@ export const AnomalyOverviewCards: React.FC<AnomalyOverviewCardsProps> = ({
 
       {/* 3. Possible Abnormal Extraction */}
       <StatCard
-        title="Possible Extraction Events"
+        title={t('Possible Extraction Events')}
         value={extractionCount.toLocaleString('en-IN')}
-        subtitle="Zero recovery lag detected"
+        subtitle={t('Zero recovery lag detected')}
         icon={Wrench}
         iconBgColor="bg-orange-100"
         iconColor="text-orange-700"
@@ -63,9 +65,9 @@ export const AnomalyOverviewCards: React.FC<AnomalyOverviewCardsProps> = ({
 
       {/* 4. Telemetry & Sensor Issues */}
       <StatCard
-        title="Telemetry & Sensor Issues"
+        title={t('Telemetry & Sensor Issues')}
         value={telemetryIssuesCount.toLocaleString('en-IN')}
-        subtitle="Missing packets or flatlines"
+        subtitle={t('Missing packets or flatlines')}
         icon={Radio}
         iconBgColor="bg-water-100"
         iconColor="text-water-700"

@@ -87,7 +87,7 @@ export const Dashboard: React.FC = () => {
             onClick={fetchSummary}
             disabled={isRefreshing}
             className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-stone-50 px-2.5 py-1 font-semibold text-stone-700 hover:bg-stone-100 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
-            title="Refresh simulation telemetry data"
+            title={t('Refresh simulation telemetry data')}
           >
             <RotateCcw className={`h-3 w-3 ${isRefreshing ? 'animate-spin text-agri-700' : ''}`} />
             <span>{t('Refresh')}</span>

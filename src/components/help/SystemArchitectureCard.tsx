@@ -1,13 +1,15 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Cpu, ArrowDown, Smartphone, Globe, ShieldCheck } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 
 export const SystemArchitectureCard: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="JalKrishi AI System Architecture & Engineering Flow"
-        subtitle="End-to-end data pipeline from physical borehole pressure transducers to farmer decision-support"
+        title={t('JalKrishi AI System Architecture & Engineering Flow')}
+        subtitle={t('End-to-end data pipeline from physical borehole pressure transducers to farmer decision-support')}
         icon={<Cpu className="h-5 w-5 text-stone-800" />}
       />
 
@@ -64,7 +66,7 @@ export const SystemArchitectureCard: React.FC = () => {
             <div className="rounded-2xl border-2 border-agri-600 bg-white p-4 shadow-sm space-y-1">
               <div className="flex items-center gap-1.5 text-xs font-black text-agri-900 uppercase">
                 <Globe className="h-4 w-4 text-agri-700" />
-                <span>Web Platform (Implemented)</span>
+                <span>{t('Web Platform (Implemented)')}</span>
               </div>
               <p className="text-[11px] text-stone-600 font-medium">
                 React 18 + TypeScript + Tailwind + Leaflet + Recharts + Client-Side XLSX/PDF Reporting.
@@ -77,7 +79,7 @@ export const SystemArchitectureCard: React.FC = () => {
             <div className="rounded-2xl border border-stone-300 bg-stone-50 p-4 space-y-1">
               <div className="flex items-center gap-1.5 text-xs font-bold text-stone-700 uppercase">
                 <Smartphone className="h-4 w-4 text-stone-500" />
-                <span>Farmer WhatsApp Bot (Planned)</span>
+                <span>{t('Farmer WhatsApp Bot (Planned)')}</span>
               </div>
               <p className="text-[11px] text-stone-600 font-medium">
                 Twilio / Meta Cloud API conversational bot for instant village-level water queries in regional languages.
@@ -91,15 +93,15 @@ export const SystemArchitectureCard: React.FC = () => {
 
         {/* Tech Stack Footer Badges */}
         <div className="pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <span className="font-bold text-stone-600">Core Technologies:</span>
+          <span className="font-bold text-stone-600">{t('Core Technologies:')}</span>
           <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-mono font-bold text-stone-700">
-            <span className="rounded-md bg-stone-100 px-2 py-1">React 18</span>
-            <span className="rounded-md bg-stone-100 px-2 py-1">TypeScript</span>
-            <span className="rounded-md bg-stone-100 px-2 py-1">Tailwind CSS</span>
-            <span className="rounded-md bg-stone-100 px-2 py-1">Leaflet.js</span>
-            <span className="rounded-md bg-stone-100 px-2 py-1">Recharts</span>
-            <span className="rounded-md bg-stone-100 px-2 py-1">SheetJS (XLSX)</span>
-            <span className="rounded-md bg-stone-100 px-2 py-1">jsPDF</span>
+            <span className="rounded-md bg-stone-100 px-2 py-1">{t('React 18')}</span>
+            <span className="rounded-md bg-stone-100 px-2 py-1">{t('TypeScript')}</span>
+            <span className="rounded-md bg-stone-100 px-2 py-1">{t('Tailwind CSS')}</span>
+            <span className="rounded-md bg-stone-100 px-2 py-1">{t('Leaflet.js')}</span>
+            <span className="rounded-md bg-stone-100 px-2 py-1">{t('Recharts')}</span>
+            <span className="rounded-md bg-stone-100 px-2 py-1">{t('SheetJS (XLSX)')}</span>
+            <span className="rounded-md bg-stone-100 px-2 py-1">{t('jsPDF')}</span>
           </div>
         </div>
       </div>

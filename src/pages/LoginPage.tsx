@@ -260,7 +260,7 @@ export const LoginPage: React.FC = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="official@jalkrishi.gov.in"
+                    placeholder={t('official@jalkrishi.gov.in')}
                     className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-all"
                   />
                 </div>
@@ -325,8 +325,8 @@ export const LoginPage: React.FC = () => {
       {/* Footer Data Honesty Notice */}
       <footer className="relative z-10 w-full max-w-7xl mx-auto px-4 py-4 text-center border-t border-slate-900 text-slate-500 text-[11px]">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span>JalKrishi Reference DWLR Network: 5,260 Observation Points (Simulated Telemetry)</span>
-          <span>Authentication Protocol &amp; Role-Based Access Control (RBAC) Active</span>
+          <span>{t('JalKrishi Reference DWLR Network: 5,260 Observation Points (Simulated Telemetry)')}</span>
+          <span>{t('Authentication Protocol &amp; Role-Based Access Control (RBAC) Active')}</span>
         </div>
       </footer>
 
@@ -359,7 +359,7 @@ export const LoginPage: React.FC = () => {
                   type="email"
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="name@jalkrishi.gov.in"
+                  placeholder={t('name@jalkrishi.gov.in')}
                   required
                   className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2 text-xs text-white focus:border-blue-500 focus:outline-none"
                 />

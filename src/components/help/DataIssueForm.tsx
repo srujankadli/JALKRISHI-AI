@@ -1,8 +1,10 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState } from 'react';
 import { AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 
 export const DataIssueForm: React.FC = () => {
+  const { t } = useLanguage();
   const [stationId, setStationId] = useState('');
   const [issueType, setIssueType] = useState('Unexpected water reading');
   const [description, setDescription] = useState('');
@@ -36,8 +38,8 @@ export const DataIssueForm: React.FC = () => {
   return (
     <div id="data-issue-form" className="space-y-4">
       <SectionHeader
-        title="Report a Groundwater Data or Telemetry Issue"
-        subtitle="Flag suspicious sensor readings, missing blocks, or GPS coordinate inaccuracies"
+        title={t('Report a Groundwater Data or Telemetry Issue')}
+        subtitle={t('Flag suspicious sensor readings, missing blocks, or GPS coordinate inaccuracies')}
         icon={<AlertCircle className="h-5 w-5 text-rose-600" />}
       />
 
@@ -65,7 +67,7 @@ export const DataIssueForm: React.FC = () => {
                   required
                   value={stationId}
                   onChange={(e) => setStationId(e.target.value)}
-                  placeholder="e.g. DWLR-PB-042 or Sangrur Well 3"
+                  placeholder={t('e.g. DWLR-PB-042 or Sangrur Well 3')}
                   className="w-full rounded-xl border border-stone-300 bg-stone-50/80 px-3 py-2.5 text-xs font-semibold text-stone-900 focus:border-rose-600 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -99,7 +101,7 @@ export const DataIssueForm: React.FC = () => {
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Explain what looks incorrect or needs calibration..."
+                placeholder={t('Explain what looks incorrect or needs calibration...')}
                 className="w-full rounded-xl border border-stone-300 bg-stone-50/80 p-3 text-xs font-semibold text-stone-900 focus:border-rose-600 focus:bg-white focus:outline-none"
               />
             </div>
@@ -111,7 +113,7 @@ export const DataIssueForm: React.FC = () => {
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-6 py-2.5 text-xs font-black text-white hover:bg-stone-800 active:scale-95 transition-all shadow-xs cursor-pointer"
               >
                 <Send className="h-3.5 w-3.5 text-rose-400" />
-                <span>Log Data Issue</span>
+                <span>{t('Log Data Issue')}</span>
               </button>
             </div>
           </form>

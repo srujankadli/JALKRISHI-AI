@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState } from 'react';
 import { ChevronDown, HelpCircle, Sparkles } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
@@ -9,6 +10,7 @@ interface FAQAccordionProps {
 }
 
 export const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, searchQuery }) => {
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [expandedId, setExpandedId] = useState<string | null>(faqs[0]?.id || null);
 
@@ -31,8 +33,8 @@ export const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, searchQuery })
   return (
     <div id="faq-section" className="space-y-4">
       <SectionHeader
-        title="Frequently Asked Questions (FAQ)"
-        subtitle="Clear answers to common questions about groundwater depth, sensor telemetry, forecasts, anomalies, and crop recommendations"
+        title={t('Frequently Asked Questions (FAQ)')}
+        subtitle={t('Clear answers to common questions about groundwater depth, sensor telemetry, forecasts, anomalies, and crop recommendations')}
         icon={<HelpCircle className="h-5 w-5 text-agri-700" />}
       />
 
@@ -56,8 +58,8 @@ export const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, searchQuery })
       {/* FAQ Accordion List */}
       {filteredFaqs.length === 0 ? (
         <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center text-xs text-stone-500 space-y-1">
-          <p className="font-bold text-stone-700">No questions matched your search query.</p>
-          <p>Try searching for words like &ldquo;DWLR&rdquo;, &ldquo;Paddy&rdquo;, &ldquo;Critical&rdquo;, or &ldquo;Forecast&rdquo;.</p>
+          <p className="font-bold text-stone-700">{t('No questions matched your search query.')}</p>
+          <p>{t('Try searching for words like &ldquo;DWLR&rdquo;, &ldquo;Paddy&rdquo;, &ldquo;Critical&rdquo;, or &ldquo;Forecast&rdquo;.')}</p>
         </div>
       ) : (
         <div className="space-y-3">

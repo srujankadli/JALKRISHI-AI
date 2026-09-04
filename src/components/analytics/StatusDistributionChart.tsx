@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { ChartCard } from '../common/ChartCard';
@@ -17,6 +18,7 @@ export const StatusDistributionChart: React.FC<StatusDistributionChartProps> = (
   criticalCount,
   totalStations,
 }) => {
+  const { t } = useLanguage();
   const data = [
     { name: 'Healthy (Safe)', count: healthyCount, color: '#16a34a' },
     { name: 'Moderate', count: moderateCount, color: '#eab308' },
@@ -26,8 +28,8 @@ export const StatusDistributionChart: React.FC<StatusDistributionChartProps> = (
 
   return (
     <ChartCard
-      title="Groundwater Health & Vulnerability Distribution"
-      subtitle="Network proportional split based on current water table depth vs threshold"
+      title={t('Groundwater Health & Vulnerability Distribution')}
+      subtitle={t('Network proportional split based on current water table depth vs threshold')}
     >
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Donut Chart */}

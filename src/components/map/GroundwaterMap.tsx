@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -68,6 +69,7 @@ const ClusteredStationMarkers: React.FC<{
   onSelectStation?: (station: DWLRStation) => void;
   onViewStationDetails: (station: DWLRStation) => void;
 }> = ({ stations, selectedStation, onSelectStation, onViewStationDetails }) => {
+  const { t } = useLanguage();
   const map = useMap();
   const clusterGroupRef = useRef<any>(null);
 
@@ -148,11 +150,11 @@ const ClusteredStationMarkers: React.FC<{
         </p>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #f5f5f4; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 11px;">
           <div>
-            <span style="font-size: 10px; color: #78716c; display: block;">Water Depth</span>
+            <span style="font-size: 10px; color: #78716c; display: block;">{t('Water Depth')}</span>
             <strong style="font-size: 13px; color: #1c1917;">${station.waterLevel} mbgl</strong>
           </div>
           <div>
-            <span style="font-size: 10px; color: #78716c; display: block;">Risk Score</span>
+            <span style="font-size: 10px; color: #78716c; display: block;">{t('Risk Score')}</span>
             <strong style="font-size: 13px; color: #1c1917;">${Math.round(station.riskScore * 100)}/100</strong>
           </div>
         </div>
@@ -163,7 +165,7 @@ const ClusteredStationMarkers: React.FC<{
 
       const btn = document.createElement('button');
       btn.className = 'w-full mt-2.5 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold py-1.5 px-3 rounded-lg flex items-center justify-center gap-1 cursor-pointer transition-all shadow-xs';
-      btn.innerHTML = '<span>View Station Details</span> &rarr;';
+      btn.innerHTML = `<span>${t('View Station Details')}</span> &rarr;`;
       btn.onclick = (e) => {
         e.stopPropagation();
         onViewStationDetails(station);
@@ -232,6 +234,7 @@ const MapControlsOverlay: React.FC<{
   showCoverageLayer,
   onToggleCoverageLayer,
 }) => {
+  const { t } = useLanguage();
   const map = useMap();
 
   return (
@@ -241,7 +244,7 @@ const MapControlsOverlay: React.FC<{
         <button
           onClick={() => map.flyTo(APP_CONFIG.defaultMapCenter, APP_CONFIG.defaultMapZoom, { duration: 1 })}
           className="rounded-xl border border-stone-300 bg-white/95 p-2.5 text-stone-700 shadow-md backdrop-blur-xs hover:bg-white active:scale-95 transition-all cursor-pointer"
-          title="Reset Map View (All India)"
+          title={t('Reset Map View (All India)')}
         >
           <RotateCcw className="h-4 w-4" />
         </button>
@@ -251,7 +254,7 @@ const MapControlsOverlay: React.FC<{
           onClick={onLocateMe}
           disabled={isLocating}
           className="rounded-xl border border-stone-300 bg-white/95 p-2.5 text-stone-700 shadow-md backdrop-blur-xs hover:bg-white active:scale-95 transition-all cursor-pointer disabled:opacity-50"
-          title="Find Nearest Station to My Location"
+          title={t('Find Nearest Station to My Location')}
         >
           <Locate className={`h-4 w-4 text-water-700 ${isLocating ? 'animate-spin' : ''}`} />
         </button>
@@ -273,10 +276,10 @@ const MapControlsOverlay: React.FC<{
               ? 'bg-teal-700 text-white border-teal-800'
               : 'bg-white/95 text-stone-800 border-stone-300 hover:bg-white'
           }`}
-          title="Toggle Groundwater Intelligence Coverage Overlay"
+          title={t('Toggle Groundwater Intelligence Coverage Overlay')}
         >
           <Satellite className="h-4 w-4" />
-          <span className="hidden sm:inline">Coverage Map</span>
+          <span className="hidden sm:inline">{t('Coverage Map')}</span>
         </button>
 
         {/* Base Layer Switcher */}
@@ -286,14 +289,25 @@ const MapControlsOverlay: React.FC<{
             className={`rounded-lg px-2 py-1 cursor-pointer transition-colors ${
               mapLayer === 'osm' ? 'bg-agri-700 text-white' : 'text-stone-700 hover:bg-stone-100'
             }`}
+            title="OpenStreetMap"
           >
-            Standard
+            Street
+          </button>
+          <button
+            onClick={() => setMapLayer('terrain')}
+            className={`rounded-lg px-2 py-1 cursor-pointer transition-colors ${
+              mapLayer === 'terrain' ? 'bg-agri-700 text-white' : 'text-stone-700 hover:bg-stone-100'
+            }`}
+            title="OpenTopoMap Terrain"
+          >
+            Terrain
           </button>
           <button
             onClick={() => setMapLayer('carto')}
             className={`rounded-lg px-2 py-1 cursor-pointer transition-colors ${
               mapLayer === 'carto' ? 'bg-agri-700 text-white' : 'text-stone-700 hover:bg-stone-100'
             }`}
+            title="CartoDB Voyager"
           >
             Clean
           </button>
@@ -327,6 +341,7 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
   panToCoords,
   onSelectLocationCoords,
 }) => {
+  const { t } = useLanguage();
   const [mapLayer, setMapLayer] = useState<'osm' | 'terrain' | 'carto'>('osm');
   const [isLocating, setIsLocating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -471,11 +486,11 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
           <div className="grid grid-cols-2 gap-2 text-[10px] pt-1 border-t border-stone-100 font-medium">
             <div className="flex items-center gap-1.5 text-blue-800">
               <Radio className="h-3 w-3 text-blue-600" />
-              <span>Direct DWLR</span>
+              <span>{t('Direct DWLR')}</span>
             </div>
             <div className="flex items-center gap-1.5 text-teal-800">
               <Satellite className="h-3 w-3 text-teal-600" />
-              <span>Satellite-Assisted</span>
+              <span>{t('Satellite-Assisted')}</span>
             </div>
           </div>
         </div>

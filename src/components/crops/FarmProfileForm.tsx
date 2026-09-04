@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   MapPin,
   Navigation,
@@ -43,7 +44,7 @@ interface FarmProfileFormProps {
 
 export const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
   states,
-  districts,
+districts,
   selectedState,
   onStateChange,
   selectedDistrict,
@@ -62,13 +63,14 @@ export const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
   onGeneratePlan,
   isGenerating = false,
 }) => {
+  const { t } = useLanguage();
   const soilOptions: { id: SoilType; label: string; desc: string }[] = [
-    { id: 'Alluvial', label: 'Alluvial Soil', desc: 'Highly fertile river plains with excellent moisture holding.' },
-    { id: 'Black', label: 'Black / Regur Soil', desc: 'High clay content; excellent water retention for cotton & pulses.' },
-    { id: 'Red', label: 'Red & Loamy Soil', desc: 'Permeable and well-drained; ideal for millets, groundnut & pulses.' },
-    { id: 'Sandy', label: 'Sandy / Arid Soil', desc: 'Light, fast drainage; requires drought-hardy millets & bajra.' },
-    { id: 'Loamy', label: 'Loamy Garden Soil', desc: 'Balanced sand, silt, and clay; universally versatile.' },
-    { id: 'Clay', label: 'Clay Heavy Soil', desc: 'Dense retention; suitable for paddy and intensive crops.' },
+    { id: 'Alluvial', label: t('Alluvial Soil'), desc: t('Highly fertile river plains with excellent moisture holding.') },
+    { id: 'Black', label: t('Black / Regur Soil'), desc: t('High clay content; excellent water retention for cotton & pulses.') },
+    { id: 'Red', label: t('Red & Loamy Soil'), desc: t('Permeable and well-drained; ideal for millets, groundnut & pulses.') },
+    { id: 'Sandy', label: t('Sandy / Arid Soil'), desc: t('Light, fast drainage; requires drought-hardy millets & bajra.') },
+    { id: 'Loamy', label: t('Loamy Garden Soil'), desc: t('Balanced sand, silt, and clay; universally versatile.') },
+    { id: 'Clay', label: t('Clay Heavy Soil'), desc: t('Dense retention; suitable for paddy and intensive crops.') },
   ];
 
   const waterOptions: {
@@ -80,22 +82,22 @@ export const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
   }[] = [
     {
       id: 'Abundant',
-      label: 'Abundant Water',
-      desc: 'Shallow water table (<10m) or reliable canal access.',
+      label: t('Abundant Water'),
+      desc: t('Shallow water table (<10m) or reliable canal access.'),
       icon: Droplets,
       color: 'text-sky-600 bg-sky-50 border-sky-200',
     },
     {
       id: 'Moderate',
-      label: 'Moderate Water',
-      desc: 'Adequate seasonal reserve; standard tube-well depth.',
+      label: t('Moderate Water'),
+      desc: t('Adequate seasonal reserve; standard tube-well depth.'),
       icon: Droplets,
       color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
     },
     {
       id: 'Limited',
-      label: 'Limited Water',
-      desc: 'Deep water table (>25m); pumping rate declining.',
+      label: t('Limited Water'),
+      desc: t('Deep water table (>25m); pumping rate declining.'),
       icon: AlertTriangle,
       color: 'text-amber-600 bg-amber-50 border-amber-200',
     },
@@ -162,7 +164,7 @@ export const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
             className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-stone-50 px-3 py-1 text-xs font-bold text-stone-700 hover:bg-stone-100 hover:border-agri-600 transition-all cursor-pointer"
           >
             <Navigation className="h-3 w-3 text-agri-700" />
-            <span>Use My Location (Auto-Detect)</span>
+            <span>{t('Use My Location (Auto-Detect)')}</span>
           </button>
         </div>
 

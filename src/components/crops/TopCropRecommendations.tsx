@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   Award,
   Droplets,
@@ -17,8 +18,9 @@ interface TopCropRecommendationsProps {
 
 export const TopCropRecommendations: React.FC<TopCropRecommendationsProps> = ({
   crops,
-  onSelectCrop,
+onSelectCrop,
 }) => {
+  const { t } = useLanguage();
   const getRankBadge = (index: number) => {
     switch (index) {
       case 0:
@@ -74,8 +76,8 @@ export const TopCropRecommendations: React.FC<TopCropRecommendationsProps> = ({
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Top 3 Recommended Crops for Your Farm"
-        subtitle="Ranked options delivering optimal harvest stability and lowest groundwater depletion risk"
+        title={t('Top 3 Recommended Crops for Your Farm')}
+        subtitle={t('Ranked options delivering optimal harvest stability and lowest groundwater depletion risk')}
         icon={<Award className="h-5 w-5 text-amber-600" />}
       />
 
@@ -161,7 +163,7 @@ export const TopCropRecommendations: React.FC<TopCropRecommendationsProps> = ({
                   }}
                   className="inline-flex items-center gap-1 rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-stone-800 shadow-xs cursor-pointer"
                 >
-                  <span>Crop Details</span>
+                  <span>{t('Crop Details')}</span>
                   <ArrowRight className="h-3 w-3" />
                 </button>
               </div>

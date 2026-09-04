@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Mic,
@@ -19,7 +20,7 @@ import {
   type VoiceQueryResponse,
   getBcp47Locale,
 } from '../../services/voiceAssistantService';
-import { t, SUPPORTED_LANGUAGES } from '../../i18n';
+import { SUPPORTED_LANGUAGES } from '../../i18n';
 
 type AssistantState = 'IDLE' | 'LISTENING' | 'PROCESSING' | 'RESPONDING' | 'ERROR';
 
@@ -39,6 +40,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
   selectedLng: _selectedLng,
   locationName: _locationName,
 }) => {
+  const { t } = useLanguage();
   const [state, setState] = useState<AssistantState>('IDLE');
   const [queryText, setQueryText] = useState('');
   const [response, setResponse] = useState<VoiceQueryResponse | null>(null);
@@ -58,7 +60,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
   useEffect(() => {
     setResponseLang(currentLanguage);
     setErrorMessage('');
-  }, [currentLanguage]);
+  });
 
   // Clean up browser speech recognition on unmount
   useEffect(() => {
@@ -72,7 +74,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
       }
       VoiceAssistantService.stopBrowserSpeech();
     };
-  }, []);
+  });
 
   const stopListening = () => {
     if (recognitionRef.current) {
@@ -135,7 +137,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
           );
         } else if (errType === 'no-speech') {
           setErrorMessage(
-            'No speech was detected. Please tap the microphone and speak again, or type below.'
+            'No speech was detected. Please tap the microphone and speak again.'
           );
         } else if (errType === 'audio-capture') {
           setErrorMessage(
@@ -183,12 +185,12 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
     try {
       const res = await VoiceAssistantService.sendVoiceQuery(
         text,
-        undefined, // lat
-        undefined, // lng
+        _selectedLat,
+        _selectedLng,
         langCode,
-        undefined, // audioBase64
-        undefined, // DO NOT silently default to dashboard selectedStation!
-        undefined, // Do NOT pass query text as locationQuery!
+        undefined,
+        selectedStation?.id,
+        _locationName,
         sessionIdRef.current,
         conversationalLocation
       );
@@ -287,20 +289,20 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-medium">
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Location</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Location')}</span>
               <strong className="text-stone-900 font-bold text-sm">{response.location?.name || 'Reference Area'}</strong>
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Expected Precipitation (30d)</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Expected Precipitation (30d)')}</span>
               <strong className="text-sky-900 font-black text-sm block">
                 {response.weather_info?.precipitation_mm || 145} mm
               </strong>
-              <span className="text-[10px] text-stone-500 font-medium">Moderate Recharge Potential</span>
+              <span className="text-[10px] text-stone-500 font-medium">{t('Moderate Recharge Potential')}</span>
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Monsoon Status</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Monsoon Status')}</span>
               <strong className="text-stone-900 font-bold block text-xs">
                 {response.weather_info?.monsoon_status || 'ACTIVE_SOUTHWEST_MONSOON'}
               </strong>
@@ -325,12 +327,12 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-medium">
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Primary Recommended Crop</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Primary Recommended Crop')}</span>
               <strong className="text-emerald-950 font-bold text-sm">{response.crop_info?.primary_crop || 'Finger Millet (Ragi)'}</strong>
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Water Requirement</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Water Requirement')}</span>
               <strong className="text-emerald-900 font-black text-sm block">
                 {response.crop_info?.water_requirement_mm || '350–450 mm'}
               </strong>
@@ -338,7 +340,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Alternative Crop</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Alternative Crop')}</span>
               <strong className="text-stone-900 font-bold block text-xs">
                 {response.crop_info?.alternate_crop || 'Red Gram (Pigeonpea)'}
               </strong>
@@ -360,21 +362,21 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-medium">
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Application Depth</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Application Depth')}</span>
               <strong className="text-blue-900 font-black text-sm block">
                 {response.irrigation_info?.depth_per_application_mm || 25} mm
               </strong>
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Recommended Schedule</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Recommended Schedule')}</span>
               <strong className="text-stone-900 font-bold block text-xs">
                 Every {response.irrigation_info?.interval_days || 5} days
               </strong>
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Evaporation Warning</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Evaporation Warning')}</span>
               <span className="text-[10px] text-amber-800 font-medium block">
                 Irrigate early morning or evening to minimize loss.
               </span>
@@ -396,19 +398,19 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-medium">
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Recommended Structure</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Recommended Structure')}</span>
               <strong className="text-cyan-950 font-bold text-xs block">{response.recharge_info?.structure || 'Rooftop RWH & Injection Pit'}</strong>
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Target Pit Depth</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Target Pit Depth')}</span>
               <strong className="text-cyan-900 font-black text-sm block">
                 {response.recharge_info?.pit_depth_m || 3.5} m
               </strong>
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Expected Replenishment Boost</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Expected Replenishment Boost')}</span>
               <strong className="text-emerald-800 font-bold block text-xs">
                 {response.recharge_info?.expected_boost || '+12-18% annual boost'}
               </strong>
@@ -436,18 +438,17 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-medium">
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Location</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Location')}</span>
               <strong className="text-stone-900 font-bold text-sm">{response.location.name}</strong>
               {response.location.state && (
                 <span className="text-stone-500 block text-[10px]">
-                  {response.location.district ? `${response.location.district}, ` : ''}
-                  {response.location.state}
+                  {response.location.district ? `${response.location.district}, ${response.location.state}` : response.location.state}
                 </span>
               )}
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Groundwater Level</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Groundwater Level')}</span>
               <strong className="text-teal-900 font-black text-sm block">
                 {response.coverage?.mode === 'DIRECT_DWLR'
                   ? `${response.groundwater?.level_value ?? (response.intelligence?.forecast_30d_water_level || 14.8)} m bgl`
@@ -473,7 +474,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
             </div>
 
             <div>
-              <span className="text-stone-500 text-[10px] block uppercase font-bold">Data Provenance</span>
+              <span className="text-stone-500 text-[10px] block uppercase font-bold">{t('Data Provenance')}</span>
               <strong className="text-stone-900 font-bold block text-xs">
                 {response.coverage?.mode === 'DIRECT_DWLR' ? 'DWLR Sensor Telemetry' : 'Spatial Hydro-Analysis'}
               </strong>
@@ -499,7 +500,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
               Target Context:{' '}
               <strong className="text-stone-800 font-bold">
                 {selectedStation
-                  ? `DWLR Well: ${selectedStation.stationName} (${selectedStation.district}, ${selectedStation.state}) [${selectedStation.id}]`
+                  ? `DWLR Well: ${selectedStation.stationName} (${selectedStation.district}) [${selectedStation.id}]`
                   : 'Ask about any location (e.g. Kolar, Sangrur, Thanjavur, Mehsana)'}
               </strong>
             </span>
@@ -537,9 +538,9 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
 
         <div>
           <h4 className="text-base font-black text-stone-900">
-            {state === 'IDLE' && t('tap_to_speak', currentLanguage)}
-            {state === 'LISTENING' && t('listening', currentLanguage)}
-            {state === 'PROCESSING' && t('preparing_advice', currentLanguage)}
+            {state === 'IDLE' && t('tap_to_speak')}
+            {state === 'LISTENING' && t('listening')}
+            {state === 'PROCESSING' && t('preparing_advice')}
             {state === 'RESPONDING' && 'Advice Ready'}
             {state === 'ERROR' && 'Voice Assistant Ready'}
           </h4>
@@ -569,7 +570,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
           className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white font-bold text-xs transition-all cursor-pointer shadow-2xs"
         >
           <Send className="h-3.5 w-3.5" />
-          <span>Ask</span>
+          <span>{t('Ask')}</span>
         </button>
       </div>
 
@@ -588,7 +589,7 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
           <button
             onClick={() => setErrorMessage('')}
             className="text-amber-700 hover:text-amber-950 p-1 rounded-lg hover:bg-amber-100 transition-colors"
-            title="Dismiss message"
+            title={t('Dismiss message')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -620,12 +621,12 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
               {isSpeaking ? (
                 <>
                   <Square className="h-3.5 w-3.5 fill-current" />
-                  <span>{t('stop', currentLanguage)}</span>
+                  <span>{t('stop')}</span>
                 </>
               ) : (
                 <>
                   <Volume2 className="h-3.5 w-3.5" />
-                  <span>{t('listen', currentLanguage)}</span>
+                  <span>{t('listen')}</span>
                 </>
               )}
             </button>

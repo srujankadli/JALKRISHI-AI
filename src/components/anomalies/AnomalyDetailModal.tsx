@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import {
   X,
@@ -37,6 +38,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
   onNavigateToForecast,
   onNavigateToCrops,
 }) => {
+  const { t } = useLanguage();
   if (!anomaly) return null;
 
   return (
@@ -90,28 +92,28 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
         {/* Observation Comparison Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 rounded-2xl bg-stone-50 p-4 border border-stone-200 text-xs">
           <div>
-            <span className="text-[10px] font-bold text-stone-500 uppercase block">Observed Reading</span>
+            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Observed Reading')}</span>
             <strong className="text-lg font-black text-stone-900 font-mono">
               {anomaly.observedValue} m
             </strong>
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-500 uppercase block">Expected Baseline</span>
+            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Expected Baseline')}</span>
             <strong className="text-lg font-bold text-stone-600 font-mono">
               {anomaly.expectedValue} m
             </strong>
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-rose-700 uppercase block">Deviation</span>
+            <span className="text-[10px] font-bold text-rose-700 uppercase block">{t('Deviation')}</span>
             <strong className="text-sm font-black text-rose-700 font-mono block truncate">
               {anomaly.deviation}
             </strong>
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-500 uppercase block">Telemetry Status</span>
+            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Telemetry Status')}</span>
             <span className="inline-flex items-center gap-1 rounded bg-stone-200/80 px-2 py-0.5 font-bold text-stone-800 text-[11px] mt-0.5">
               <Radio className="h-3 w-3 text-stone-600" />
               {anomaly.status}
@@ -127,7 +129,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
                 <Activity className="h-4 w-4 text-water-700" />
                 Hourly Telemetry vs Expected Baseline Curve
               </span>
-              <span className="text-[11px] text-stone-500">Meters Below Ground Level (mbgl)</span>
+              <span className="text-[11px] text-stone-500">{t('Meters Below Ground Level (mbgl)')}</span>
             </div>
 
             <ResponsiveContainer width="100%" height={180}>
@@ -182,7 +184,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
         <div className="rounded-2xl border border-agri-200 bg-agri-50/70 p-4 text-xs text-agri-950 space-y-1.5">
           <div className="flex items-center gap-1.5 font-extrabold text-agri-950">
             <Sparkles className="h-4 w-4 text-agri-700" />
-            <span>Plain-Language Farmer Insight</span>
+            <span>{t('Plain-Language Farmer Insight')}</span>
           </div>
           <p className="leading-relaxed text-agri-900 font-medium">
             {anomaly.farmerExplanation}
@@ -193,7 +195,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
         <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 text-xs space-y-2">
           <div className="flex items-center gap-1.5 font-bold text-stone-800">
             <Zap className="h-4 w-4 text-amber-600" />
-            <span>Technical Root Cause Analysis</span>
+            <span>{t('Technical Root Cause Analysis')}</span>
           </div>
           <p className="text-stone-600 font-mono text-[11px] leading-relaxed">
             {anomaly.technicalDetails}
@@ -202,15 +204,15 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
           {anomaly.telemetryHealth && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-stone-200/60 text-[11px]">
               <div>
-                <span className="text-stone-400 block">Battery Voltage:</span>
+                <span className="text-stone-400 block">{t('Battery Voltage:')}</span>
                 <strong className="text-stone-800 font-mono">{anomaly.telemetryHealth.batteryVoltage}</strong>
               </div>
               <div>
-                <span className="text-stone-400 block">Signal Strength:</span>
+                <span className="text-stone-400 block">{t('Signal Strength:')}</span>
                 <strong className="text-stone-800 font-mono">{anomaly.telemetryHealth.signalDbm}</strong>
               </div>
               <div>
-                <span className="text-stone-400 block">Hardware Status:</span>
+                <span className="text-stone-400 block">{t('Hardware Status:')}</span>
                 <strong className="text-stone-800">{anomaly.telemetryHealth.hardwareStatus}</strong>
               </div>
             </div>
@@ -242,7 +244,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
               className="inline-flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-xs font-bold text-stone-800 hover:bg-stone-50 shadow-xs cursor-pointer"
             >
               <MapPin className="h-3.5 w-3.5 text-stone-600" />
-              <span>Locate on Map</span>
+              <span>{t('Locate on Map')}</span>
             </button>
 
             <button
@@ -250,14 +252,14 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
               className="inline-flex items-center gap-1.5 rounded-xl border border-water-300 bg-water-50 px-3.5 py-2 text-xs font-bold text-water-900 hover:bg-water-100 shadow-xs cursor-pointer"
             >
               <TrendingDown className="h-3.5 w-3.5 text-water-700" />
-              <span>View Forecast</span>
+              <span>{t('View Forecast')}</span>
             </button>
 
             <button
               onClick={onNavigateToCrops}
               className="inline-flex items-center gap-1.5 rounded-xl bg-agri-700 px-4 py-2 text-xs font-bold text-white hover:bg-agri-800 shadow-xs cursor-pointer"
             >
-              <span>Crop Advisor</span>
+              <span>{t('Crop Advisor')}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>

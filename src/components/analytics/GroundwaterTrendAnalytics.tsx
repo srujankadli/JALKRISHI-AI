@@ -22,6 +22,7 @@ export const GroundwaterTrendAnalytics: React.FC<GroundwaterTrendAnalyticsProps>
   selectedRegionLabel,
   avgDepth,
 }) => {
+  
   // Generate realistic historical depth trajectory matching timeframe and current avgDepth
   const count = timeframe === '7d' ? 7 : timeframe === '30d' ? 15 : 24;
   const daysStep = timeframe === '7d' ? 1 : timeframe === '30d' ? 2 : 4;

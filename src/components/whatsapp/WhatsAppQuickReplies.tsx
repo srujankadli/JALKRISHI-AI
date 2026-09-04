@@ -14,6 +14,7 @@ export const WhatsAppQuickReplies: React.FC<WhatsAppQuickRepliesProps> = ({
   onSelect,
   disabled = false,
 }) => {
+  
   const options: QuickReplyOption[] = [
     { label: '💧 Water Status', query: 'Kolar water' },
     { label: '🔮 30d Forecast', query: 'Kolar forecast' },

@@ -1104,10 +1104,10 @@ export const OfficialCommandCenter: React.FC = () => {
                       onChange={(e) => setSimRechargeLevel(e.target.value)}
                       className="w-full bg-stone-900 border border-stone-700 text-stone-200 p-2 rounded-lg"
                     >
-                      <option value="None">None</option>
-                      <option value="Low">Low (+3% Recharge)</option>
-                      <option value="Medium">Medium (+7% Recharge)</option>
-                      <option value="High">High (+12% Recharge)</option>
+                      <option value="None">{t('None')}</option>
+                      <option value="Low">{t('Low (+3% Recharge)')}</option>
+                      <option value="Medium">{t('Medium (+7% Recharge)')}</option>
+                      <option value="High">{t('High (+12% Recharge)')}</option>
                     </select>
                   </div>
 
@@ -1228,13 +1228,13 @@ export const OfficialCommandCenter: React.FC = () => {
                 <input
                   type="text" value={regionA} onChange={(e) => setRegionA(e.target.value)}
                   className="bg-stone-900 border border-stone-700 text-stone-100 p-2.5 rounded-xl flex-1"
-                  placeholder="Region A"
+                  placeholder={t('Region A')}
                 />
                 <span className="font-bold text-stone-500">VS</span>
                 <input
                   type="text" value={regionB} onChange={(e) => setRegionB(e.target.value)}
                   className="bg-stone-900 border border-stone-700 text-stone-100 p-2.5 rounded-xl flex-1"
-                  placeholder="Region B"
+                  placeholder={t('Region B')}
                 />
                 <button
                   onClick={handleRunComparison}

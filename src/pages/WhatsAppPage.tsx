@@ -115,19 +115,19 @@ export const WhatsAppPage: React.FC = () => {
             <ul className="space-y-2.5 text-xs text-stone-600">
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>Zero App Installation:</strong> Works directly on existing farmer smartphones and 2G/3G connections.</span>
+                <span><strong>{t('Zero App Installation:')}</strong> Works directly on existing farmer smartphones and 2G/3G connections.</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>Native Multi-Lingual:</strong> Supports English and Devanagari Hindi text seamlessly with deterministic understanding.</span>
+                <span><strong>{t('Native Multi-Lingual:')}</strong> Supports English and Devanagari Hindi text seamlessly with deterministic understanding.</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>Powered by 5 Engines:</strong> Reuses the exact same DWLR station repository, forecasting hydrodynamic model, and crop scoring matrix.</span>
+                <span><strong>{t('Powered by 5 Engines:')}</strong> Reuses the exact same DWLR station repository, forecasting hydrodynamic model, and crop scoring matrix.</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>Explainable Recommendations:</strong> Never tells a farmer what not to do without explaining <em>why</em> (e.g. low aquifer recharge vs root rot).</span>
+                <span><strong>{t('Explainable Recommendations:')}</strong> Never tells a farmer what not to do without explaining <em>{t('why')}</em> (e.g. low aquifer recharge vs root rot).</span>
               </li>
             </ul>
           </div>
@@ -147,11 +147,11 @@ export const WhatsAppPage: React.FC = () => {
             </div>
 
             <p className="text-xs text-stone-600 leading-relaxed">
-              The FastAPI endpoint <code className="bg-white px-1.5 py-0.5 rounded font-mono text-emerald-900 border border-emerald-200 text-[11px]">POST /api/v1/whatsapp/webhook</code> is structurally formatted to bind directly to the Meta Cloud API / Twilio WhatsApp Sandbox without altering core intelligence logic.
+              The FastAPI endpoint <code className="bg-white px-1.5 py-0.5 rounded font-mono text-emerald-900 border border-emerald-200 text-[11px]">{t('POST /api/v1/whatsapp/webhook')}</code> is structurally formatted to bind directly to the Meta Cloud API / Twilio WhatsApp Sandbox without altering core intelligence logic.
             </p>
 
             <div className="pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[11px] text-stone-500 font-medium">
-              <span>Simulation Sandbox Active</span>
+              <span>{t('Simulation Sandbox Active')}</span>
               <span className="font-mono text-emerald-800 font-bold">+91 1800-JALKRISHI (Demo)</span>
             </div>
           </div>

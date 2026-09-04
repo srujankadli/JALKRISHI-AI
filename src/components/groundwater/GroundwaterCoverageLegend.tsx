@@ -1,7 +1,9 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Radio, Satellite, Info, ShieldCheck } from 'lucide-react';
 
 export const GroundwaterCoverageLegend: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-subtle space-y-3">
       <div className="flex items-center justify-between border-b border-stone-100 pb-2">
@@ -11,7 +13,7 @@ export const GroundwaterCoverageLegend: React.FC = () => {
             Groundwater Intelligence Coverage Legend
           </h4>
         </div>
-        <span className="text-[10px] font-bold text-stone-500 font-mono">Radius: 15.0 km</span>
+        <span className="text-[10px] font-bold text-stone-500 font-mono">{t('Radius: 15.0 km')}</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">

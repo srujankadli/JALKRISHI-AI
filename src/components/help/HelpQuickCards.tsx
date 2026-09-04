@@ -6,6 +6,7 @@ interface HelpQuickCardsProps {
 }
 
 export const HelpQuickCards: React.FC<HelpQuickCardsProps> = ({ onScrollTo }) => {
+  
   const cards = [
     {
       id: 'farmer-guide',

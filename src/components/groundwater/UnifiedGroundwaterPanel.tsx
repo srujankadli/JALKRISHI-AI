@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -30,6 +31,7 @@ export const UnifiedGroundwaterPanel: React.FC<UnifiedGroundwaterPanelProps> = (
   longitude,
   onClose,
 }) => {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<GroundwaterIntelligence | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'crops' | 'irrigation' | 'sources'>('overview');
@@ -257,7 +259,7 @@ export const UnifiedGroundwaterPanel: React.FC<UnifiedGroundwaterPanelProps> = (
                     )}
                   </div>
                   <div>
-                    <span className="text-stone-500 block text-[10px] uppercase font-bold">Precipitation Signal</span>
+                    <span className="text-stone-500 block text-[10px] uppercase font-bold">{t('Precipitation Signal')}</span>
                     <strong className="text-sm text-slate-900 font-bold">{data.rainfall_signal}</strong>
                   </div>
                 </div>
@@ -340,7 +342,7 @@ export const UnifiedGroundwaterPanel: React.FC<UnifiedGroundwaterPanelProps> = (
 
               <div className="p-4 rounded-xl border border-stone-200 bg-stone-50 text-xs text-stone-600 flex items-center gap-2 font-medium">
                 <Info className="h-4 w-4 text-stone-400 shrink-0" />
-                <span>Recommendations powered by Phase F Hydro-Agronomic Crop Engine. No arbitrary agronomic rules added outside core recommender.</span>
+                <span>{t('Recommendations powered by Phase F Hydro-Agronomic Crop Engine. No arbitrary agronomic rules added outside core recommender.')}</span>
               </div>
 
             </div>
@@ -391,7 +393,7 @@ export const UnifiedGroundwaterPanel: React.FC<UnifiedGroundwaterPanelProps> = (
               
               <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-xs">Overall Data Confidence</span>
+                  <span className="font-bold text-slate-900 text-xs">{t('Overall Data Confidence')}</span>
                   <span className={`font-mono font-extrabold text-xs px-2.5 py-0.5 rounded-full ${
                     data.confidence === 'HIGH' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                   }`}>
@@ -404,12 +406,12 @@ export const UnifiedGroundwaterPanel: React.FC<UnifiedGroundwaterPanelProps> = (
               </div>
 
               <div className="space-y-2 text-xs">
-                <h4 className="font-bold text-stone-900 uppercase text-[11px] tracking-wider">Data Provenance Pipeline</h4>
+                <h4 className="font-bold text-stone-900 uppercase text-[11px] tracking-wider">{t('Data Provenance Pipeline')}</h4>
                 <div className="space-y-2">
                   {data.data_sources.map((src, idx) => (
                     <div key={idx} className="p-3 rounded-xl border border-stone-200 bg-white flex items-center justify-between">
                       <span className="font-mono font-bold text-stone-800">{src}</span>
-                      <span className="text-[10px] text-stone-500 font-mono">Simulated Signal</span>
+                      <span className="text-[10px] text-stone-500 font-mono">{t('Simulated Signal')}</span>
                     </div>
                   ))}
                 </div>
@@ -419,7 +421,7 @@ export const UnifiedGroundwaterPanel: React.FC<UnifiedGroundwaterPanelProps> = (
               <div className="p-4 rounded-2xl border border-amber-300 bg-amber-50 text-amber-950 text-xs space-y-1.5">
                 <div className="flex items-center gap-1.5 font-bold">
                   <ShieldCheck className="h-4 w-4 text-amber-700" />
-                  <span>Data Honesty &amp; Scientific Transparency Disclaimer</span>
+                  <span>{t('Data Honesty &amp; Scientific Transparency Disclaimer')}</span>
                 </div>
                 <p className="text-[11px] leading-relaxed text-amber-900">
                   {data.disclaimer}
@@ -435,7 +437,7 @@ export const UnifiedGroundwaterPanel: React.FC<UnifiedGroundwaterPanelProps> = (
         <div className="p-4 border-t border-stone-200 bg-stone-50 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-stone-500 gap-2">
           <div className="flex items-center gap-2">
             <Lock className="h-3.5 w-3.5 text-stone-400" />
-            <span>Mode: <strong>{data.data_mode}</strong></span>
+            <span>{t('Mode:')} <strong>{data.data_mode}</strong></span>
             <span>&bull;</span>
             <span>Sync: {new Date(data.timestamp).toLocaleTimeString()}</span>
           </div>

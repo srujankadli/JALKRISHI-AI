@@ -72,7 +72,7 @@ export const UserMenu: React.FC = () => {
               className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 font-semibold text-stone-700 flex items-center gap-2 cursor-pointer"
             >
               <UserCheck className="h-3.5 w-3.5 text-teal-600" />
-              <span>Switch Account / Role</span>
+              <span>{t('Switch Account / Role')}</span>
             </button>
 
             <button

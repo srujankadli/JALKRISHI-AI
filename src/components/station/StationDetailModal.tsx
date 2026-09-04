@@ -54,7 +54,7 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
         <button
           onClick={onClose}
           className="absolute right-5 top-5 rounded-full p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700"
-          aria-label="Close station modal"
+          aria-label={t('Close station modal')}
         >
           <X className="h-5 w-5" />
         </button>

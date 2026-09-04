@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import {
   TrendingDown,
@@ -11,6 +12,7 @@ import {
 import { SectionHeader } from '../common/SectionHeader';
 
 export const ForecastAndAnomalyGuide: React.FC = () => {
+  const { t } = useLanguage();
   const anomalyCategories = [
     {
       title: 'Sudden Groundwater Drop',
@@ -54,8 +56,8 @@ export const ForecastAndAnomalyGuide: React.FC = () => {
       {/* 1. Forecasting & Days-to-Critical Section */}
       <div className="space-y-3">
         <SectionHeader
-          title="How Groundwater Forecasting Works"
-          subtitle="Understanding multi-horizon projections, uncertainty envelopes, and Days-to-Critical indicators"
+          title={t('How Groundwater Forecasting Works')}
+          subtitle={t('Understanding multi-horizon projections, uncertainty envelopes, and Days-to-Critical indicators')}
           icon={<TrendingDown className="h-5 w-5 text-sky-700" />}
         />
 
@@ -97,8 +99,8 @@ export const ForecastAndAnomalyGuide: React.FC = () => {
       {/* 2. Anomaly Detection Guide */}
       <div className="space-y-3">
         <SectionHeader
-          title="Understanding Groundwater Telemetry Anomalies"
-          subtitle="How the automated quality control engine isolates genuine extraction spikes from sensor hardware faults"
+          title={t('Understanding Groundwater Telemetry Anomalies')}
+          subtitle={t('How the automated quality control engine isolates genuine extraction spikes from sensor hardware faults')}
           icon={<AlertTriangle className="h-5 w-5 text-amber-600" />}
         />
 
@@ -122,7 +124,7 @@ export const ForecastAndAnomalyGuide: React.FC = () => {
                 </div>
 
                 <div className="pt-2 border-t border-stone-100 text-[11px] text-stone-700">
-                  <strong className="text-stone-900 block font-bold">Suggested Action:</strong>
+                  <strong className="text-stone-900 block font-bold">{t('Suggested Action:')}</strong>
                   <span>{cat.action}</span>
                 </div>
               </div>

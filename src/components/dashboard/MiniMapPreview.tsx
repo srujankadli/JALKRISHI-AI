@@ -5,12 +5,14 @@ import { SectionHeader } from '../common/SectionHeader';
 import { GroundwaterMap } from '../map/GroundwaterMap';
 import { stationService } from '../../services/stationService';
 import type { DWLRStation } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface MiniMapPreviewProps {
   onSelectStation: (station: DWLRStation) => void;
 }
 
 export const MiniMapPreview: React.FC<MiniMapPreviewProps> = ({ onSelectStation }) => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [stations, setStations] = useState<DWLRStation[]>([]);
 
@@ -26,8 +28,8 @@ export const MiniMapPreview: React.FC<MiniMapPreviewProps> = ({ onSelectStation 
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Groundwater Across India"
-        subtitle="Geographic snapshot of telemetric observation wells and regional aquifer stress"
+        title={t('Groundwater Across India')}
+        subtitle={t('Geographic snapshot of telemetric observation wells and regional aquifer stress')}
         icon={<MapPin className="h-5 w-5 text-water-600" />}
         action={
           <button
@@ -56,7 +58,7 @@ export const MiniMapPreview: React.FC<MiniMapPreviewProps> = ({ onSelectStation 
             onClick={() => navigate('/map')}
             className="rounded-lg bg-agri-700 px-3 py-1 text-xs font-bold text-white shadow-xs hover:bg-agri-800 transition-all flex items-center gap-1"
           >
-            <span>Open Interactive Map</span>
+            <span>{t('Open Interactive Map')}</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>

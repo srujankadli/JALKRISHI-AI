@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import {
   AlertTriangle,
@@ -22,6 +23,7 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
   onSelectAnomaly,
   onNavigateToMap,
 }) => {
+  const { t } = useLanguage();
   const getSeverityBadge = (severity: AnomalySeverity) => {
     switch (severity) {
       case 'critical':
@@ -61,8 +63,8 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
   if (anomalies.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-8 text-center">
-        <p className="text-sm font-bold text-stone-700">No anomalies match your current filters.</p>
-        <p className="text-xs text-stone-500 mt-1">Try selecting 'All Severities' or clearing your search keywords.</p>
+        <p className="text-sm font-bold text-stone-700">{t('No anomalies match your current filters.')}</p>
+        <p className="text-xs text-stone-500 mt-1">{t('Try selecting \'All Severities\' or clearing your search keywords.')}</p>
       </div>
     );
   }
@@ -122,15 +124,15 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
               {/* Observed vs Expected vs Deviation */}
               <div className="lg:col-span-6 grid grid-cols-3 gap-2 text-xs text-center rounded-xl bg-white p-2.5 border border-stone-200">
                 <div>
-                  <span className="text-[10px] text-stone-400 font-bold uppercase block">Observed</span>
+                  <span className="text-[10px] text-stone-400 font-bold uppercase block">{t('Observed')}</span>
                   <strong className="text-sm font-black text-stone-900">{a.observedValue} m</strong>
                 </div>
                 <div>
-                  <span className="text-[10px] text-stone-400 font-bold uppercase block">Expected</span>
+                  <span className="text-[10px] text-stone-400 font-bold uppercase block">{t('Expected')}</span>
                   <span className="text-sm font-bold text-stone-600">{a.expectedValue} m</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-rose-600 font-bold uppercase block">Deviation</span>
+                  <span className="text-[10px] text-rose-600 font-bold uppercase block">{t('Deviation')}</span>
                   <strong className="text-xs font-black text-rose-700 font-mono block truncate">
                     {a.deviation}
                   </strong>
@@ -143,7 +145,7 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
               <div className="flex items-start gap-2">
                 <Sparkles className="h-3.5 w-3.5 text-agri-700 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  <strong className="text-stone-900 font-bold">Farmer Summary: </strong>
+                  <strong className="text-stone-900 font-bold">{t('Farmer Summary:')} </strong>
                   {a.farmerExplanation}
                 </p>
               </div>
@@ -164,7 +166,7 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
                   className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-bold text-stone-700 hover:bg-stone-50 shadow-xs cursor-pointer"
                 >
                   <MapPin className="h-3 w-3 text-stone-500" />
-                  <span>View on Map</span>
+                  <span>{t('View on Map')}</span>
                 </button>
 
                 <button
@@ -174,7 +176,7 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
                   }}
                   className="inline-flex items-center gap-1 rounded-lg bg-stone-900 px-3 py-1 text-xs font-bold text-white hover:bg-stone-800 shadow-xs cursor-pointer"
                 >
-                  <span>Inspect Details</span>
+                  <span>{t('Inspect Details')}</span>
                   <ArrowRight className="h-3 w-3" />
                 </button>
               </div>

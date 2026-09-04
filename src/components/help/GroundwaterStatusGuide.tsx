@@ -1,8 +1,10 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Droplets, ShieldCheck, Eye, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 
 export const GroundwaterStatusGuide: React.FC = () => {
+  const { t } = useLanguage();
   const statuses = [
     {
       level: 'HEALTHY (SAFE)',
@@ -49,8 +51,8 @@ export const GroundwaterStatusGuide: React.FC = () => {
   return (
     <div id="status-guide" className="space-y-4">
       <SectionHeader
-        title="Understanding Groundwater Status Levels"
-        subtitle="Hydrogeological definitions, depth ranges, and practical actions for each alert tier"
+        title={t('Understanding Groundwater Status Levels')}
+        subtitle={t('Hydrogeological definitions, depth ranges, and practical actions for each alert tier')}
         icon={<Droplets className="h-5 w-5 text-water-700" />}
       />
 
@@ -75,15 +77,15 @@ export const GroundwaterStatusGuide: React.FC = () => {
 
                 <div className="space-y-1.5 text-xs text-stone-800 pt-1">
                   <p>
-                    <strong className="text-stone-900 block font-bold">Hydrogeological Meaning:</strong>
+                    <strong className="text-stone-900 block font-bold">{t('Hydrogeological Meaning:')}</strong>
                     {st.meaning}
                   </p>
                   <p>
-                    <strong className="text-stone-900 block font-bold">What to Watch:</strong>
+                    <strong className="text-stone-900 block font-bold">{t('What to Watch:')}</strong>
                     {st.whatToWatch}
                   </p>
                   <p>
-                    <strong className="text-stone-900 block font-bold">Suggested Farmer Action:</strong>
+                    <strong className="text-stone-900 block font-bold">{t('Suggested Farmer Action:')}</strong>
                     {st.suggestedAction}
                   </p>
                 </div>

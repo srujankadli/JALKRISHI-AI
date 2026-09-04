@@ -1,8 +1,10 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState } from 'react';
 import { Send, Star, CheckCircle2, MessageSquare } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 
 export const FeedbackForm: React.FC = () => {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [role, setRole] = useState<'Farmer' | 'Student' | 'Researcher' | 'Administrator' | 'Other'>('Farmer');
   const [feedbackType, setFeedbackType] = useState<'Suggestion' | 'Bug' | 'Data Issue' | 'Usability' | 'Other'>('Suggestion');
@@ -41,8 +43,8 @@ export const FeedbackForm: React.FC = () => {
   return (
     <div id="feedback-form" className="space-y-4">
       <SectionHeader
-        title="Send Us Your Feedback & Suggestions"
-        subtitle="Help our agronomy and engineering team refine groundwater decision-support tools"
+        title={t('Send Us Your Feedback & Suggestions')}
+        subtitle={t('Help our agronomy and engineering team refine groundwater decision-support tools')}
         icon={<MessageSquare className="h-5 w-5 text-agri-700" />}
       />
 
@@ -69,7 +71,7 @@ export const FeedbackForm: React.FC = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Ramesh Kumar / Sangrur KVK"
+                  placeholder={t('e.g. Ramesh Kumar / Sangrur KVK')}
                   className="w-full rounded-xl border border-stone-300 bg-stone-50/80 px-3 py-2.5 text-xs font-semibold text-stone-900 focus:border-agri-600 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -151,7 +153,7 @@ export const FeedbackForm: React.FC = () => {
                 required
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Share your experience, feature requests, or agronomic feedback..."
+                placeholder={t('Share your experience, feature requests, or agronomic feedback...')}
                 className="w-full rounded-xl border border-stone-300 bg-stone-50/80 p-3 text-xs font-semibold text-stone-900 focus:border-agri-600 focus:bg-white focus:outline-none"
               />
             </div>
@@ -167,7 +169,7 @@ export const FeedbackForm: React.FC = () => {
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-agri-700 px-6 py-2.5 text-xs font-black text-white hover:bg-agri-800 active:scale-95 transition-all shadow-xs cursor-pointer"
               >
                 <Send className="h-3.5 w-3.5" />
-                <span>Submit Feedback</span>
+                <span>{t('Submit Feedback')}</span>
               </button>
             </div>
           </form>

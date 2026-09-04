@@ -1,7 +1,9 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Cpu, CheckCircle2, Clock, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export const AIIntelligencePipelineCard: React.FC = () => {
+  const { t } = useLanguage();
   const steps = [
     { num: 1, title: 'DWLR Telemetry Data', desc: '5,260 reference observation wells emitting groundwater depth (mbgl)' },
     { num: 2, title: 'Data Quality & Filtering', desc: '12 hydrogeological checks (range, stuck value, spike, battery voltage)' },
@@ -20,7 +22,7 @@ export const AIIntelligencePipelineCard: React.FC = () => {
             <Cpu className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-black text-stone-900">How JalKrishi AI Works (7-Step End-to-End Pipeline)</h3>
+            <h3 className="text-base font-black text-stone-900">{t('How JalKrishi AI Works (7-Step End-to-End Pipeline)')}</h3>
             <p className="text-xs text-stone-500 font-medium">
               Deterministic hydrogeological intelligence flow from raw piezometer sensor data to farmer action.
             </p>
@@ -57,15 +59,15 @@ export const AIIntelligencePipelineCard: React.FC = () => {
         <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2">
           <div className="flex items-center gap-2 text-xs font-black text-emerald-900 uppercase tracking-wider">
             <CheckCircle2 className="h-4 w-4 text-emerald-700" />
-            <span>Implemented & Verified Now (Phase A–L)</span>
+            <span>{t('Implemented & Verified Now (Phase A–L)')}</span>
           </div>
           <ul className="text-xs text-stone-700 space-y-1 font-medium list-disc list-inside">
             <li>5,260-Station Reference DWLR Network</li>
-            <li>FastAPI Intelligence Engines (Analytics, Forecast, Anomalies, Crops, Insights)</li>
-            <li>React + Vite Live API Bridge &amp; Offline Fallback</li>
-            <li>In-Browser WhatsApp Farmer Simulator</li>
-            <li>CSV Upload &amp; Quality Audit Sandbox</li>
-            <li>Production Hardening &amp; Health/Readiness Probes</li>
+            <li>{t('FastAPI Intelligence Engines (Analytics, Forecast, Anomalies, Crops, Insights)')}</li>
+            <li>{t('React + Vite Live API Bridge &amp; Offline Fallback')}</li>
+            <li>{t('In-Browser WhatsApp Farmer Simulator')}</li>
+            <li>{t('CSV Upload &amp; Quality Audit Sandbox')}</li>
+            <li>{t('Production Hardening &amp; Health/Readiness Probes')}</li>
           </ul>
         </div>
 
@@ -73,13 +75,13 @@ export const AIIntelligencePipelineCard: React.FC = () => {
         <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2">
           <div className="flex items-center gap-2 text-xs font-black text-amber-900 uppercase tracking-wider">
             <Clock className="h-4 w-4 text-amber-700" />
-            <span>Future Live Government Integration (NOT_CONFIGURED)</span>
+            <span>{t('Future Live Government Integration (NOT_CONFIGURED)')}</span>
           </div>
           <ul className="text-xs text-stone-700 space-y-1 font-medium list-disc list-inside">
-            <li>India-WRIS Live API Gateway (`NOT_CONFIGURED`)</li>
-            <li>CGWB Monitoring Well Production Feed (`NOT_CONFIGURED`)</li>
-            <li>IMD High-Resolution Precipitation Grids (`NOT_CONFIGURED`)</li>
-            <li>Twilio / Meta Enterprise WhatsApp Business Webhook</li>
+            <li>{t('India-WRIS Live API Gateway (`NOT_CONFIGURED`)')}</li>
+            <li>{t('CGWB Monitoring Well Production Feed (`NOT_CONFIGURED`)')}</li>
+            <li>{t('IMD High-Resolution Precipitation Grids (`NOT_CONFIGURED`)')}</li>
+            <li>{t('Twilio / Meta Enterprise WhatsApp Business Webhook')}</li>
           </ul>
         </div>
       </div>

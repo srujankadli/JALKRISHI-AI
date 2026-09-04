@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { Layers, ArrowRight } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 import type { CropRecommendation } from '../../types';
@@ -10,13 +11,14 @@ interface CropComparisonTableProps {
 
 export const CropComparisonTable: React.FC<CropComparisonTableProps> = ({
   crops,
-  onSelectCrop,
+onSelectCrop,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Compare Recommended Crops Side-by-Side"
-        subtitle="Evaluate water consumption, maturity duration, and expected yield potential"
+        title={t('Compare Recommended Crops Side-by-Side')}
+        subtitle={t('Evaluate water consumption, maturity duration, and expected yield potential')}
         icon={<Layers className="h-5 w-5 text-water-700" />}
       />
 
@@ -25,10 +27,10 @@ export const CropComparisonTable: React.FC<CropComparisonTableProps> = ({
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-stone-50 text-stone-600 uppercase text-[11px] font-bold border-b border-stone-200">
               <tr>
-                <th className="px-4 py-3">Crop Name</th>
-                <th className="px-4 py-3">Match Score</th>
-                <th className="px-4 py-3">Water Demand</th>
-                <th className="px-4 py-3">Duration</th>
+                <th className="px-4 py-3">{t('Crop Name')}</th>
+                <th className="px-4 py-3">{t('Match Score')}</th>
+                <th className="px-4 py-3">{t('Water Demand')}</th>
+                <th className="px-4 py-3">{t('Duration')}</th>
                 <th className="px-4 py-3">Expected Yield</th>
                 <th className="px-4 py-3">Groundwater Impact</th>
                 <th className="px-4 py-3 text-right">Details</th>

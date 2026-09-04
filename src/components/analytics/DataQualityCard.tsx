@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { ShieldCheck, Radio, Info } from 'lucide-react';
 
@@ -11,19 +12,20 @@ export const DataQualityCard: React.FC<DataQualityCardProps> = ({
   reportingRatePct,
   anomalyCount,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* 1. Telemetry Health */}
       <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-subtle space-y-2">
         <div className="flex items-center gap-2 text-xs font-bold text-stone-700">
           <Radio className="h-4 w-4 text-emerald-600" />
-          <span>Telemetry Link Integrity</span>
+          <span>{t('Telemetry Link Integrity')}</span>
         </div>
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-black text-stone-900 font-mono">
             {reportingRatePct}%
           </span>
-          <span className="text-xs text-stone-500 font-semibold">Online & Synchronized</span>
+          <span className="text-xs text-stone-500 font-semibold">{t('Online & Synchronized')}</span>
         </div>
         <p className="text-[11px] text-stone-500 leading-snug">
           6-hour scheduled transmission intervals with automatic cellular retry buffers.
@@ -34,13 +36,13 @@ export const DataQualityCard: React.FC<DataQualityCardProps> = ({
       <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-subtle space-y-2">
         <div className="flex items-center gap-2 text-xs font-bold text-stone-700">
           <ShieldCheck className="h-4 w-4 text-agri-600" />
-          <span>Automated QC Flags</span>
+          <span>{t('Automated QC Flags')}</span>
         </div>
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-black text-rose-700 font-mono">
             {anomalyCount}
           </span>
-          <span className="text-xs text-stone-500 font-semibold">Active Quality Flags</span>
+          <span className="text-xs text-stone-500 font-semibold">{t('Active Quality Flags')}</span>
         </div>
         <p className="text-[11px] text-stone-500 leading-snug">
           Real-time Z-score deviation filters isolate sensor faults from genuine drawdown events.
@@ -51,7 +53,7 @@ export const DataQualityCard: React.FC<DataQualityCardProps> = ({
       <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 shadow-subtle space-y-1 text-xs text-stone-600">
         <div className="flex items-center gap-1.5 font-bold text-stone-900">
           <Info className="h-4 w-4 text-agri-700" />
-          <span>Methodology & Disclaimer</span>
+          <span>{t('Methodology & Disclaimer')}</span>
         </div>
         <p className="text-[11px] leading-relaxed">
           Simulation dataset featuring 5,260 simulated DWLR observation wells across India. Telemetry values represent hydrogeologically realistic groundwater patterns.

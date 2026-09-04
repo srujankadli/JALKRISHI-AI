@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { ArrowRight, AlertTriangle } from 'lucide-react';
 import type { DWLRStation } from '../../types';
@@ -14,6 +15,7 @@ export const StationPopupContent: React.FC<StationPopupContentProps> = ({
   station,
   onViewDetails,
 }) => {
+  const { t } = useLanguage();
   const trend = getTrendDetails(station.trend);
 
   return (
@@ -39,13 +41,13 @@ export const StationPopupContent: React.FC<StationPopupContentProps> = ({
       {/* Key Metrics Grid */}
       <div className="mt-2.5 grid grid-cols-2 gap-1.5 rounded-lg bg-stone-50 p-2 border border-stone-100 text-xs">
         <div>
-          <span className="text-[10px] text-stone-500 block">Water Depth</span>
+          <span className="text-[10px] text-stone-500 block">{t('Water Depth')}</span>
           <span className="text-sm font-bold text-stone-900">
             {formatDepth(station.waterLevel)}
           </span>
         </div>
         <div>
-          <span className="text-[10px] text-stone-500 block">Risk Score</span>
+          <span className="text-[10px] text-stone-500 block">{t('Risk Score')}</span>
           <span className="text-sm font-bold text-stone-900">
             {formatRiskScore(station.riskScore)}
           </span>
@@ -55,7 +57,7 @@ export const StationPopupContent: React.FC<StationPopupContentProps> = ({
       {/* Farmer Summary */}
       <div className="mt-2 text-[11px] text-stone-700 leading-snug">
         <p className="line-clamp-2">
-          <span className="font-semibold text-agri-800">Trend: </span>
+          <span className="font-semibold text-agri-800">{t('Trend:')} </span>
           {trend.farmerText}
         </p>
       </div>
@@ -74,7 +76,7 @@ export const StationPopupContent: React.FC<StationPopupContentProps> = ({
           onClick={() => onViewDetails(station)}
           className="w-full flex items-center justify-center gap-1 rounded-lg bg-agri-700 py-1.5 px-3 text-xs font-semibold text-white shadow-xs hover:bg-agri-800 active:scale-95 transition-all"
         >
-          <span>View Station Details</span>
+          <span>{t('View Station Details')}</span>
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>

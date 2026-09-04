@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   RotateCcw,
@@ -23,6 +24,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
   className = '',
   initialDistrict = 'Kolar',
 }) => {
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [currentLang, setCurrentLang] = useState<'en' | 'hi'>('en');
@@ -157,15 +159,15 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
           <div>
             <div className="flex items-center gap-1.5">
-              <h3 className="font-bold text-sm leading-tight tracking-wide">JalKrishi AI</h3>
-              <span title="Verified Assistant">
+              <h3 className="font-bold text-sm leading-tight tracking-wide">{t('JalKrishi AI')}</h3>
+              <span title={t('Verified Assistant')}>
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-300" />
               </span>
             </div>
             <p className="text-[11px] text-emerald-100 flex items-center gap-1">
-              <span>Farmer Water Assistant</span>
+              <span>{t('Farmer Water Assistant')}</span>
               <span>&bull;</span>
-              <span className="text-emerald-300 font-medium">Online</span>
+              <span className="text-emerald-300 font-medium">{t('Online')}</span>
             </p>
           </div>
         </div>
@@ -175,7 +177,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
           {/* Language Switch */}
           <button
             onClick={toggleLanguage}
-            title="Switch Language (English / Hindi)"
+            title={t('Switch Language (English / Hindi)')}
             className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-800/70 hover:bg-emerald-800 text-[11px] font-bold text-emerald-100 border border-emerald-700/60 transition-colors cursor-pointer"
           >
             <Languages className="h-3.5 w-3.5" />
@@ -185,7 +187,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
           {/* Reset Chat */}
           <button
             onClick={handleResetChat}
-            title="Reset Conversation"
+            title={t('Reset Conversation')}
             className="p-1.5 rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-800 transition-colors cursor-pointer"
           >
             <RotateCcw className="h-4 w-4" />
@@ -197,7 +199,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
       <div className="bg-[#128c7e]/10 border-b border-stone-200/60 px-3 py-1.5 flex items-center justify-between text-[11px] text-stone-600">
         <div className="flex items-center gap-1.5 font-medium">
           <Radio className="h-3 w-3 text-emerald-600 animate-pulse" />
-          <span>Simulation Data (5,260 DWLR Nodes)</span>
+          <span>{t('Simulation Data (5,260 DWLR Nodes)')}</span>
         </div>
         <span className="text-[10px] text-stone-500 hidden sm:inline">
           No real WhatsApp SMS sent

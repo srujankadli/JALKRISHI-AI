@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Search, X } from 'lucide-react';
 
@@ -12,6 +13,7 @@ export const HelpSearchBar: React.FC<HelpSearchBarProps> = ({
   onSearchChange,
   matchCount,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="relative rounded-2xl border border-stone-200 bg-white p-2 shadow-subtle flex items-center gap-2">
       <div className="pl-3 text-stone-400">
@@ -21,7 +23,7 @@ export const HelpSearchBar: React.FC<HelpSearchBarProps> = ({
         type="text"
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
-        placeholder="Search FAQs, telemetry guides, forecasting, crop rules, or data sources..."
+        placeholder={t('Search FAQs, telemetry guides, forecasting, crop rules, or data sources...')}
         className="w-full bg-transparent text-xs sm:text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none"
       />
       {searchQuery && (

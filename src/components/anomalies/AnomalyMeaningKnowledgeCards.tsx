@@ -1,8 +1,10 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { HelpCircle, TrendingDown, TrendingUp, Radio, Activity, Wrench } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 
 export const AnomalyMeaningKnowledgeCards: React.FC = () => {
+  const { t } = useLanguage();
   const cards = [
     {
       title: 'Sudden Groundwater Drop',
@@ -54,8 +56,8 @@ export const AnomalyMeaningKnowledgeCards: React.FC = () => {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="What Does an Anomaly Mean? (Farmer Guide)"
-        subtitle="Simple explanations of automated telemetry quality flags and hydrostatic alerts"
+        title={t('What Does an Anomaly Mean? (Farmer Guide)')}
+        subtitle={t('Simple explanations of automated telemetry quality flags and hydrostatic alerts')}
         icon={<HelpCircle className="h-5 w-5 text-agri-700" />}
       />
 

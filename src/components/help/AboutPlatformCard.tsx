@@ -1,14 +1,16 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Award, Users, Target, ShieldCheck } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 import { APP_CONFIG } from '../../utils/constants';
 
 export const AboutPlatformCard: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-4">
       <SectionHeader
         title={`About ${APP_CONFIG.appName} Platform`}
-        subtitle="National Environmental Intelligence Architecture for Groundwater Resource Evaluation"
+        subtitle={t('National Environmental Intelligence Architecture for Groundwater Resource Evaluation')}
         icon={<Award className="h-5 w-5 text-teal-600" />}
       />
 
@@ -29,7 +31,7 @@ export const AboutPlatformCard: React.FC = () => {
           </div>
 
           <div className="text-right">
-            <span className="text-xs font-bold text-stone-400 block">System Scope:</span>
+            <span className="text-xs font-bold text-stone-400 block">{t('System Scope:')}</span>
             <span className="text-sm font-extrabold text-stone-900">
               5,260 Monitored DWLR Stations &bull; 37 States &amp; UTs
             </span>
@@ -40,7 +42,7 @@ export const AboutPlatformCard: React.FC = () => {
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold text-stone-900">
               <Target className="h-4 w-4 text-agri-700" />
-              <span>Core Mission</span>
+              <span>{t('Core Mission')}</span>
             </div>
             <p className="text-stone-600 leading-relaxed font-medium">
               Bridging the critical gap between complex hydrological sensor telemetry and everyday agricultural sowing decisions for Indian farmers.
@@ -50,7 +52,7 @@ export const AboutPlatformCard: React.FC = () => {
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold text-stone-900">
               <Users className="h-4 w-4 text-water-700" />
-              <span>Target Stakeholders</span>
+              <span>{t('Target Stakeholders')}</span>
             </div>
             <p className="text-stone-600 leading-relaxed font-medium">
               Farmers, Krishi Vigyan Kendra (KVK) agronomists, district water resource officers, policy planners, and groundwater researchers.
@@ -60,7 +62,7 @@ export const AboutPlatformCard: React.FC = () => {
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold text-stone-900">
               <ShieldCheck className="h-4 w-4 text-emerald-700" />
-              <span>Implementation Scope</span>
+              <span>{t('Implementation Scope')}</span>
             </div>
             <p className="text-stone-600 leading-relaxed font-medium">
               Complete, verified platform architecture with interactive mapping, 30-day forecasting, anomaly triage, crop advisory, and multi-format report exports.

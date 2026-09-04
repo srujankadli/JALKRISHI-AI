@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -10,7 +11,6 @@ import {
   MapPin,
 } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
-import { useLanguage } from '../../context/LanguageContext';
 
 interface GroundwaterAlertsFeedProps {
   onSelectStation: (stationId: string) => void;
@@ -90,8 +90,8 @@ export const GroundwaterAlertsFeed: React.FC<GroundwaterAlertsFeedProps> = ({ on
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Groundwater Alerts"
-        subtitle="Automated severity warnings from DWLR telemetry with plain-language farmer impact"
+        title={t('Groundwater Alerts')}
+        subtitle={t('Automated severity warnings from DWLR telemetry with plain-language farmer impact')}
         icon={<AlertTriangle className="h-5 w-5 text-rose-600" />}
         action={
           <button

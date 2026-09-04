@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Sprout, ArrowRight, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
@@ -15,14 +16,15 @@ export const AgriculturalWaterOutlook: React.FC<AgriculturalWaterOutlookProps> =
   regionLabel,
   onNavigateToCrops,
 }) => {
+  const { t } = useLanguage();
   const isHighStress = criticalPct > 15 || avgDepth > 25;
   const isModerateStress = criticalPct > 8 || avgDepth > 18;
 
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Agricultural Groundwater Vulnerability & Sowing Implications"
-        subtitle="Translating sub-surface hydrogeology into seasonal crop planning decisions"
+        title={t('Agricultural Groundwater Vulnerability & Sowing Implications')}
+        subtitle={t('Translating sub-surface hydrogeology into seasonal crop planning decisions')}
         icon={<Sprout className="h-5 w-5 text-agri-700" />}
       />
 
@@ -69,7 +71,7 @@ export const AgriculturalWaterOutlook: React.FC<AgriculturalWaterOutlookProps> =
           onClick={onNavigateToCrops}
           className="inline-flex items-center justify-center gap-2 rounded-2xl bg-agri-700 px-6 py-3 text-xs font-black text-white hover:bg-agri-800 shadow-elevated transition-all cursor-pointer shrink-0"
         >
-          <span>Open Smart Crop Advisor</span>
+          <span>{t('Open Smart Crop Advisor')}</span>
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>

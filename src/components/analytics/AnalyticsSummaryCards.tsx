@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import {
   Radio,
@@ -32,6 +33,7 @@ export const AnalyticsSummaryCards: React.FC<AnalyticsSummaryCardsProps> = ({
   onFilterWarning,
   onFilterHealthy,
 }) => {
+  const { t } = useLanguage();
   const healthyPct = Math.round((healthyCount / (totalStations || 1)) * 100);
   const warningPct = Math.round((warningCount / (totalStations || 1)) * 100);
   const criticalPct = Math.round((criticalCount / (totalStations || 1)) * 100);
@@ -40,9 +42,9 @@ export const AnalyticsSummaryCards: React.FC<AnalyticsSummaryCardsProps> = ({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
       {/* 1. Total Wells in Scope */}
       <StatCard
-        title="Wells in Scope"
+        title={t('Wells in Scope')}
         value={totalStations.toLocaleString('en-IN')}
-        subtitle="DWLR Telemetry Nodes"
+        subtitle={t('DWLR Telemetry Nodes')}
         icon={Radio}
         iconBgColor="bg-stone-100"
         iconColor="text-stone-700"
@@ -51,7 +53,7 @@ export const AnalyticsSummaryCards: React.FC<AnalyticsSummaryCardsProps> = ({
 
       {/* 2. Healthy Safe Wells */}
       <StatCard
-        title="Healthy (Safe)"
+        title={t('Healthy (Safe)')}
         value={healthyCount.toLocaleString('en-IN')}
         subtitle={`${healthyPct}% of active view`}
         icon={ShieldCheck}
@@ -64,7 +66,7 @@ export const AnalyticsSummaryCards: React.FC<AnalyticsSummaryCardsProps> = ({
 
       {/* 3. Warning Watch Wells */}
       <StatCard
-        title="Warning / Watch"
+        title={t('Warning / Watch')}
         value={warningCount.toLocaleString('en-IN')}
         subtitle={`${warningPct}% of active view`}
         icon={Eye}
@@ -77,7 +79,7 @@ export const AnalyticsSummaryCards: React.FC<AnalyticsSummaryCardsProps> = ({
 
       {/* 4. Critical Drawdown Wells */}
       <StatCard
-        title="Critical Drawdown"
+        title={t('Critical Drawdown')}
         value={criticalCount.toLocaleString('en-IN')}
         subtitle={`${criticalPct}% of active view`}
         icon={ShieldAlert}
@@ -90,9 +92,9 @@ export const AnalyticsSummaryCards: React.FC<AnalyticsSummaryCardsProps> = ({
 
       {/* 5. Average Water Table Depth */}
       <StatCard
-        title="Avg. Depth (mbgl)"
+        title={t('Avg. Depth (mbgl)')}
         value={`${avgDepth} m`}
-        subtitle="Hydrostatic head mean"
+        subtitle={t('Hydrostatic head mean')}
         icon={Droplets}
         iconBgColor="bg-water-100"
         iconColor="text-water-700"
@@ -101,7 +103,7 @@ export const AnalyticsSummaryCards: React.FC<AnalyticsSummaryCardsProps> = ({
 
       {/* 6. Network Risk Index */}
       <StatCard
-        title="Aquifer Risk Index"
+        title={t('Aquifer Risk Index')}
         value={`${Math.round(avgRiskScore * 100)}/100`}
         subtitle={avgRiskScore > 0.6 ? 'High Regional Stress' : avgRiskScore > 0.4 ? 'Moderate Vulnerability' : 'Low Vulnerability'}
         icon={Activity}

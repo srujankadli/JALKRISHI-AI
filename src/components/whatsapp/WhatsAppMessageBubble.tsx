@@ -21,6 +21,7 @@ export const WhatsAppMessageBubble: React.FC<WhatsAppMessageBubbleProps> = ({
   message,
   onActionClick,
 }) => {
+  
   const isFarmer = message.sender === 'farmer';
 
   // Format message text: convert *bold* to <strong>, _italic_ to <em>, and linebreaks

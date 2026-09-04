@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import {
   Droplets,
@@ -9,7 +10,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
-import { useLanguage } from '../../context/LanguageContext';
 
 export const FarmerActionCenter: React.FC = () => {
   const navigate = useNavigate();
@@ -73,8 +73,8 @@ export const FarmerActionCenter: React.FC = () => {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Recommended Actions for Farmers"
-        subtitle="Practical steps based on real-time groundwater depth and seasonal recharge models"
+        title={t('Recommended Actions for Farmers')}
+        subtitle={t('Practical steps based on real-time groundwater depth and seasonal recharge models')}
         icon={<Sparkles className="h-5 w-5 text-agri-700" />}
       />
 

@@ -19,6 +19,7 @@ export const AnomalyCategoryGrid: React.FC<AnomalyCategoryGridProps> = ({
   onSelectCategory,
   categoryCounts,
 }) => {
+  
   const getCategoryIcon = (category: AnomalyCategory) => {
     switch (category) {
       case 'Sudden Drop':

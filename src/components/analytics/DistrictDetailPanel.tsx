@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import {
   MapPin,
@@ -34,6 +35,7 @@ export const DistrictDetailPanel: React.FC<DistrictDetailPanelProps> = ({
   onNavigateToAnomalies,
   onNavigateToCrops,
 }) => {
+  const { t } = useLanguage();
   if (!district) return null;
 
   // Generate 14-day depth curve for district
@@ -73,28 +75,28 @@ export const DistrictDetailPanel: React.FC<DistrictDetailPanelProps> = ({
       {/* Grid of Key District Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
         <div className="rounded-2xl border border-stone-200 bg-white p-3.5 shadow-xs">
-          <span className="text-[10px] font-bold text-stone-500 uppercase block">Monitored Wells</span>
+          <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Monitored Wells')}</span>
           <strong className="text-xl font-black text-stone-900 font-mono">
             {district.totalStations}
           </strong>
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-3.5 shadow-xs">
-          <span className="text-[10px] font-bold text-stone-500 uppercase block">Avg Depth (mbgl)</span>
+          <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Avg Depth (mbgl)')}</span>
           <strong className="text-xl font-black text-sky-800 font-mono">
             {district.avgDepth} m
           </strong>
         </div>
 
         <div className="rounded-2xl border border-rose-200 bg-rose-50/50 p-3.5 shadow-xs">
-          <span className="text-[10px] font-bold text-rose-700 uppercase block">Critical Drawdown</span>
+          <span className="text-[10px] font-bold text-rose-700 uppercase block">{t('Critical Drawdown')}</span>
           <strong className="text-xl font-black text-rose-800 font-mono">
             {district.criticalCount} wells
           </strong>
         </div>
 
         <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-3.5 shadow-xs">
-          <span className="text-[10px] font-bold text-amber-700 uppercase block">Days to Critical</span>
+          <span className="text-[10px] font-bold text-amber-700 uppercase block">{t('Days to Critical')}</span>
           <strong className="text-xl font-black text-amber-900 font-mono flex items-center gap-1">
             <Clock className="h-4 w-4" />
             {typeof district.avgDaysToCritical === 'number'
@@ -137,7 +139,7 @@ export const DistrictDetailPanel: React.FC<DistrictDetailPanelProps> = ({
             className="inline-flex items-center gap-1 rounded-xl border border-stone-300 bg-white px-3 py-1.5 text-xs font-bold text-stone-800 hover:bg-stone-50 shadow-xs cursor-pointer"
           >
             <MapPin className="h-3.5 w-3.5 text-agri-700" />
-            <span>View on Map</span>
+            <span>{t('View on Map')}</span>
           </button>
 
           <button
@@ -145,21 +147,21 @@ export const DistrictDetailPanel: React.FC<DistrictDetailPanelProps> = ({
             className="inline-flex items-center gap-1 rounded-xl border border-stone-300 bg-white px-3 py-1.5 text-xs font-bold text-stone-800 hover:bg-stone-50 shadow-xs cursor-pointer"
           >
             <TrendingDown className="h-3.5 w-3.5 text-sky-700" />
-            <span>View Forecast</span>
+            <span>{t('View Forecast')}</span>
           </button>
 
           <button
             onClick={onNavigateToAnomalies}
             className="inline-flex items-center gap-1 rounded-xl border border-stone-300 bg-white px-3 py-1.5 text-xs font-bold text-stone-800 hover:bg-stone-50 shadow-xs cursor-pointer"
           >
-            <span>Anomalies</span>
+            <span>{t('Anomalies')}</span>
           </button>
 
           <button
             onClick={onNavigateToCrops}
             className="inline-flex items-center gap-1 rounded-xl bg-agri-700 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-agri-800 shadow-xs cursor-pointer"
           >
-            <span>Crop Advisor</span>
+            <span>{t('Crop Advisor')}</span>
             <ArrowRight className="h-3 w-3" />
           </button>
         </div>

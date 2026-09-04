@@ -1,8 +1,10 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const FarmerSummaryBanner: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <div className="bg-gradient-to-r from-agri-800 via-agri-700 to-water-800 text-white px-4 py-2.5 sm:px-6 shadow-sm">
       <div className="mx-auto flex flex-col md:flex-row items-center justify-between gap-2 text-xs sm:text-sm">
@@ -11,8 +13,8 @@ export const FarmerSummaryBanner: React.FC = () => {
             🌾
           </span>
           <p className="font-medium text-emerald-50">
-            <strong className="text-white font-bold">Farmer Advisory: </strong>
-            Monsoon groundwater recharge active across 64% of DWLR stations. 3 Punjab & Rajasthan districts flagged with rapid drawdown alerts.
+            <strong className="text-white font-bold">{t('Farmer Advisory')}: </strong>
+            {t('Monsoon groundwater recharge active across 64% of DWLR stations. 3 Punjab & Rajasthan districts flagged with rapid drawdown alerts.')}
           </p>
         </div>
 
@@ -21,7 +23,7 @@ export const FarmerSummaryBanner: React.FC = () => {
             to="/crops"
             className="inline-flex items-center gap-1 font-bold text-emerald-200 hover:text-white transition-colors underline"
           >
-            <span>Get Water-Smart Crop Plan</span>
+            <span>{t('Get Water-Smart Crop Plan')}</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

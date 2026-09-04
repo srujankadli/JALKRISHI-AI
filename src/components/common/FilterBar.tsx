@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { Search, RotateCcw } from 'lucide-react';
 import type { StationStatus } from '../../types';
 import { mockStates } from '../../data/mockStations';
@@ -24,6 +25,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onReset,
   totalResults,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-subtle lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
@@ -34,7 +36,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search by station, district, state or code..."
+            placeholder={t('Search by station, district, state or code...')}
             className="w-full rounded-lg border border-stone-300 bg-stone-50/50 py-2 pl-10 pr-4 text-sm text-stone-900 placeholder:text-stone-400 focus:border-agri-600 focus:bg-white focus:outline-none focus:ring-1 focus:ring-agri-600"
           />
         </div>
@@ -48,7 +50,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           >
             {mockStates.map((st) => (
               <option key={st} value={st}>
-                {st}
+                {t(st)}
               </option>
             ))}
           </select>
@@ -59,11 +61,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           {(['all', 'healthy', 'moderate', 'warning', 'critical'] as const).map((status) => {
             const isSelected = selectedStatus === status;
             const labels: Record<string, string> = {
-              all: 'All',
-              healthy: '🟢 Healthy',
-              moderate: '🟡 Moderate',
-              warning: '🟠 Warning',
-              critical: '🔴 Critical',
+              all: t('All'),
+              healthy: `🟢 ${t('Healthy')}`,
+              moderate: `🟡 ${t('Moderate')}`,
+              warning: `🟠 ${t('Warning')}`,
+              critical: `🔴 ${t('Critical')}`,
             };
 
             return (
@@ -87,7 +89,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       <div className="flex items-center justify-between gap-3 border-t border-stone-100 pt-2 lg:border-t-0 lg:pt-0">
         {totalResults !== undefined && (
           <span className="text-xs font-medium text-stone-500">
-            Showing <strong className="text-stone-900">{totalResults}</strong> stations
+            {t('Showing')} <strong className="text-stone-900">{totalResults}</strong> {t('stations')}
           </span>
         )}
         {onReset && (
@@ -96,7 +98,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             className="inline-flex items-center gap-1 text-xs font-semibold text-stone-500 hover:text-stone-900"
           >
             <RotateCcw className="h-3 w-3" />
-            Reset
+            <span>{t('Reset')}</span>
           </button>
         )}
       </div>

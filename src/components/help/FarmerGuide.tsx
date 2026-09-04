@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import {
   MapPin,
@@ -16,6 +17,7 @@ interface FarmerGuideProps {
 }
 
 export const FarmerGuide: React.FC<FarmerGuideProps> = ({ onNavigate }) => {
+  const { t } = useLanguage();
   const getIcon = (name: string) => {
     switch (name) {
       case 'MapPin':
@@ -37,8 +39,8 @@ export const FarmerGuide: React.FC<FarmerGuideProps> = ({ onNavigate }) => {
   return (
     <div id="farmer-guide" className="space-y-4">
       <SectionHeader
-        title="JalKrishi AI for Farmers: 6-Step Decision Guide"
-        subtitle="How to turn local groundwater telemetry into smart, water-secure farming decisions"
+        title={t('JalKrishi AI for Farmers: 6-Step Decision Guide')}
+        subtitle={t('How to turn local groundwater telemetry into smart, water-secure farming decisions')}
         icon={<Sprout className="h-5 w-5 text-agri-700" />}
       />
 

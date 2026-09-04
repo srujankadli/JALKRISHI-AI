@@ -26,8 +26,8 @@ export const AreasToWatchTable: React.FC<AreasToWatchTableProps> = ({ onSelectSt
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Areas to Watch"
-        subtitle="Ranked high-risk districts exhibiting rapid depletion and lowest days-to-critical margins"
+        title={t('Areas to Watch')}
+        subtitle={t('Ranked high-risk districts exhibiting rapid depletion and lowest days-to-critical margins')}
         icon={<ShieldAlert className="h-5 w-5 text-orange-600" />}
         action={
           <button

@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -28,6 +29,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
   longitude,
   onClose,
 }) => {
+  const { t } = useLanguage();
   const [estimate, setEstimate] = useState<SatelliteGroundwaterEstimate | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'indicators' | 'sources'>('overview');
@@ -115,7 +117,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
               </div>
               <p className="text-xs text-slate-300 flex items-center gap-2 mt-0.5">
                 <MapPin className="h-3.5 w-3.5 text-teal-400" />
-                <span>Target Coordinates: <strong>{latitude.toFixed(4)}° N, {longitude.toFixed(4)}° E</strong></span>
+                <span>{t('Target Coordinates:')} <strong>{latitude.toFixed(4)}° N, {longitude.toFixed(4)}° E</strong></span>
               </p>
             </div>
           </div>
@@ -123,7 +125,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
           <button
             onClick={onClose}
             className="rounded-full p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-            aria-label="Close satellite intelligence modal"
+            aria-label={t('Close satellite intelligence modal')}
           >
             <X className="h-5 w-5" />
           </button>
@@ -134,7 +136,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 text-amber-700 flex-shrink-0" />
             <span>
-              <strong>Satellite-Assisted Estimate:</strong> This spatial estimate combines remote sensing signals, weather models, and nearby DWLR wells. It is <em>not</em> a direct well-level measurement.
+              <strong>{t('Satellite-Assisted Estimate:')}</strong> This spatial estimate combines remote sensing signals, weather models, and nearby DWLR wells. It is <em>{t('not')}</em> a direct well-level measurement.
             </span>
           </div>
           <span className="hidden sm:inline-flex items-center gap-1 rounded bg-amber-200/80 px-2 py-0.5 text-[10px] font-bold text-amber-950 font-mono">
@@ -153,7 +155,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
             }`}
           >
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Spatial Overview</span>
+            <span>{t('Spatial Overview')}</span>
           </button>
 
           <button
@@ -177,7 +179,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
             }`}
           >
             <Radio className="h-3.5 w-3.5" />
-            <span>Data Sources &amp; Providers</span>
+            <span>{t('Data Sources &amp; Providers')}</span>
           </button>
         </div>
 
@@ -186,8 +188,8 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
           {isLoading ? (
             <div className="py-16 text-center space-y-3">
               <div className="h-10 w-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-sm font-bold text-stone-700">Computing spatial satellite-assisted groundwater estimate...</p>
-              <p className="text-xs text-stone-500">Evaluating remote sensing moisture signals and nearby DWLR drawdown</p>
+              <p className="text-sm font-bold text-stone-700">{t('Computing spatial satellite-assisted groundwater estimate...')}</p>
+              <p className="text-xs text-stone-500">{t('Evaluating remote sensing moisture signals and nearby DWLR drawdown')}</p>
             </div>
           ) : estimate ? (
             <>
@@ -250,8 +252,8 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                       </div>
 
                       <div className="flex items-center justify-between pt-1 text-xs border-t border-current/20">
-                        <span>Model Confidence: <strong>{estimate.confidence}</strong> ({Math.round(estimate.confidence_score * 100)}%)</span>
-                        <span>Recharge: <strong>{estimate.recharge_outlook}</strong></span>
+                        <span>{t('Model Confidence:')} <strong>{estimate.confidence}</strong> ({Math.round(estimate.confidence_score * 100)}%)</span>
+                        <span>{t('Recharge:')} <strong>{estimate.recharge_outlook}</strong></span>
                       </div>
                     </div>
 
@@ -260,9 +262,9 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                   {/* Summary Metric Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <div className="p-3 rounded-2xl bg-white border border-stone-200 shadow-subtle space-y-1">
-                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Estimated Trend</span>
+                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">{t('Estimated Trend')}</span>
                       <span className="text-base font-black text-stone-900 block">{estimate.estimated_trend}</span>
-                      <span className="text-[10px] text-stone-500">Hydrodynamic trajectory</span>
+                      <span className="text-[10px] text-stone-500">{t('Hydrodynamic trajectory')}</span>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-white border border-stone-200 shadow-subtle space-y-1">
@@ -272,13 +274,13 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-white border border-stone-200 shadow-subtle space-y-1">
-                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Recharge Outlook</span>
+                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">{t('Recharge Outlook')}</span>
                       <span className="text-base font-black text-teal-700 block">{estimate.recharge_outlook}</span>
-                      <span className="text-[10px] text-stone-500">Infiltration potential</span>
+                      <span className="text-[10px] text-stone-500">{t('Infiltration potential')}</span>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-white border border-stone-200 shadow-subtle space-y-1">
-                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Nearest Well</span>
+                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">{t('Nearest Well')}</span>
                       <span className="text-base font-black text-stone-900 font-mono block truncate">{estimate.nearest_station_id || 'N/A'}</span>
                       <span className="text-[10px] text-stone-500">{estimate.nearest_station_distance_km} km away</span>
                     </div>
@@ -326,7 +328,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                       Data Sources &amp; Adapter Architecture Status
                     </h4>
                     <p className="text-stone-600 leading-relaxed text-xs">
-                      The satellite-assisted engine uses an adapter architecture designed for live production integration. Unconfigured adapters honestly report <strong>NOT_CONFIGURED</strong> status.
+                      The satellite-assisted engine uses an adapter architecture designed for live production integration. Unconfigured adapters honestly report <strong>{t('NOT_CONFIGURED')}</strong> status.
                     </p>
                   </div>
 
@@ -360,7 +362,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
 
         {/* Footer */}
         <div className="bg-stone-50 border-t border-stone-200 px-6 py-3 flex items-center justify-between text-xs text-stone-500">
-          <span>JalKrishi AI • Satellite-Assisted Groundwater Engine</span>
+          <span>{t('JalKrishi AI • Satellite-Assisted Groundwater Engine')}</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl transition-all cursor-pointer"

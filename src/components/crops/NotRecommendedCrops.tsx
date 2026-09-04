@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { AlertTriangle, AlertCircle, Droplets, ArrowRight } from 'lucide-react';
 import type { CropRecommendation } from '../../types';
 import { SectionHeader } from '../common/SectionHeader';
@@ -10,15 +11,16 @@ interface NotRecommendedCropsProps {
 
 export const NotRecommendedCrops: React.FC<NotRecommendedCropsProps> = ({
   crops,
-  onSelectCrop,
+onSelectCrop,
 }) => {
+  const { t } = useLanguage();
   if (crops.length === 0) return null;
 
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Crops Not Recommended Under Current Conditions"
-        subtitle="Crops with excessive water footprint or poor season/soil alignment that increase borewell failure risk"
+        title={t('Crops Not Recommended Under Current Conditions')}
+        subtitle={t('Crops with excessive water footprint or poor season/soil alignment that increase borewell failure risk')}
         icon={<AlertTriangle className="h-5 w-5 text-rose-600" />}
       />
 
@@ -82,7 +84,7 @@ export const NotRecommendedCrops: React.FC<NotRecommendedCropsProps> = ({
                 }}
                 className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:text-rose-900 hover:underline cursor-pointer"
               >
-                <span>View Risk Analysis</span>
+                <span>{t('View Risk Analysis')}</span>
                 <ArrowRight className="h-3 w-3" />
               </button>
             </div>

@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import {
   ResponsiveContainer,
@@ -34,13 +35,14 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
   severityData,
   onSelectCategory,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       {/* 1. Anomalies by Category */}
       <div className="lg:col-span-7">
         <ChartCard
-          title="Anomalies by Failure & Drawdown Category"
-          subtitle="Distribution of detected events across physical drawdowns vs sensor/telemetry issues"
+          title={t('Anomalies by Failure & Drawdown Category')}
+          subtitle={t('Distribution of detected events across physical drawdowns vs sensor/telemetry issues')}
           badge={
             <span className="rounded bg-stone-100 px-2 py-0.5 text-xs font-bold text-stone-700">
               5 Core Categories
@@ -94,8 +96,8 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
       {/* 2. Severity Breakdown Donut */}
       <div className="lg:col-span-5">
         <ChartCard
-          title="Severity Priority Breakdown"
-          subtitle="Triage breakdown for agricultural extension and maintenance dispatch"
+          title={t('Severity Priority Breakdown')}
+          subtitle={t('Triage breakdown for agricultural extension and maintenance dispatch')}
         >
           <div className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={200}>

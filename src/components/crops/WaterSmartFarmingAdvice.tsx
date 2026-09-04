@@ -1,8 +1,10 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { Droplets, Clock, CloudRain, Sprout, CheckCircle2 } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 
 export const WaterSmartFarmingAdvice: React.FC = () => {
+  const { t } = useLanguage();
   const tips = [
     {
       title: 'Drip & Micro-Sprinkler Irrigation',
@@ -33,8 +35,8 @@ export const WaterSmartFarmingAdvice: React.FC = () => {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Water-Smart Farming Practices & Ground Rules"
-        subtitle="Practical techniques to maximize crop yields while stabilizing local groundwater reserves"
+        title={t('Water-Smart Farming Practices & Ground Rules')}
+        subtitle={t('Practical techniques to maximize crop yields while stabilizing local groundwater reserves')}
         icon={<CheckCircle2 className="h-5 w-5 text-agri-700" />}
       />
 

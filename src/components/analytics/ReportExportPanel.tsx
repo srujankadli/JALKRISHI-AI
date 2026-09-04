@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState } from 'react';
 import {
   FileSpreadsheet,
@@ -20,6 +21,7 @@ interface ReportExportPanelProps {
 export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({
   exportData,
 }) => {
+  const { t } = useLanguage();
   const [isExportingXLSX, setIsExportingXLSX] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -58,8 +60,8 @@ export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Export Regional Groundwater Decision Reports"
-        subtitle="Generate client-side analytical reports in multi-sheet Excel (XLSX) or printable PDF format"
+        title={t('Export Regional Groundwater Decision Reports')}
+        subtitle={t('Generate client-side analytical reports in multi-sheet Excel (XLSX) or printable PDF format')}
         icon={<Download className="h-5 w-5 text-agri-700" />}
       />
 

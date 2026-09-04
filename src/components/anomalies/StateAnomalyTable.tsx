@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { MapPin, ArrowRight } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
@@ -12,11 +13,12 @@ export const StateAnomalyTable: React.FC<StateAnomalyTableProps> = ({
   stateSummaries,
   onSelectState,
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Where are Anomalies Concentrated? (Regional Breakdown)"
-        subtitle="Ranked agricultural states by alert frequency and primary failure/drawdown modes"
+        title={t('Where are Anomalies Concentrated? (Regional Breakdown)')}
+        subtitle={t('Ranked agricultural states by alert frequency and primary failure/drawdown modes')}
         icon={<MapPin className="h-5 w-5 text-agri-700" />}
       />
 
@@ -25,13 +27,13 @@ export const StateAnomalyTable: React.FC<StateAnomalyTableProps> = ({
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-stone-50 text-stone-600 uppercase text-[11px] font-bold border-b border-stone-200">
               <tr>
-                <th className="px-4 py-3">State</th>
-                <th className="px-4 py-3">Total Alerts</th>
-                <th className="px-4 py-3">Critical</th>
-                <th className="px-4 py-3">High Attention</th>
-                <th className="px-4 py-3">Warning / Low</th>
-                <th className="px-4 py-3">Primary Anomaly Mode</th>
-                <th className="px-4 py-3 text-right">Filter Feed</th>
+                <th className="px-4 py-3">{t('State')}</th>
+                <th className="px-4 py-3">{t('Total Alerts')}</th>
+                <th className="px-4 py-3">{t('Critical')}</th>
+                <th className="px-4 py-3">{t('High Attention')}</th>
+                <th className="px-4 py-3">{t('Warning / Low')}</th>
+                <th className="px-4 py-3">{t('Primary Anomaly Mode')}</th>
+                <th className="px-4 py-3 text-right">{t('Filter Feed')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 font-medium text-stone-800">
@@ -75,7 +77,7 @@ export const StateAnomalyTable: React.FC<StateAnomalyTableProps> = ({
                       }}
                       className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-bold text-stone-700 hover:bg-stone-50 shadow-xs cursor-pointer"
                     >
-                      <span>Filter</span>
+                      <span>{t('Filter')}</span>
                       <ArrowRight className="h-3 w-3" />
                     </button>
                   </td>

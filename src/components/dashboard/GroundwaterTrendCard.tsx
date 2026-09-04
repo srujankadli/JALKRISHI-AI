@@ -30,8 +30,8 @@ export const GroundwaterTrendCard: React.FC = () => {
 
   return (
     <ChartCard
-      title="Groundwater Trend"
-      subtitle="National monitored station average"
+      title={t('Groundwater Trend')}
+      subtitle={t('National monitored station average')}
       badge={
         <span className="inline-flex items-center gap-1 rounded-full bg-water-100 px-2.5 py-0.5 text-xs font-bold text-water-800">
           <Activity className="h-3 w-3" />

@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState } from 'react';
 import { Layers, ArrowUpDown, ArrowRight } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
@@ -16,6 +17,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
   onSelectState,
   selectedState,
 }) => {
+  const { t } = useLanguage();
   const [sortField, setSortField] = useState<SortField>('risk');
   const [sortAsc, setSortAsc] = useState(false);
 
@@ -41,14 +43,14 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <SectionHeader
-          title="State-wise Groundwater Comparison"
-          subtitle="Comparative telemetry analysis across all monitored agricultural states and UTs"
+          title={t('State-wise Groundwater Comparison')}
+          subtitle={t('Comparative telemetry analysis across all monitored agricultural states and UTs')}
           icon={<Layers className="h-5 w-5 text-agri-700" />}
         />
 
         {/* Sort Controls */}
         <div className="flex items-center gap-1.5 text-xs">
-          <span className="text-stone-400 font-bold">Sort By:</span>
+          <span className="text-stone-400 font-bold">{t('Sort By:')}</span>
           <button
             onClick={() => handleSort('risk')}
             className={`rounded-lg px-2.5 py-1 font-bold border transition-all cursor-pointer ${
@@ -87,7 +89,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-stone-50 text-stone-600 uppercase text-[11px] font-bold border-b border-stone-200">
               <tr>
-                <th className="px-4 py-3">State / Basin</th>
+                <th className="px-4 py-3">{t('State / Basin')}</th>
                 <th
                   className="px-4 py-3 cursor-pointer hover:text-stone-900"
                   onClick={() => handleSort('stations')}
@@ -122,8 +124,8 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                     Risk Index <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
-                <th className="px-4 py-3">Trend</th>
-                <th className="px-4 py-3 text-right">Filter</th>
+                <th className="px-4 py-3">{t('Trend')}</th>
+                <th className="px-4 py-3 text-right">{t('Filter')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 font-medium text-stone-800">
@@ -207,7 +209,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                         }}
                         className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-bold text-stone-700 hover:bg-stone-100 shadow-xs cursor-pointer"
                       >
-                        <span>Focus</span>
+                        <span>{t('Focus')}</span>
                         <ArrowRight className="h-3 w-3" />
                       </button>
                     </td>

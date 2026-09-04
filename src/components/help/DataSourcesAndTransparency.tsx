@@ -1,16 +1,18 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Database, ExternalLink, ShieldCheck } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 import { DATA_SOURCE_REFERENCES } from '../../data/helpContent';
 
 export const DataSourcesAndTransparency: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <div id="sources-transparency" className="space-y-6">
       {/* 1. Official Data Sources & References */}
       <div className="space-y-3">
         <SectionHeader
-          title="Data Sources & Hydrogeological References"
-          subtitle="Government standards and telemetry frameworks utilized in the JalKrishi AI architecture"
+          title={t('Data Sources & Hydrogeological References')}
+          subtitle={t('Government standards and telemetry frameworks utilized in the JalKrishi AI architecture')}
           icon={<Database className="h-5 w-5 text-agri-700" />}
         />
 
@@ -46,7 +48,7 @@ export const DataSourcesAndTransparency: React.FC = () => {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs font-bold text-agri-700 hover:text-agri-900 hover:underline cursor-pointer"
                   >
-                    <span>Visit Reference Portal</span>
+                    <span>{t('Visit Reference Portal')}</span>
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>

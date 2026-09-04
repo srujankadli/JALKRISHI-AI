@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Filter, RotateCcw, LayoutGrid, BarChart2 } from 'lucide-react';
 import type { StationStatus, TrendDirection } from '../../types';
@@ -45,6 +46,7 @@ export const AnalyticsFilterBar: React.FC<AnalyticsFilterBarProps> = ({
   totalStations,
   onReset,
 }) => {
+  const { t } = useLanguage();
   const isFiltered =
     selectedState !== 'All States' ||
     selectedDistrict !== 'All Districts' ||
@@ -60,7 +62,7 @@ export const AnalyticsFilterBar: React.FC<AnalyticsFilterBarProps> = ({
         <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
           <div className="flex items-center gap-1 text-xs font-bold text-stone-700">
             <Filter className="h-3.5 w-3.5 text-agri-700" />
-            <span>Region:</span>
+            <span>{t('Region:')}</span>
           </div>
 
           <select
@@ -118,7 +120,7 @@ export const AnalyticsFilterBar: React.FC<AnalyticsFilterBarProps> = ({
               }`}
             >
               <LayoutGrid className="h-3 w-3" />
-              <span>Simple</span>
+              <span>{t('Simple')}</span>
             </button>
             <button
               onClick={() => onViewModeChange('analyst')}
@@ -129,7 +131,7 @@ export const AnalyticsFilterBar: React.FC<AnalyticsFilterBarProps> = ({
               }`}
             >
               <BarChart2 className="h-3 w-3" />
-              <span>Analyst View</span>
+              <span>{t('Analyst View')}</span>
             </button>
           </div>
         </div>
@@ -140,7 +142,7 @@ export const AnalyticsFilterBar: React.FC<AnalyticsFilterBarProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           {/* Status Filter */}
           <div className="flex items-center gap-1">
-            <span className="text-stone-400 font-bold text-[11px]">Status:</span>
+            <span className="text-stone-400 font-bold text-[11px]">{t('Status:')}</span>
             {(['all', 'healthy', 'moderate', 'warning', 'critical'] as const).map((s) => (
               <button
                 key={s}
@@ -158,7 +160,7 @@ export const AnalyticsFilterBar: React.FC<AnalyticsFilterBarProps> = ({
 
           {/* Risk Filter */}
           <div className="flex items-center gap-1">
-            <span className="text-stone-400 font-bold text-[11px]">Risk:</span>
+            <span className="text-stone-400 font-bold text-[11px]">{t('Risk:')}</span>
             {(['all', 'low', 'medium', 'high', 'critical'] as const).map((r) => (
               <button
                 key={r}
@@ -176,7 +178,7 @@ export const AnalyticsFilterBar: React.FC<AnalyticsFilterBarProps> = ({
 
           {/* Trend Filter */}
           <div className="flex items-center gap-1">
-            <span className="text-stone-400 font-bold text-[11px]">Trend:</span>
+            <span className="text-stone-400 font-bold text-[11px]">{t('Trend:')}</span>
             {(['all', 'rising', 'stable', 'falling'] as const).map((tr) => (
               <button
                 key={tr}
@@ -205,7 +207,7 @@ export const AnalyticsFilterBar: React.FC<AnalyticsFilterBarProps> = ({
               className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-bold text-stone-700 hover:bg-stone-50 shadow-xs cursor-pointer"
             >
               <RotateCcw className="h-3 w-3" />
-              <span>Clear</span>
+              <span>{t('Clear')}</span>
             </button>
           )}
         </div>

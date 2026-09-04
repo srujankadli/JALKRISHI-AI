@@ -38,7 +38,7 @@ export const StationCard: React.FC<StationCardProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-stone-400">
-          <span title="Telemetry Online" className="flex items-center">
+          <span title={t('Telemetry Online')} className="flex items-center">
             <Wifi className="h-3.5 w-3.5 text-emerald-600" />
           </span>
           <div className="flex items-center gap-0.5 text-[11px] font-medium text-stone-500">

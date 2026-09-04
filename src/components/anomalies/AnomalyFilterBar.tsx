@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React from 'react';
 import { Search, Filter, RotateCcw, Tag } from 'lucide-react';
 import type { AnomalyCategory, AnomalySeverity } from '../../types';
@@ -31,6 +32,7 @@ export const AnomalyFilterBar: React.FC<AnomalyFilterBarProps> = ({
   totalAnomalies,
   onReset,
 }) => {
+  const { t } = useLanguage();
   const isFiltered =
     searchQuery !== '' ||
     selectedCategory !== 'all' ||
@@ -57,7 +59,7 @@ export const AnomalyFilterBar: React.FC<AnomalyFilterBarProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search anomalies by station code, village name, district, or category..."
+            placeholder={t('Search anomalies by station code, village name, district, or category...')}
             className="w-full rounded-xl border border-stone-300 bg-stone-50/80 py-2.5 pl-10 pr-4 text-xs font-semibold text-stone-900 placeholder:text-stone-400 focus:border-agri-600 focus:bg-white focus:outline-none"
           />
         </div>
@@ -142,7 +144,7 @@ export const AnomalyFilterBar: React.FC<AnomalyFilterBarProps> = ({
               className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-bold text-stone-700 hover:bg-stone-50 shadow-xs cursor-pointer"
             >
               <RotateCcw className="h-3 w-3" />
-              <span>Clear</span>
+              <span>{t('Clear')}</span>
             </button>
           )}
         </div>

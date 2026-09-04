@@ -45,7 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/official',
       icon: Landmark,
       label: 'Official Command Center',
-      badge: 'Command',
+      badge: t('Command'),
       badgeColor: 'bg-amber-600 text-white',
       emoji: '🏛️',
     }] : []),
@@ -74,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/crops',
       icon: Sprout,
       label: 'Crop Advisor',
-      badge: 'AI Smart',
+      badge: t('AI Smart'),
       badgeColor: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
       emoji: '🌱',
     },
@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/whatsapp',
       icon: MessageSquare,
       label: 'WhatsApp Farmer',
-      badge: 'Chat',
+      badge: t('Chat'),
       badgeColor: 'bg-emerald-600 text-white',
       emoji: '💬',
     },
@@ -138,7 +138,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
             <span className="text-xs font-semibold text-emerald-900">{t('DWLR Telemetry Network')}</span>
           </div>
-          <span className="text-[11px] font-bold font-mono text-emerald-800">5,260 Nodes</span>
+          <span className="text-[11px] font-bold font-mono text-emerald-800">5,260 {t('Nodes')}</span>
         </div>
       </div>
 
@@ -192,7 +192,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Platform Product Footer */}
       <div className="p-4 border-t border-stone-200 bg-stone-50/50 space-y-1">
         <div className="flex items-center justify-between text-xs font-semibold text-stone-600">
-          <span>{APP_CONFIG.appName} Platform</span>
+          <span>{APP_CONFIG.appName} {t('Platform')}</span>
           <span className="font-mono text-[10px] bg-stone-200 text-stone-700 px-1.5 py-0.5 rounded">
             {APP_CONFIG.version}
           </span>
