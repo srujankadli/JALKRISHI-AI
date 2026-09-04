@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin, TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 import type { RegionalForecastOutlook } from '../../data/mockForecasts';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface RegionalForecastTableProps {
   outlooks: RegionalForecastOutlook[];
@@ -12,6 +13,7 @@ export const RegionalForecastTable: React.FC<RegionalForecastTableProps> = ({
   outlooks,
   onSelectState,
 }) => {
+  const { t } = useLanguage();
   const getRiskBadge = (risk: RegionalForecastOutlook['riskLevel']) => {
     switch (risk) {
       case 'Critical':
@@ -29,8 +31,8 @@ export const RegionalForecastTable: React.FC<RegionalForecastTableProps> = ({
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Regional Groundwater Outlook (90-Day Projections)"
-        subtitle="Comparative state-level forecast trajectory, rainfall expectation, and agronomic priority actions"
+        title={t('Regional Groundwater Outlook (90-Day Projections)')}
+        subtitle={t('Comparative state-level forecast trajectory, rainfall expectation, and agronomic priority actions')}
         icon={<MapPin className="h-5 w-5 text-water-700" />}
       />
 
@@ -39,13 +41,13 @@ export const RegionalForecastTable: React.FC<RegionalForecastTableProps> = ({
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-stone-50 text-stone-600 uppercase text-[11px] font-bold border-b border-stone-200">
               <tr>
-                <th className="px-4 py-3">State</th>
-                <th className="px-4 py-3">Observation Wells</th>
-                <th className="px-4 py-3">Current Avg Depth</th>
-                <th className="px-4 py-3">Current Trend</th>
-                <th className="px-4 py-3">Risk Level</th>
-                <th className="px-4 py-3">90-Day Forecast Direction</th>
-                <th className="px-4 py-3">Priority Agronomic Action</th>
+                <th className="px-4 py-3">{t('State')}</th>
+                <th className="px-4 py-3">{t('Observation Wells')}</th>
+                <th className="px-4 py-3">{t('Current Avg Depth')}</th>
+                <th className="px-4 py-3">{t('Current Trend')}</th>
+                <th className="px-4 py-3">{t('Risk Level')}</th>
+                <th className="px-4 py-3">{t('90-Day Forecast Direction')}</th>
+                <th className="px-4 py-3">{t('Priority Agronomic Action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 font-medium text-stone-800">
@@ -56,7 +58,7 @@ export const RegionalForecastTable: React.FC<RegionalForecastTableProps> = ({
                   onClick={() => onSelectState?.(item.state)}
                 >
                   <td className="px-4 py-3">
-                    <span className="font-extrabold text-stone-900">{item.state}</span>
+                    <span className="font-extrabold text-stone-900">{t(item.state)}</span>
                   </td>
 
                   <td className="px-4 py-3 font-mono text-stone-600">
@@ -71,17 +73,17 @@ export const RegionalForecastTable: React.FC<RegionalForecastTableProps> = ({
                     {item.trend === 'falling' ? (
                       <span className="text-rose-700 inline-flex items-center gap-1">
                         <TrendingDown className="h-3.5 w-3.5" />
-                        Falling
+                        {t('Falling')}
                       </span>
                     ) : item.trend === 'rising' ? (
                       <span className="text-emerald-700 inline-flex items-center gap-1">
                         <TrendingUp className="h-3.5 w-3.5" />
-                        Rising
+                        {t('Rising')}
                       </span>
                     ) : (
                       <span className="text-stone-600 inline-flex items-center gap-1">
                         <Minus className="h-3.5 w-3.5" />
-                        Stable
+                        {t('Stable')}
                       </span>
                     )}
                   </td>
@@ -92,16 +94,16 @@ export const RegionalForecastTable: React.FC<RegionalForecastTableProps> = ({
                         item.riskLevel
                       )}`}
                     >
-                      {item.riskLevel}
+                      {t(item.riskLevel)}
                     </span>
                   </td>
 
                   <td className="px-4 py-3 font-mono font-bold text-stone-900">
-                    {item.forecast90d}
+                    {t(item.forecast90d)}
                   </td>
 
                   <td className="px-4 py-3 text-xs text-stone-600 max-w-xs">
-                    {item.priorityAction}
+                    {t(item.priorityAction)}
                   </td>
                 </tr>
               ))}

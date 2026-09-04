@@ -4,6 +4,7 @@ import { SectionHeader } from '../common/SectionHeader';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatDepth } from '../../utils/formatters';
 import type { DWLRStation } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface TopRiskStationsTableProps {
   stations: DWLRStation[];
@@ -14,11 +15,13 @@ export const TopRiskStationsTable: React.FC<TopRiskStationsTableProps> = ({
   stations,
   onSelectStation,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Top 10 High-Risk Stations"
-        subtitle="Ranked observation wells facing rapid depletion and imminent critical threshold arrival"
+        title={t('Top 10 High-Risk Stations')}
+        subtitle={t('Ranked observation wells facing rapid depletion and imminent critical threshold arrival')}
         icon={<ShieldAlert className="h-5 w-5 text-rose-600" />}
       />
 
@@ -27,13 +30,13 @@ export const TopRiskStationsTable: React.FC<TopRiskStationsTableProps> = ({
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-stone-50 text-stone-600 uppercase text-[11px] font-bold border-b border-stone-200">
               <tr>
-                <th className="px-4 py-3">Rank</th>
-                <th className="px-4 py-3">Station & Location</th>
-                <th className="px-4 py-3">Current Depth</th>
-                <th className="px-4 py-3">Trend</th>
-                <th className="px-4 py-3">Risk Level</th>
-                <th className="px-4 py-3">Days to Critical</th>
-                <th className="px-4 py-3 text-right">Action</th>
+                <th className="px-4 py-3">{t('Rank')}</th>
+                <th className="px-4 py-3">{t('Station & Location')}</th>
+                <th className="px-4 py-3">{t('Current Depth')}</th>
+                <th className="px-4 py-3">{t('Trend')}</th>
+                <th className="px-4 py-3">{t('Risk Level')}</th>
+                <th className="px-4 py-3">{t('Days to Critical')}</th>
+                <th className="px-4 py-3 text-right">{t('Action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 font-medium text-stone-800">
@@ -62,7 +65,7 @@ export const TopRiskStationsTable: React.FC<TopRiskStationsTableProps> = ({
                   <td className="px-4 py-3 text-rose-700 font-bold">
                     <span className="inline-flex items-center gap-1">
                       <TrendingDown className="h-3.5 w-3.5" />
-                      {st.trendRateMetersPerMonth ? `${st.trendRateMetersPerMonth} m/mo` : 'Falling'}
+                      {st.trendRateMetersPerMonth ? `${st.trendRateMetersPerMonth} m/mo` : t('Falling')}
                     </span>
                   </td>
 
@@ -73,7 +76,7 @@ export const TopRiskStationsTable: React.FC<TopRiskStationsTableProps> = ({
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 border border-rose-200 px-2 py-0.5 font-mono font-black text-rose-800 text-xs">
                       <Clock className="h-3 w-3 text-rose-600" />
-                      {st.daysToCritical ? `${st.daysToCritical} days` : 'Imminent'}
+                      {st.daysToCritical ? `${st.daysToCritical} ${t('days')}` : t('Imminent')}
                     </span>
                   </td>
 
@@ -85,7 +88,7 @@ export const TopRiskStationsTable: React.FC<TopRiskStationsTableProps> = ({
                       }}
                       className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-bold text-stone-700 hover:bg-stone-100 shadow-xs cursor-pointer"
                     >
-                      <span>View</span>
+                      <span>{t('View')}</span>
                       <ArrowRight className="h-3 w-3" />
                     </button>
                   </td>

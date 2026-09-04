@@ -30,7 +30,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           </div>
           {subtitle && (
             <p className="mt-1 text-sm font-medium text-stone-600 sm:text-base">
-              {subtitle}
+              {t(subtitle)}
             </p>
           )}
         </div>
@@ -42,8 +42,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-agri-200 bg-agri-50/70 p-3 text-xs text-agri-950 sm:text-sm">
           <span className="text-base" aria-hidden="true">💡</span>
           <div>
-            <span className="font-semibold text-agri-900">Farmer Summary: </span>
-            {farmerNote}
+            <span className="font-semibold text-agri-900">{t('Farmer Summary')}: </span>
+            {t(farmerNote)}
           </div>
         </div>
       )}

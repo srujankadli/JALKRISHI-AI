@@ -13,6 +13,7 @@ import {
 import { Sparkles, Activity, Calendar, MapPin } from 'lucide-react';
 import { ChartCard } from '../common/ChartCard';
 import type { StationForecast, DWLRStation } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ForecastCurveCardProps {
   forecast: StationForecast | null;
@@ -33,6 +34,7 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
   onSelectState,
   statesList,
 }) => {
+  const { t } = useLanguage();
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | '60d' | '90d'>('90d');
   const [scope, setScope] = useState<'station' | 'state'>('station');
 
@@ -49,12 +51,12 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
 
   return (
     <ChartCard
-      title="Groundwater Forecast Curve & Uncertainty Bounds"
-      subtitle={`Projected water depth for ${forecast.stationName} (${forecast.district}, ${forecast.state})`}
+      title={t('Groundwater Forecast Curve & Uncertainty Bounds')}
+      subtitle={`${t('Projected water depth for')} ${forecast.stationName} (${forecast.district}, ${forecast.state})`}
       badge={
         <span className="inline-flex items-center gap-1.5 rounded-full bg-water-100 px-2.5 py-0.5 text-xs font-bold text-water-800">
           <Activity className="h-3.5 w-3.5" />
-          Confidence: {Math.round(forecast.confidenceScore * 100)}%
+          {t('Confidence')}: {Math.round(forecast.confidenceScore * 100)}%
         </span>
       }
       actions={
@@ -67,7 +69,7 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
                 scope === 'station' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              Station Scope
+              {t('Station Scope')}
             </button>
             <button
               onClick={() => setScope('state')}
@@ -75,21 +77,21 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
                 scope === 'state' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              State Scope
+              {t('State Scope')}
             </button>
           </div>
 
           {/* Timeframe Selector */}
           <div className="flex items-center rounded-lg border border-stone-200 bg-stone-100 p-0.5 text-xs font-semibold">
-            {(['7d', '30d', '60d', '90d'] as const).map((t) => (
+            {(['7d', '30d', '60d', '90d'] as const).map((tVal) => (
               <button
-                key={t}
-                onClick={() => setTimeframe(t)}
+                key={tVal}
+                onClick={() => setTimeframe(tVal)}
                 className={`rounded px-2 py-1 transition-all ${
-                  timeframe === t ? 'bg-agri-700 text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                  timeframe === tVal ? 'bg-agri-700 text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
-                {t.toUpperCase()}
+                {tVal.toUpperCase()}
               </button>
             ))}
           </div>
@@ -101,7 +103,7 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
         {scope === 'station' ? (
           <div className="flex items-center gap-2 flex-1 min-w-[240px]">
             <MapPin className="h-4 w-4 text-agri-700 shrink-0" />
-            <span className="font-bold text-stone-700">Observation Well:</span>
+            <span className="font-bold text-stone-700">{t('Observation Well')}:</span>
             <select
               value={selectedStationId}
               onChange={(e) => onSelectStationId(e.target.value)}
@@ -116,7 +118,7 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
           </div>
         ) : (
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-            <span className="font-bold text-stone-700">State Aggregate:</span>
+            <span className="font-bold text-stone-700">{t('State Aggregate')}:</span>
             <select
               value={selectedState}
               onChange={(e) => onSelectState(e.target.value)}
@@ -133,10 +135,10 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
 
         <div className="flex items-center gap-3 text-xs font-semibold ml-auto">
           <span className="text-stone-500">
-            Current Depth: <strong className="text-stone-900">{forecast.currentLevel} mbgl</strong>
+            {t('Current Depth')}: <strong className="text-stone-900">{forecast.currentLevel} mbgl</strong>
           </span>
           <span className="text-stone-500">
-            30d Projected: <strong className="text-rose-700">{forecast.projectedLevel30d} mbgl</strong>
+            {t('30d Projected')}: <strong className="text-rose-700">{forecast.projectedLevel30d} mbgl</strong>
           </span>
         </div>
       </div>
@@ -165,17 +167,17 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
                     </p>
                     <div className="border-t border-stone-100 pt-1 space-y-0.5">
                       <p className="text-water-900 font-black text-sm">
-                        Expected: {item.predictedLevel} mbgl
+                        {t('Expected')}: {item.predictedLevel} mbgl
                       </p>
                       <p className="text-stone-500 text-[11px]">
-                        Forecast Range: {item.lowerConfidence}m — {item.upperConfidence}m
+                        {t('Forecast Range')}: {item.lowerConfidence}m — {item.upperConfidence}m
                       </p>
                       <p className="text-emerald-700 font-semibold text-[11px]">
-                        Expected Rainfall: {item.expectedRainfallMm} mm
+                        {t('Expected Rainfall')}: {item.expectedRainfallMm} mm
                       </p>
                       {item.change && (
                         <p className="text-stone-600 font-mono text-[11px]">
-                          Cumulative Change: {item.change}
+                          {t('Cumulative Change')}: {item.change}
                         </p>
                       )}
                     </div>
@@ -191,7 +193,7 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
           <Area
             type="monotone"
             dataKey="upperConfidence"
-            name="Upper Range (+Uncertainty)"
+            name={t('Upper Range (+Uncertainty)')}
             stroke="#93c5fd"
             strokeDasharray="3 3"
             fillOpacity={1}
@@ -200,7 +202,7 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
           <Area
             type="monotone"
             dataKey="lowerConfidence"
-            name="Lower Range (-Uncertainty)"
+            name={t('Lower Range (-Uncertainty)')}
             stroke="#93c5fd"
             strokeDasharray="3 3"
             fillOpacity={0}
@@ -210,7 +212,7 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
           <Line
             type="monotone"
             dataKey="predictedLevel"
-            name="Projected Water Depth (mbgl)"
+            name={t('Projected Water Depth (mbgl)')}
             stroke="#0284c7"
             strokeWidth={3}
             dot={{ r: 4, fill: '#0284c7', stroke: '#ffffff', strokeWidth: 2 }}
@@ -223,9 +225,9 @@ export const ForecastCurveCard: React.FC<ForecastCurveCardProps> = ({
         <div className="flex items-start gap-2.5">
           <Sparkles className="h-4 w-4 text-agri-700 shrink-0 mt-0.5" />
           <div>
-            <span className="font-extrabold text-agri-950 block">Forecast Insight:</span>
+            <span className="font-extrabold text-agri-950 block">{t('Forecast Insight')}:</span>
             <p className="mt-0.5 leading-relaxed text-agri-900">
-              {forecast.farmerGuidance}
+              {t(forecast.farmerGuidance)}
             </p>
           </div>
         </div>
