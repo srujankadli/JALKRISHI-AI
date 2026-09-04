@@ -303,3 +303,14 @@ def test_risk_ranking_pagination_and_level():
     assert d_state["rankings"][0]["parent_region"] == "India"
 
 
+def test_map_features_count_and_role_scoping():
+    """Verifies official intelligence map returns complete 5,260 station features for ADMIN."""
+    headers = {"Authorization": f"Bearer {ADMIN_TOKEN}"}
+    res = client.get("/api/v1/official/map", headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data["features"]) == 5260
+    assert data["features"][0]["type"] == "station"
+
+
+

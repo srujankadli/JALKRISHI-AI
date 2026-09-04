@@ -16,6 +16,7 @@ import {
 import { APP_CONFIG } from '../../utils/constants';
 
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface SidebarProps {
   anomalyCount?: number;
@@ -26,6 +27,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   anomalyCount = 4,
 }) => {
   const { t, currentLanguage } = useLanguage();
+  const { user } = useAuth();
+
+  const isFarmer =
+    user?.system_role === 'FARMER' ||
+    user?.email === 'farmer@jalkrishi.in' ||
+    (user?.role?.toUpperCase().includes('FARMER') && !user?.role?.toUpperCase().includes('OFFICIAL'));
+
   const navItems = [
     {
       to: '/',
@@ -34,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       sublabel: 'मुख्य पृष्ठ',
       emoji: '🌾',
     },
-    {
+    ...(!isFarmer ? [{
       to: '/official',
       icon: Landmark,
       label: 'Official Command Center',
@@ -42,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: 'Command',
       badgeColor: 'bg-amber-600 text-white',
       emoji: '🏛️',
-    },
+    }] : []),
     {
       to: '/map',
       icon: MapPin,

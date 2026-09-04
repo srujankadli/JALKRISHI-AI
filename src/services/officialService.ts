@@ -571,13 +571,13 @@ class OfficialService {
 
     return {
       timestamp: new Date().toISOString(),
-      user_scope: 'Pan-India National Network (5,260 DWLR Stations)',
-      total_stations: 5260,
-      online_stations: 4628,
-      delayed_stations: 368,
-      offline_stations: 264,
-      missing_pings_count: 632,
-      reporting_pct: 88.0,
+      user_scope: 'Local Offline Reference Mode (1 Sample Station)',
+      total_stations: 1,
+      online_stations: 1,
+      delayed_stations: 0,
+      offline_stations: 0,
+      missing_pings_count: 0,
+      reporting_pct: 100.0,
       page: params?.page || 1,
       page_size: params?.page_size || 25,
       total_pages: 1,
@@ -600,7 +600,7 @@ class OfficialService {
           data_source: 'DWLR Reference Simulation Telemetry',
         },
       ],
-      disclaimer: 'Local Reference Fallback — Backend Unavailable. JalKrishi Reference Simulation Dataset & Hydrogeological Model Output.',
+      disclaimer: 'Local Reference Fallback — Complete station network unavailable (Backend connection offline).',
     };
   }
 

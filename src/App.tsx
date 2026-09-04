@@ -14,6 +14,7 @@ import { HelpPage } from './pages/HelpPage';
 import { LanguageProvider } from './context/LanguageContext';
 
 import { OfficialCommandCenter } from './pages/official/OfficialCommandCenter';
+import { ProtectedOfficialRoute } from './components/auth/ProtectedOfficialRoute';
 
 export function App() {
   return (
@@ -27,7 +28,14 @@ export function App() {
             {/* Main Platform Shell Routes */}
             <Route element={<AppShell />}>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/official" element={<OfficialCommandCenter />} />
+              <Route
+                path="/official"
+                element={
+                  <ProtectedOfficialRoute>
+                    <OfficialCommandCenter />
+                  </ProtectedOfficialRoute>
+                }
+              />
               <Route path="/map" element={<GroundwaterMapPage />} />
               <Route path="/forecast" element={<ForecastPage />} />
               <Route path="/anomalies" element={<AnomaliesPage />} />

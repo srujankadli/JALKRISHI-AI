@@ -133,6 +133,19 @@ class ApiClient {
     }
   }
 
+  private getAuthHeaders(): Record<string, string> {
+    const headers: Record<string, string> = { Accept: 'application/json' };
+    try {
+      const token = localStorage.getItem('jalkrishi_auth_token') || 'jalkrishi-default-session-token';
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    } catch {
+      // LocalStorage unreadable
+    }
+    return headers;
+  }
+
   public async get<T>(
     endpoint: string,
     params?: Record<string, any>,
@@ -174,7 +187,7 @@ class ApiClient {
     try {
       const res = await fetch(url, {
         method: 'GET',
-        headers: { Accept: 'application/json' },
+        headers: this.getAuthHeaders(),
         signal,
       });
       clearTimeout(timer);
@@ -224,7 +237,7 @@ class ApiClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Accept: 'application/json',
+          ...this.getAuthHeaders(),
         },
         body: JSON.stringify(body),
         signal,

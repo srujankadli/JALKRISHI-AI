@@ -258,6 +258,14 @@ export const OfficialCommandCenter: React.FC = () => {
     await fetchRankingWithParams({ sort: newSort, page: 1 });
   };
 
+  const activeRoleDisplay = (
+    user?.system_role
+      ? user.system_role.replace(/_/g, ' ').toUpperCase()
+      : (overview?.user_role || user?.role || 'OFFICIAL')
+  ).toUpperCase();
+
+  const activeScopeDisplay = overview?.assigned_scope || user?.assigned_state || 'Authorized Network Scope';
+
   return (
     <div className="min-h-screen bg-stone-900 text-stone-100 font-sans p-4 lg:p-6 space-y-6 max-w-full overflow-x-hidden">
       {/* Header Banner */}
@@ -268,7 +276,7 @@ export const OfficialCommandCenter: React.FC = () => {
               Official Decision Support
             </span>
             <span className="px-2.5 py-0.5 rounded-full bg-stone-800 text-stone-300 text-xs font-mono font-semibold border border-stone-700">
-              {overview?.user_role || user?.system_role || 'ADMIN'}
+              {activeRoleDisplay}
             </span>
           </div>
           <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
@@ -277,7 +285,7 @@ export const OfficialCommandCenter: React.FC = () => {
           </h1>
           <p className="text-sm text-stone-400 mt-0.5 flex items-center gap-2">
             <span>{t('Authorized Scope')}:</span>
-            <span className="font-semibold text-stone-200">{overview?.assigned_scope || 'Pan-India Network'}</span>
+            <span className="font-semibold text-stone-200">{activeScopeDisplay}</span>
           </p>
         </div>
 

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { APP_CONFIG } from '../../utils/constants';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -28,10 +29,16 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   anomalyCount = 4,
 }) => {
   const { t } = useLanguage();
+  const { user } = useAuth();
+
+  const isFarmer =
+    user?.system_role === 'FARMER' ||
+    user?.email === 'farmer@jalkrishi.in' ||
+    (user?.role?.toUpperCase().includes('FARMER') && !user?.role?.toUpperCase().includes('OFFICIAL'));
 
   const mainNav = [
     { to: '/', label: 'Dashboard', emoji: '🌾' },
-    { to: '/official', label: 'Command Center', emoji: '🏛️' },
+    ...(!isFarmer ? [{ to: '/official', label: 'Command Center', emoji: '🏛️' }] : []),
     { to: '/map', label: 'Groundwater Map', emoji: '🗺️' },
     { to: '/forecast', label: 'Forecast & Predictions', emoji: '🔮' },
     { to: '/crops', label: 'Crop Advisor', emoji: '🌱' },
@@ -40,7 +47,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 
   const fullNav = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard', sub: 'Home & summary', emoji: '🌾' },
-    { to: '/official', icon: Landmark, label: 'Official Command Center', sub: 'Decision & policy engine', emoji: '🏛️', badge: 'Admin' },
+    ...(!isFarmer ? [{ to: '/official', icon: Landmark, label: 'Official Command Center', sub: 'Decision & policy engine', emoji: '🏛️', badge: 'Admin' }] : []),
     { to: '/map', icon: MapPin, label: 'Groundwater Map', sub: 'Interactive station map', emoji: '🗺️' },
     { to: '/forecast', icon: TrendingUp, label: 'Forecast & Predictions', sub: 'Water level projections', emoji: '🔮' },
     { to: '/anomalies', icon: AlertTriangle, label: 'Anomaly Detection', sub: 'Critical drawdowns', emoji: '⚠️', badge: anomalyCount },
