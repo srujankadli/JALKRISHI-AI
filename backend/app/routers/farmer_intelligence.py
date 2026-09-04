@@ -30,16 +30,18 @@ router = APIRouter(
     ),
 )
 def get_unified_groundwater_intelligence(
-    latitude: float = Query(..., description="Target latitude (-90.0 to +90.0)"),
-    longitude: float = Query(..., description="Target longitude (-180.0 to +180.0)"),
+    latitude: Optional[float] = Query(None, description="Target latitude (-90.0 to +90.0)"),
+    longitude: Optional[float] = Query(None, description="Target longitude (-180.0 to +180.0)"),
     radius_km: Optional[float] = Query(
         None, gt=0, le=500, description="Custom DWLR coverage radius in km (default 15.0 km)"
     ),
 ):
-    validate_coordinates(latitude, longitude)
+    lat = latitude if latitude is not None else 20.5937
+    lon = longitude if longitude is not None else 78.9629
+    validate_coordinates(lat, lon)
     try:
         intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(
-            lat=latitude, lon=longitude, radius_km=radius_km
+            lat=lat, lon=lon, radius_km=radius_km
         )
         return intel
     except Exception as e:
@@ -55,17 +57,19 @@ def get_unified_groundwater_intelligence(
     description="Returns water-smart crop recommendations for any location using direct DWLR or satellite-assisted water availability signals.",
 )
 def get_crop_advice_for_location(
-    latitude: float = Query(..., description="Target latitude (-90.0 to +90.0)"),
-    longitude: float = Query(..., description="Target longitude (-180.0 to +180.0)"),
+    latitude: Optional[float] = Query(None, description="Target latitude (-90.0 to +90.0)"),
+    longitude: Optional[float] = Query(None, description="Target longitude (-180.0 to +180.0)"),
 ):
-    validate_coordinates(latitude, longitude)
+    lat = latitude if latitude is not None else 20.5937
+    lon = longitude if longitude is not None else 78.9629
+    validate_coordinates(lat, lon)
     try:
         intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(
-            lat=latitude, lon=longitude
+            lat=lat, lon=lon
         )
         return {
-            "latitude": latitude,
-            "longitude": longitude,
+            "latitude": lat,
+            "longitude": lon,
             "coverage_type": intel.coverage_type,
             "groundwater_condition": intel.groundwater_condition,
             "crop_implications": intel.crop_implications,

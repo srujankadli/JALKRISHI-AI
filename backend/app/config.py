@@ -48,7 +48,8 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "*"
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
     ]
 
     @field_validator("CORS_ORIGINS", mode="before")
@@ -58,7 +59,7 @@ class Settings(BaseSettings):
             return [i.strip() for i in v.split(",") if i.strip()]
         elif isinstance(v, list):
             return v
-        return ["http://localhost:5173", "http://127.0.0.1:5173", "*"]
+        return ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"]
 
 
 settings = Settings()
