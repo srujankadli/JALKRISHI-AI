@@ -4,6 +4,7 @@ import {
   FileText,
   Download,
   CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { SectionHeader } from '../common/SectionHeader';
 import {
@@ -22,16 +23,18 @@ export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({
   const [isExportingXLSX, setIsExportingXLSX] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleDownloadXLSX = async () => {
     try {
+      setErrorMessage(null);
       setIsExportingXLSX(true);
       exportAnalyticsToXLSX(exportData);
       setSuccessMessage('XLSX Excel report generated & downloaded successfully.');
       setTimeout(() => setSuccessMessage(null), 4000);
     } catch (err) {
       console.error(err);
-      alert('Failed to generate XLSX report.');
+      setErrorMessage('Failed to generate XLSX report.');
     } finally {
       setIsExportingXLSX(false);
     }
@@ -39,13 +42,14 @@ export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({
 
   const handleDownloadPDF = async () => {
     try {
+      setErrorMessage(null);
       setIsExportingPDF(true);
       exportAnalyticsToPDF(exportData);
       setSuccessMessage('Printable PDF report generated & downloaded successfully.');
       setTimeout(() => setSuccessMessage(null), 4000);
     } catch (err) {
       console.error(err);
-      alert('Failed to generate PDF report.');
+      setErrorMessage('Failed to generate PDF report.');
     } finally {
       setIsExportingPDF(false);
     }
@@ -110,6 +114,14 @@ export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Error Feedback Toast */}
+      {errorMessage && (
+        <div className="rounded-2xl border border-rose-300 bg-rose-50 p-3.5 text-xs text-rose-900 font-bold flex items-center gap-2 shadow-sm animate-fadeIn">
+          <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
 
       {/* Success Feedback Toast */}
       {successMessage && (

@@ -331,6 +331,7 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
   const [isLocating, setIsLocating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showCoverageLayer, setShowCoverageLayer] = useState(false);
+  const [geoNotice, setGeoNotice] = useState<string | null>(null);
 
   const tileUrls = {
     osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -339,8 +340,9 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
   };
 
   const handleLocateMe = () => {
+    setGeoNotice(null);
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser. Please search for your district above.');
+      setGeoNotice('Geolocation is not supported by your browser. Please search for your district above.');
       return;
     }
 
@@ -354,7 +356,7 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
       (error) => {
         setIsLocating(false);
         console.warn('Geolocation access denied or unavailable', error);
-        alert('Location access is unavailable. You can search for your district or station name above.');
+        setGeoNotice('Location access is unavailable. You can search for your district or station name above.');
       },
       { timeout: 8000, enableHighAccuracy: true }
     );
@@ -399,6 +401,19 @@ export const GroundwaterMap: React.FC<GroundwaterMapProps> = ({
           onViewStationDetails={onViewStationDetails}
         />
       </MapContainer>
+
+      {/* Geolocation Notice Banner */}
+      {geoNotice && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[1000] max-w-md rounded-2xl border border-amber-300 bg-amber-50/95 p-3.5 shadow-xl backdrop-blur-md text-xs text-amber-900 font-semibold flex items-center justify-between gap-3 animate-fadeIn">
+          <span>{geoNotice}</span>
+          <button
+            onClick={() => setGeoNotice(null)}
+            className="text-amber-700 hover:text-amber-950 font-bold cursor-pointer shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Persistent Map Status Legend (Bottom Left) */}
       <div className="absolute bottom-3 left-3 z-[1000] rounded-xl border border-stone-200/90 bg-white/95 px-3.5 py-2.5 shadow-lg backdrop-blur-xs text-xs">

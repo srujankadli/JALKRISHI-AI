@@ -45,6 +45,7 @@ export const CropAdvisorPage: React.FC = () => {
 
   // Connected Nearby Station Context
   const [nearbyStation, setNearbyStation] = useState<DWLRStation | null>(null);
+  const [locationNotice, setLocationNotice] = useState<string | null>(null);
 
   // Recommendations & Modal States
   const [recommendations, setRecommendations] = useState<CropRecommendationResult | null>(null);
@@ -134,43 +135,47 @@ export const CropAdvisorPage: React.FC = () => {
 
   // Browser Geolocation Auto-Detection
   const handleUseMyLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const nearest = await stationService.findNearest(lat, lng);
-          if (nearest) {
-            const st = nearest.station;
-            setNearbyStation(st);
-            setSelectedState(st.state);
-            setSelectedDistrict(st.district);
-            if (st.soilType && ['Alluvial', 'Black', 'Red', 'Laterite', 'Sandy', 'Loamy', 'Clay'].includes(st.soilType)) {
-              setSoilType(st.soilType as SoilType);
-            }
-            if (st.status === 'critical') setWaterAvailability('Stressed');
-            else if (st.status === 'warning') setWaterAvailability('Limited');
-            else if (st.status === 'moderate') setWaterAvailability('Moderate');
-            else setWaterAvailability('Abundant');
-
-            // Automatically re-evaluate
-            const result = await cropService.evaluateCrops({
-              soilType: (st.soilType as SoilType) || soilType,
-              season,
-              waterAvailability: st.status === 'critical' ? 'Stressed' : 'Moderate',
-              rainfallCondition,
-              groundwaterTrend: st.trend,
-              state: st.state,
-              district: st.district,
-            });
-            setRecommendations(result);
-          }
-        },
-        () => {
-          alert('Location access unavailable. Please select your State and District manually from the dropdowns.');
-        }
-      );
+    setLocationNotice(null);
+    if (!navigator.geolocation) {
+      setLocationNotice('Location access is not supported by your browser. Please select your State and District manually from the dropdowns.');
+      return;
     }
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const nearest = await stationService.findNearest(lat, lng);
+        if (nearest) {
+          const st = nearest.station;
+          setNearbyStation(st);
+          setSelectedState(st.state);
+          setSelectedDistrict(st.district);
+          if (st.soilType && ['Alluvial', 'Black', 'Red', 'Laterite', 'Sandy', 'Loamy', 'Clay'].includes(st.soilType)) {
+            setSoilType(st.soilType as SoilType);
+          }
+          if (st.status === 'critical') setWaterAvailability('Stressed');
+          else if (st.status === 'warning') setWaterAvailability('Limited');
+          else if (st.status === 'moderate') setWaterAvailability('Moderate');
+          else setWaterAvailability('Abundant');
+
+          // Automatically re-evaluate
+          const result = await cropService.evaluateCrops({
+            soilType: (st.soilType as SoilType) || soilType,
+            season,
+            waterAvailability: st.status === 'critical' ? 'Stressed' : 'Moderate',
+            rainfallCondition,
+            groundwaterTrend: st.trend,
+            state: st.state,
+            district: st.district,
+          });
+          setRecommendations(result);
+          setLocationNotice(`Located station: ${st.stationName} (${st.district}, ${st.state}). Form auto-populated.`);
+        }
+      },
+      () => {
+        setLocationNotice('Location access is unavailable or denied. Please select your State and District manually from the dropdowns.');
+      }
+    );
   };
 
   // Preset Scenario Handlers
@@ -256,6 +261,18 @@ export const CropAdvisorPage: React.FC = () => {
           </span>
         }
       />
+
+      {locationNotice && (
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-xs font-semibold text-amber-900 shadow-xs flex items-center justify-between animate-fadeIn">
+          <span>{locationNotice}</span>
+          <button
+            onClick={() => setLocationNotice(null)}
+            className="text-amber-700 hover:text-amber-950 font-bold ml-4 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* 2. Interactive Farm Profile Input Form */}
       <FarmProfileForm
