@@ -230,7 +230,7 @@ class OfficialIntelligenceEngine:
                 crop_demand_signal=crop_demand,
                 forecast_stress=forecast_stress,
                 confidence="HIGH",
-                data_source="Direct DWLR Telemetry Observation",
+                data_source="DWLR Reference Simulation Telemetry",
             )
             features.append(feat)
 
@@ -611,7 +611,7 @@ class OfficialIntelligenceEngine:
                 sensor_status=calib_status,
                 trend=self._get_trend_str(s.trend).upper(),
                 risk_score=risk_val,
-                data_source="DWLR Automatic Telemetry",
+                data_source="DWLR Reference Simulation Telemetry",
             )
             items.append(item)
 
