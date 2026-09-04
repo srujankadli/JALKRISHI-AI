@@ -40,12 +40,12 @@ export const AnomalyFilterBar: React.FC<AnomalyFilterBarProps> = ({
     (selectedState !== 'All States' && selectedState !== 'All India');
 
   const categories: { id: 'all' | AnomalyCategory; label: string }[] = [
-    { id: 'all', label: 'All Types' },
-    { id: 'Sudden Drop', label: 'Sudden Drop' },
-    { id: 'Possible Extraction', label: 'Abnormal Extraction' },
-    { id: 'Missing Data', label: 'Missing Data' },
-    { id: 'Sensor Issue', label: 'Sensor Issue' },
-    { id: 'Sudden Rise', label: 'Sudden Rise' },
+    { id: 'all', label: t('All Types') },
+    { id: 'Sudden Drop', label: t('Sudden Drop') },
+    { id: 'Possible Extraction', label: t('Abnormal Extraction') },
+    { id: 'Missing Data', label: t('Missing Data') },
+    { id: 'Sensor Issue', label: t('Sensor Issue') },
+    { id: 'Sudden Rise', label: t('Sudden Rise') },
   ];
 
   return (
@@ -73,7 +73,7 @@ export const AnomalyFilterBar: React.FC<AnomalyFilterBarProps> = ({
           >
             {statesList.map((st) => (
               <option key={st} value={st}>
-                {st}
+                {st === 'All States' ? t('All States') : st}
               </option>
             ))}
           </select>
@@ -84,13 +84,13 @@ export const AnomalyFilterBar: React.FC<AnomalyFilterBarProps> = ({
       <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-stone-100 text-xs">
         <span className="font-bold text-stone-500 flex items-center gap-1 mr-1">
           <Tag className="h-3.5 w-3.5 text-stone-400" />
-          Category:
+          {t('Category:')}
         </span>
         {categories.map((c) => (
           <button
             key={c.id}
             onClick={() => onCategoryChange(c.id)}
-            className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
+            className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
               selectedCategory === c.id
                 ? 'bg-agri-700 text-white shadow-xs'
                 : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
@@ -106,22 +106,22 @@ export const AnomalyFilterBar: React.FC<AnomalyFilterBarProps> = ({
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="font-bold text-stone-500 flex items-center gap-1 mr-1">
             <Filter className="h-3.5 w-3.5 text-stone-400" />
-            Severity:
+            {t('Severity:')}
           </span>
 
           {(
             [
-              { id: 'all', label: 'All Severities' },
-              { id: 'critical', label: '🔴 Critical' },
-              { id: 'high', label: '🟠 High' },
-              { id: 'warning', label: '🟡 Warning' },
-              { id: 'info', label: 'ℹ️ Info / Low' },
+              { id: 'all', label: t('All Severities') },
+              { id: 'critical', label: `🔴 ${t('Critical')}` },
+              { id: 'high', label: `🟠 ${t('High')}` },
+              { id: 'warning', label: `🟡 ${t('Moderate')}` },
+              { id: 'info', label: `ℹ️ ${t('Data Quality / Low')}` },
             ] as const
           ).map((s) => (
             <button
               key={s.id}
               onClick={() => onSeverityChange(s.id as any)}
-              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
+              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
                 selectedSeverity === s.id
                   ? 'bg-stone-900 text-white shadow-xs'
                   : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
@@ -135,7 +135,7 @@ export const AnomalyFilterBar: React.FC<AnomalyFilterBarProps> = ({
         {/* Counter and Reset */}
         <div className="flex items-center gap-2 ml-auto">
           <span className="text-xs font-semibold text-stone-500">
-            Showing <strong className="text-stone-900">{totalFiltered}</strong> of {totalAnomalies} alerts
+            {t('Showing')} <strong className="text-stone-900">{totalFiltered}</strong> {t('of')} {totalAnomalies} {t('signals')}
           </span>
 
           {isFiltered && (

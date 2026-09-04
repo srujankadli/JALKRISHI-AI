@@ -28,14 +28,14 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
     switch (severity) {
       case 'critical':
         return {
-          label: 'CRITICAL ALERT',
+          label: t('Critical (Immediate Attention)'),
           badge: 'bg-rose-100 text-rose-900 border-rose-300',
           icon: AlertTriangle,
           border: 'border-rose-300 bg-gradient-to-br from-rose-50/40 via-white to-white',
         };
       case 'high':
         return {
-          label: 'HIGH ATTENTION',
+          label: t('High (Review Soon)'),
           badge: 'bg-orange-100 text-orange-900 border-orange-300',
           icon: AlertCircle,
           border: 'border-orange-200 bg-gradient-to-br from-orange-50/30 via-white to-white',
@@ -43,7 +43,7 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
       case 'warning':
       case 'medium':
         return {
-          label: 'MONITORING WARNING',
+          label: t('Moderate (Monitor)'),
           badge: 'bg-amber-100 text-amber-900 border-amber-300',
           icon: Eye,
           border: 'border-amber-200 bg-gradient-to-br from-amber-50/20 via-white to-white',
@@ -52,7 +52,7 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
       case 'low':
       default:
         return {
-          label: 'INFORMATIONAL / LOW',
+          label: t('Data Quality / Low (Verify)'),
           badge: 'bg-stone-100 text-stone-800 border-stone-300',
           icon: Info,
           border: 'border-stone-200 bg-white',
@@ -60,11 +60,28 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
     }
   };
 
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case 'Sudden Drop':
+        return t('Sudden Groundwater Drop');
+      case 'Possible Extraction':
+        return t('Possible Abnormal Extraction');
+      case 'Missing Data':
+        return t('Missing / Delayed Data');
+      case 'Sensor Issue':
+        return t('Possible Sensor Data Issue');
+      case 'Sudden Rise':
+        return t('Sudden Groundwater Rise');
+      default:
+        return t(category);
+    }
+  };
+
   if (anomalies.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-8 text-center">
         <p className="text-sm font-bold text-stone-700">{t('No anomalies match your current filters.')}</p>
-        <p className="text-xs text-stone-500 mt-1">{t('Try selecting \'All Severities\' or clearing your search keywords.')}</p>
+        <p className="text-xs text-stone-500 mt-1">{t("Try selecting 'All Severities' or clearing your search keywords.")}</p>
       </div>
     );
   }
@@ -92,17 +109,13 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
                 </span>
 
                 <span className="rounded-md bg-stone-100 px-2 py-0.5 text-xs font-bold text-stone-700">
-                  {a.category}
-                </span>
-
-                <span className="text-xs font-semibold text-stone-500">
-                  &bull; {a.anomalyType}
+                  {getCategoryLabel(a.category)}
                 </span>
               </div>
 
               <div className="flex items-center gap-1 text-xs text-stone-500 font-medium">
                 <Clock className="h-3.5 w-3.5 text-stone-400" />
-                <span>Detected: {a.detectedAt}</span>
+                <span>{t('Detected:')} {a.detectedAt}</span>
               </div>
             </div>
 
@@ -140,12 +153,12 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
               </div>
             </div>
 
-            {/* Farmer Explanation */}
+            {/* Farmer / Plain-Language Explanation */}
             <div className="mt-3 rounded-xl border border-stone-200/80 bg-white/80 p-3 text-xs text-stone-700">
               <div className="flex items-start gap-2">
                 <Sparkles className="h-3.5 w-3.5 text-agri-700 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  <strong className="text-stone-900 font-bold">{t('Farmer Summary:')} </strong>
+                  <strong className="text-stone-900 font-bold">{t('Why Flagged / Insight:')} </strong>
                   {a.farmerExplanation}
                 </p>
               </div>
@@ -154,7 +167,7 @@ export const AnomalyFeedList: React.FC<AnomalyFeedListProps> = ({
             {/* Action Bar */}
             <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-stone-100">
               <span className="text-[11px] font-semibold text-stone-500">
-                Status: <strong className="text-stone-800">{a.status}</strong>
+                {t('Status:')} <strong className="text-stone-800">{a.status}</strong>
               </span>
 
               <div className="flex items-center gap-2">

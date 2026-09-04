@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingDown, ShieldAlert, Radio, Activity, Droplets } from 'lucide-react';
 import type { AnomalyCategory } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface AnomalyCategoryGridProps {
   selectedCategory: string;
@@ -19,6 +20,7 @@ export const AnomalyCategoryGrid: React.FC<AnomalyCategoryGridProps> = ({
   onSelectCategory,
   categoryCounts,
 }) => {
+  const { t } = useLanguage();
   
   const getCategoryIcon = (category: AnomalyCategory) => {
     switch (category) {
@@ -76,16 +78,16 @@ export const AnomalyCategoryGrid: React.FC<AnomalyCategoryGridProps> = ({
               </div>
 
               <h4 className="mt-3 text-xs sm:text-sm font-extrabold text-stone-900 leading-snug">
-                {item.name}
+                {t(item.name)}
               </h4>
 
               <p className="mt-1 text-[11px] text-stone-500 leading-relaxed">
-                {item.description}
+                {t(item.description)}
               </p>
             </div>
 
             <div className="mt-3 border-t border-stone-100 pt-2 text-[10px] font-bold text-stone-400">
-              {isSelected ? '✓ Filter Active (Click to Clear)' : 'Click to Filter'}
+              {isSelected ? t('✓ Filter Active (Click to Clear)') : t('Click to Filter')}
             </div>
           </div>
         );

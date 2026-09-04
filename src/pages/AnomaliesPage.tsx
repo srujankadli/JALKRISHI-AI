@@ -109,40 +109,40 @@ export const AnomaliesPage: React.FC = () => {
   };
 
   const severityChartData = [
-    { name: t('Critical Alert'), count: severityCounts.critical, color: '#dc2626' },
-    { name: t('High Attention'), count: severityCounts.high, color: '#ea580c' },
-    { name: t('Warning / Monitor'), count: severityCounts.warning, color: '#d97706' },
-    { name: t('Info / Low'), count: severityCounts.info, color: '#16a34a' },
+    { name: t('Critical (Immediate Attention)'), count: severityCounts.critical, color: '#dc2626' },
+    { name: t('High (Review Soon)'), count: severityCounts.high, color: '#ea580c' },
+    { name: t('Moderate (Monitor)'), count: severityCounts.warning, color: '#d97706' },
+    { name: t('Data Quality / Low (Verify)'), count: severityCounts.info, color: '#16a34a' },
   ];
 
   return (
     <div className="space-y-8 animate-fadeIn pb-8">
-      {/* 0. Telemetry Quality Engine Top Bar */}
+      {/* 0. Early Warning Engine Top Bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-stone-200 bg-white px-4 py-2 text-xs shadow-xs">
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-rose-600 animate-ping" />
           <span className="font-extrabold text-stone-900">
-            {t('JalKrishi Automated Telemetry Quality & Hydrostatic Anomaly Engine')}
+            {t('Groundwater Early Warning Engine')}
           </span>
           <span className="text-stone-400">&bull;</span>
-          <span className="text-stone-500 font-medium">{t('Real-Time Drawdown & Sensor Checks')}</span>
+          <span className="text-stone-500 font-medium">{t('Groundwater Change & Data Quality Monitoring')}</span>
         </div>
 
         <span className="inline-flex items-center gap-1 rounded bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600">
           <Radio className="h-3 w-3 text-rose-600" />
-          {t('Reference Simulation Model')}
+          {t('Reference Simulation Data')}
         </span>
       </div>
 
       {/* 1. Page Header */}
       <PageHeader
-        title={t('Anomaly Detection & Groundwater Alerts')}
-        subtitle={t('Identify sudden localized drawdown spikes, abnormal extraction patterns, and telemetry sensor issues before crop water stress intensifies.')}
-        farmerNote={t('Anomalies alert you when water levels drop much faster than expected in your area, giving you advance notice to manage tube-wells and protect pumps.')}
+        title={t('Groundwater Anomaly Detection & Early Warnings')}
+        subtitle={t('Detect unusual groundwater changes, distinguish possible water-level stress from sensor-quality issues, and identify areas that may need attention.')}
+        farmerNote={t('An unusual groundwater change can indicate increasing water stress, abnormal extraction, or a data-quality issue. Early review can help farmers and officials respond before water availability becomes a larger problem.')}
         badge={
           <span className="rounded-full bg-rose-100 border border-rose-300 px-3 py-1 text-xs font-bold text-rose-800 flex items-center gap-1.5 shadow-xs">
             <ShieldAlert className="h-3.5 w-3.5 text-rose-600" />
-            {anomalies.length} {t('Active Telemetry Alerts')}
+            {anomalies.length} {t('Detected Anomaly Signals')}
           </span>
         }
       />
@@ -188,7 +188,7 @@ export const AnomaliesPage: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-extrabold text-stone-900">
-            {t('Recent Hydrostatic & Telemetry Alerts')} ({filteredAnomalies.length})
+            {t('Recent Groundwater & Data Quality Signals')} ({filteredAnomalies.length})
           </h3>
           <span className="text-xs text-stone-500">{t('Sorted by detection time')}</span>
         </div>

@@ -14,11 +14,29 @@ export const StateAnomalyTable: React.FC<StateAnomalyTableProps> = ({
   onSelectState,
 }) => {
   const { t } = useLanguage();
+
+  const getCategoryLabel = (cat: string) => {
+    switch (cat) {
+      case 'Sudden Drop':
+        return t('Sudden Groundwater Drop');
+      case 'Possible Extraction':
+        return t('Possible Abnormal Extraction');
+      case 'Missing Data':
+        return t('Missing / Delayed Data');
+      case 'Sensor Issue':
+        return t('Possible Sensor Data Issue');
+      case 'Sudden Rise':
+        return t('Sudden Groundwater Rise');
+      default:
+        return t(cat);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <SectionHeader
-        title={t('Where are Anomalies Concentrated? (Regional Breakdown)')}
-        subtitle={t('Ranked agricultural states by alert frequency and primary failure/drawdown modes')}
+        title={t('Where are Signals Concentrated? (Regional Breakdown)')}
+        subtitle={t('Ranked states by detected signals and primary anomaly category')}
         icon={<MapPin className="h-5 w-5 text-agri-700" />}
       />
 
@@ -28,11 +46,11 @@ export const StateAnomalyTable: React.FC<StateAnomalyTableProps> = ({
             <thead className="bg-stone-50 text-stone-600 uppercase text-[11px] font-bold border-b border-stone-200">
               <tr>
                 <th className="px-4 py-3">{t('State')}</th>
-                <th className="px-4 py-3">{t('Total Alerts')}</th>
+                <th className="px-4 py-3">{t('Total Signals')}</th>
                 <th className="px-4 py-3">{t('Critical')}</th>
                 <th className="px-4 py-3">{t('High Attention')}</th>
-                <th className="px-4 py-3">{t('Warning / Low')}</th>
-                <th className="px-4 py-3">{t('Primary Anomaly Mode')}</th>
+                <th className="px-4 py-3">{t('Moderate / Low')}</th>
+                <th className="px-4 py-3">{t('Primary Anomaly Category')}</th>
                 <th className="px-4 py-3 text-right">{t('Filter Feed')}</th>
               </tr>
             </thead>
@@ -52,11 +70,11 @@ export const StateAnomalyTable: React.FC<StateAnomalyTableProps> = ({
                   </td>
 
                   <td className="px-4 py-3 font-mono font-bold text-rose-700">
-                    {item.critical > 0 ? `${item.critical} Critical` : '0'}
+                    {item.critical > 0 ? `${item.critical} ${t('Critical')}` : '0'}
                   </td>
 
                   <td className="px-4 py-3 font-mono font-bold text-orange-700">
-                    {item.high > 0 ? `${item.high} High` : '0'}
+                    {item.high > 0 ? `${item.high} ${t('High')}` : '0'}
                   </td>
 
                   <td className="px-4 py-3 font-mono text-stone-600">
@@ -65,7 +83,7 @@ export const StateAnomalyTable: React.FC<StateAnomalyTableProps> = ({
 
                   <td className="px-4 py-3 text-xs font-bold text-agri-900">
                     <span className="rounded-md bg-stone-100 px-2 py-0.5">
-                      {item.mostCommonCategory}
+                      {getCategoryLabel(item.mostCommonCategory)}
                     </span>
                   </td>
 

@@ -41,11 +41,11 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
       {/* 1. Anomalies by Category */}
       <div className="lg:col-span-7">
         <ChartCard
-          title={t('Anomalies by Failure & Drawdown Category')}
-          subtitle={t('Distribution of detected events across physical drawdowns vs sensor/telemetry issues')}
+          title={t('Signals by Category')}
+          subtitle={t('Distribution of detected events across groundwater changes and data quality checks')}
           badge={
             <span className="rounded bg-stone-100 px-2 py-0.5 text-xs font-bold text-stone-700">
-              5 Core Categories
+              {t('5 Core Categories')}
             </span>
           }
         >
@@ -60,9 +60,9 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
                     const item = payload[0].payload;
                     return (
                       <div className="rounded-lg border border-stone-200 bg-white p-2.5 shadow-md text-xs">
-                        <p className="font-bold text-stone-900">{item.name}</p>
+                        <p className="font-bold text-stone-900">{t(item.name)}</p>
                         <p className="text-stone-700 font-semibold mt-1">
-                          Count: <strong>{item.count}</strong> stations
+                          {t('Count:')} <strong>{item.count}</strong> {t('stations')}
                         </p>
                       </div>
                     );
@@ -72,7 +72,7 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
               />
               <Bar
                 dataKey="count"
-                name="Stations"
+                name={t('Stations')}
                 radius={[6, 6, 0, 0]}
                 onClick={(entry: any) => {
                   if (entry && entry.category) {
@@ -88,7 +88,7 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
           </ResponsiveContainer>
 
           <p className="mt-2 text-xs text-stone-500 text-center">
-            Click any bar to filter the anomaly feed by category.
+            {t('Click any bar to filter the anomaly feed by category.')}
           </p>
         </ChartCard>
       </div>
@@ -96,8 +96,8 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
       {/* 2. Severity Breakdown Donut */}
       <div className="lg:col-span-5">
         <ChartCard
-          title={t('Severity Priority Breakdown')}
-          subtitle={t('Triage breakdown for agricultural extension and maintenance dispatch')}
+          title={t('Severity Distribution')}
+          subtitle={t('Priority classification for field inspection and irrigation review')}
         >
           <div className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={200}>
@@ -122,8 +122,8 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
                       const item = payload[0].payload;
                       return (
                         <div className="rounded-lg border border-stone-200 bg-white p-2 shadow-md text-xs">
-                          <p className="font-bold text-stone-900">{item.name}</p>
-                          <p className="text-stone-700">Count: {item.count} alerts</p>
+                          <p className="font-bold text-stone-900">{t(item.name)}</p>
+                          <p className="text-stone-700">{t('Count:')} {item.count} {t('alerts')}</p>
                         </div>
                       );
                     }
@@ -138,7 +138,7 @@ export const AnomalyDistributionCharts: React.FC<AnomalyDistributionChartsProps>
             {severityData.map((s) => (
               <div key={s.name} className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                <span className="text-stone-600 font-medium">{s.name}:</span>
+                <span className="text-stone-600 font-medium">{t(s.name)}:</span>
                 <strong className="text-stone-900 ml-auto">{s.count}</strong>
               </div>
             ))}

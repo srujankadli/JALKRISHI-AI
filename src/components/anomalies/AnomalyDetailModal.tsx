@@ -1,5 +1,5 @@
 import { useLanguage } from '../../context/LanguageContext';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   MapPin,
@@ -10,6 +10,8 @@ import {
   ArrowRight,
   TrendingDown,
   Activity,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -39,7 +41,26 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
   onNavigateToCrops,
 }) => {
   const { t } = useLanguage();
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+
   if (!anomaly) return null;
+
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case 'Sudden Drop':
+        return t('Sudden Groundwater Drop');
+      case 'Possible Extraction':
+        return t('Possible Abnormal Extraction');
+      case 'Missing Data':
+        return t('Missing / Delayed Data');
+      case 'Sensor Issue':
+        return t('Possible Sensor Data Issue');
+      case 'Sudden Rise':
+        return t('Sudden Groundwater Rise');
+      default:
+        return t(category);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 p-4 backdrop-blur-xs animate-fadeIn overflow-y-auto">
@@ -65,11 +86,11 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
               }`}
             >
               <AlertTriangle className="h-3.5 w-3.5" />
-              {anomaly.severity.toUpperCase()} ANOMALY ALERT
+              {t(anomaly.severity.toUpperCase())} {t('Early Warning Signal')}
             </span>
 
             <span className="rounded-md bg-stone-100 px-2.5 py-0.5 text-xs font-bold text-stone-800">
-              {anomaly.category}
+              {getCategoryLabel(anomaly.category)}
             </span>
 
             <span className="text-xs font-mono text-stone-500 font-semibold">
@@ -113,7 +134,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Telemetry Status')}</span>
+            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Observation Status')}</span>
             <span className="inline-flex items-center gap-1 rounded bg-stone-200/80 px-2 py-0.5 font-bold text-stone-800 text-[11px] mt-0.5">
               <Radio className="h-3 w-3 text-stone-600" />
               {anomaly.status}
@@ -127,7 +148,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-stone-800 flex items-center gap-1.5">
                 <Activity className="h-4 w-4 text-water-700" />
-                Hourly Telemetry vs Expected Baseline Curve
+                {t('Observation Timeline vs Expected Baseline')}
               </span>
               <span className="text-[11px] text-stone-500">{t('Meters Below Ground Level (mbgl)')}</span>
             </div>
@@ -144,11 +165,11 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
                       return (
                         <div className="rounded-lg border border-stone-200 bg-white p-2.5 shadow-md text-xs space-y-1">
                           <p className="font-bold text-stone-900">{item.time}</p>
-                          <p className="text-rose-700 font-bold">Observed: {item.observed} m</p>
-                          <p className="text-stone-500 font-medium">Expected: {item.expected} m</p>
+                          <p className="text-rose-700 font-bold">{t('Observed:')} {item.observed} m</p>
+                          <p className="text-stone-500 font-medium">{t('Expected:')} {item.expected} m</p>
                           {item.isAnomaly && (
                             <span className="inline-block rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-800">
-                              ⚠️ Anomaly Trigger
+                              ⚠️ {t('Anomaly Trigger')}
                             </span>
                           )}
                         </div>
@@ -161,7 +182,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
                 <Line
                   type="monotone"
                   dataKey="expected"
-                  name="Expected Baseline"
+                  name={t('Expected Baseline')}
                   stroke="#94a3b8"
                   strokeDasharray="4 4"
                   strokeWidth={2}
@@ -170,7 +191,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
                 <Line
                   type="monotone"
                   dataKey="observed"
-                  name="Observed DWLR Reading"
+                  name={t('Observed Reading')}
                   stroke="#dc2626"
                   strokeWidth={2.5}
                   dot={{ r: 4, fill: '#dc2626' }}
@@ -180,53 +201,68 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
           </div>
         )}
 
-        {/* Farmer Plain-Language Interpretation */}
+        {/* Plain-Language Assessment */}
         <div className="rounded-2xl border border-agri-200 bg-agri-50/70 p-4 text-xs text-agri-950 space-y-1.5">
           <div className="flex items-center gap-1.5 font-extrabold text-agri-950">
             <Sparkles className="h-4 w-4 text-agri-700" />
-            <span>{t('Plain-Language Farmer Insight')}</span>
+            <span>{t('Plain-Language Assessment')}</span>
           </div>
           <p className="leading-relaxed text-agri-900 font-medium">
             {anomaly.farmerExplanation}
           </p>
         </div>
 
-        {/* Technical Root Cause & Telemetry Specs */}
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 text-xs space-y-2">
-          <div className="flex items-center gap-1.5 font-bold text-stone-800">
-            <Zap className="h-4 w-4 text-amber-600" />
-            <span>{t('Technical Root Cause Analysis')}</span>
-          </div>
-          <p className="text-stone-600 font-mono text-[11px] leading-relaxed">
-            {anomaly.technicalDetails}
-          </p>
-
-          {anomaly.telemetryHealth && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-stone-200/60 text-[11px]">
-              <div>
-                <span className="text-stone-400 block">{t('Battery Voltage:')}</span>
-                <strong className="text-stone-800 font-mono">{anomaly.telemetryHealth.batteryVoltage}</strong>
-              </div>
-              <div>
-                <span className="text-stone-400 block">{t('Signal Strength:')}</span>
-                <strong className="text-stone-800 font-mono">{anomaly.telemetryHealth.signalDbm}</strong>
-              </div>
-              <div>
-                <span className="text-stone-400 block">{t('Hardware Status:')}</span>
-                <strong className="text-stone-800">{anomaly.telemetryHealth.hardwareStatus}</strong>
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Recommended Action */}
         <div className="rounded-2xl border border-rose-200 bg-rose-50/50 p-4 text-xs space-y-1">
           <span className="font-extrabold text-rose-900 block uppercase text-[11px]">
-            🌱 Recommended Agronomic Action
+            🌱 {t('Recommended Follow-up Action')}
           </span>
           <p className="text-stone-800 font-medium leading-relaxed">
             {anomaly.suggestedAction}
           </p>
+        </div>
+
+        {/* Secondary / Collapsible Technical Evidence */}
+        <div className="rounded-2xl border border-stone-200 bg-stone-50 text-xs overflow-hidden">
+          <button
+            onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+            className="w-full flex items-center justify-between p-3.5 font-bold text-stone-800 hover:bg-stone-100 transition-colors cursor-pointer text-left"
+          >
+            <div className="flex items-center gap-1.5">
+              <Zap className="h-4 w-4 text-amber-600" />
+              <span>{t('Technical Evidence & Telemetry Details')}</span>
+            </div>
+            {showTechnicalDetails ? (
+              <ChevronUp className="h-4 w-4 text-stone-500" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-stone-500" />
+            )}
+          </button>
+
+          {showTechnicalDetails && (
+            <div className="p-4 pt-0 space-y-2 border-t border-stone-200/60 mt-1">
+              <p className="text-stone-600 font-mono text-[11px] leading-relaxed pt-2">
+                {anomaly.technicalDetails}
+              </p>
+
+              {anomaly.telemetryHealth && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-stone-200/60 text-[11px]">
+                  <div>
+                    <span className="text-stone-400 block">{t('Battery Voltage:')}</span>
+                    <strong className="text-stone-800 font-mono">{anomaly.telemetryHealth.batteryVoltage}</strong>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">{t('Signal Strength:')}</span>
+                    <strong className="text-stone-800 font-mono">{anomaly.telemetryHealth.signalDbm}</strong>
+                  </div>
+                  <div>
+                    <span className="text-stone-400 block">{t('Sensor / Hardware Status:')}</span>
+                    <strong className="text-stone-800">{anomaly.telemetryHealth.hardwareStatus}</strong>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* CTA Buttons */}
@@ -235,7 +271,7 @@ export const AnomalyDetailModal: React.FC<AnomalyDetailModalProps> = ({
             onClick={onClose}
             className="rounded-xl border border-stone-300 bg-white px-4 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50 cursor-pointer"
           >
-            Dismiss Alert
+            {t('Close')}
           </button>
 
           <div className="flex flex-wrap items-center gap-2">
