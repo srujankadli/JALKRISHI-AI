@@ -26,7 +26,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   onOpenNotifications,
   unreadAlertCount = 4,
 }) => {
-  const { currentLanguage, setLanguage } = useLanguage();
+  const { currentLanguage, setLanguage, t } = useLanguage();
 
   return (
     <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-stone-200 bg-white/95 px-4 backdrop-blur-md sm:px-6">
@@ -54,7 +54,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         <div className="hidden lg:flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-water-50 border border-water-200 px-3 py-1 text-xs font-semibold text-water-800">
             <Radio className="h-3.5 w-3.5 text-water-600 animate-pulse" />
-            JalKrishi Reference DWLR Network: 5,260 Stations (Simulated Telemetry)
+            {t('reference_simulation')}
           </span>
           <BackendStatusBadge showDetails={true} />
         </div>

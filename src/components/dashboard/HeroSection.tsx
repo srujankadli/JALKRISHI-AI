@@ -2,9 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Sprout, Radio, Sparkles, Droplets } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '../common/Buttons';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-stone-200/90 bg-gradient-to-br from-white via-stone-50/80 to-agri-50/30 p-6 shadow-card sm:p-8 lg:p-10">
@@ -25,25 +27,19 @@ export const HeroSection: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-agri-300 bg-agri-100/90 px-3 py-1 text-xs font-bold text-agri-900 tracking-wide uppercase">
               <Sparkles className="h-3.5 w-3.5 text-agri-700" />
-              Groundwater Intelligence
+              {t('groundwater_intelligence')}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white/90 px-2.5 py-1 text-xs font-semibold text-stone-600">
               <Radio className="h-3 w-3 text-water-600 animate-pulse" />
-              DWLR Network • Reference Simulation
+              {t('reference_simulation')}
             </span>
           </div>
 
           {/* Main Heading */}
           <div className="space-y-1">
             <h1 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl lg:text-5xl leading-[1.15]">
-              Know Your Water. <br />
-              <span className="bg-gradient-to-r from-agri-700 via-agri-800 to-water-700 bg-clip-text text-transparent">
-                Grow Smarter.
-              </span>
+              {t('know_your_water')}
             </h1>
-            <p className="text-sm font-hindi text-stone-500 font-medium pt-1">
-              अपने भूजल को जानें, बेहतर फसल उगाएं
-            </p>
           </div>
 
           {/* Supporting Description */}
@@ -59,7 +55,7 @@ export const HeroSection: React.FC = () => {
               onClick={() => navigate('/map')}
               className="shadow-md hover:shadow-lg"
             >
-              Explore Groundwater Map
+              {t('explore_map')}
             </PrimaryButton>
 
             <SecondaryButton
@@ -68,7 +64,7 @@ export const HeroSection: React.FC = () => {
               onClick={() => navigate('/crops')}
               className="border-agri-300 bg-white hover:bg-agri-50/60 text-agri-900"
             >
-              Get Crop Advice
+              {t('get_crop_advice')}
             </SecondaryButton>
           </div>
         </div>
@@ -80,10 +76,10 @@ export const HeroSection: React.FC = () => {
             <div className="flex items-center justify-between border-b border-stone-100 pb-2 text-xs">
               <div className="flex items-center gap-1.5 text-stone-700 font-semibold">
                 <span className="text-base" aria-hidden="true">🌱</span>
-                <span>Active Crop Canopy</span>
+                <span>{t('active_crop_canopy')}</span>
               </div>
               <span className="rounded bg-water-50 border border-water-200 px-2 py-0.5 text-[11px] font-bold text-water-800">
-                Monsoon Infiltration: Normal
+                {t('monsoon_infiltration')}
               </span>
             </div>
 

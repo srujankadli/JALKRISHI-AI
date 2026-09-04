@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, LogIn, ChevronDown, ShieldCheck, UserCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const UserMenu: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +28,7 @@ export const UserMenu: React.FC = () => {
         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
       >
         <LogIn className="h-3.5 w-3.5" />
-        <span>Sign In</span>
+        <span>{t('login')}</span>
       </button>
     );
   }
@@ -82,7 +84,7 @@ export const UserMenu: React.FC = () => {
               className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-rose-50 text-rose-700 font-semibold flex items-center gap-2 cursor-pointer"
             >
               <LogOut className="h-3.5 w-3.5 text-rose-600" />
-              <span>Sign Out Session</span>
+              <span>{t('logout')}</span>
             </button>
           </div>
         </div>

@@ -15,9 +15,11 @@ import {
   insightService,
   type ExecutiveInsightSummaryData,
 } from '../../services/insightService';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const ExecutiveWaterBrief: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [insight, setInsight] = useState<ExecutiveInsightSummaryData | null>(null);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
 
@@ -53,11 +55,11 @@ export const ExecutiveWaterBrief: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-base font-black text-stone-900 tracking-tight">
-                JalKrishi AI — Executive Water Intelligence Brief
+                JalKrishi AI — {t('executive_brief')}
               </h3>
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
                 <ShieldCheck className="h-3 w-3" />
-                Confidence: {insight.confidence_level}
+                {t('confidence_score')}: {insight.confidence_level}
               </span>
             </div>
             <p className="text-xs text-stone-600 font-medium mt-0.5">
@@ -71,7 +73,7 @@ export const ExecutiveWaterBrief: React.FC = () => {
           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all cursor-pointer shadow-2xs"
         >
           <HelpCircle className="h-3.5 w-3.5" />
-          <span>{showTechnicalDetails ? 'Hide Evidence' : 'View Technical Evidence'}</span>
+          <span>{showTechnicalDetails ? 'Hide Evidence' : t('view_technical_evidence')}</span>
         </button>
       </div>
 
@@ -82,7 +84,7 @@ export const ExecutiveWaterBrief: React.FC = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
               <span className="h-2 w-2 rounded-full bg-emerald-600"></span>
-              <span>1. Current Situation</span>
+              <span>1. {t('current_situation')}</span>
             </div>
             <p className="text-xs text-stone-700 leading-relaxed font-medium">
               {insight.current_situation}
@@ -93,7 +95,7 @@ export const ExecutiveWaterBrief: React.FC = () => {
             className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer pt-1 border-t border-stone-100"
           >
             <MapPin className="h-3 w-3" />
-            <span>Inspect 5,260 Map Stations &rarr;</span>
+            <span>Inspect Map Stations &rarr;</span>
           </button>
         </div>
 
@@ -102,7 +104,7 @@ export const ExecutiveWaterBrief: React.FC = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800">
               <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
-              <span>2. Priority Risk Belt</span>
+              <span>2. {t('priority_risk_belt')}</span>
             </div>
             <p className="text-xs font-bold text-stone-900">{insight.top_priority_region}</p>
             <p className="text-[11px] text-stone-600 leading-relaxed font-medium">
@@ -122,7 +124,7 @@ export const ExecutiveWaterBrief: React.FC = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-bold text-water-800">
               <TrendingDown className="h-3.5 w-3.5 text-water-600" />
-              <span>3. 30-Day Forecast</span>
+              <span>3. {t('forecast_30_day')}</span>
             </div>
             <p className="text-xs text-stone-700 leading-relaxed font-medium">
               {insight.forecast_outlook}
@@ -141,7 +143,7 @@ export const ExecutiveWaterBrief: React.FC = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-bold text-agri-800">
               <Sprout className="h-3.5 w-3.5 text-agri-600" />
-              <span>4. Recommended Action</span>
+              <span>4. {t('recommended_action')}</span>
             </div>
             <p className="text-xs text-stone-700 leading-relaxed font-medium">
               {insight.recommended_farmer_action}

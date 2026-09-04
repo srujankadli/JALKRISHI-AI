@@ -13,6 +13,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { APP_CONFIG } from '../../utils/constants';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -25,13 +26,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   onClose,
   anomalyCount = 4,
 }) => {
+  const { t } = useLanguage();
+
   const mainNav = [
     { to: '/', label: 'Dashboard', emoji: '🌾' },
-    { to: '/map', label: 'Map', emoji: '🗺️' },
-    { to: '/forecast', label: 'Forecast', emoji: '🔮' },
-    { to: '/crops', label: 'Crops', emoji: '🌱' },
-    { to: '/whatsapp', label: 'Chat', emoji: '💬' },
-    { to: '/anomalies', label: 'Alerts', emoji: '⚠️', badge: anomalyCount },
+    { to: '/map', label: 'Groundwater Map', emoji: '🗺️' },
+    { to: '/forecast', label: 'Forecast & Predictions', emoji: '🔮' },
+    { to: '/crops', label: 'Crop Advisor', emoji: '🌱' },
+    { to: '/whatsapp', label: 'WhatsApp Farmer', emoji: '💬' },
+    { to: '/anomalies', label: 'Anomaly Detection', emoji: '⚠️', badge: anomalyCount },
   ];
 
   const fullNav = [
@@ -42,7 +45,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
     { to: '/crops', icon: Sprout, label: 'Crop Advisor', sub: 'Water-smart crop engine', emoji: '🌱' },
     { to: '/analytics', icon: BarChart3, label: 'Regional Analytics', sub: 'State & district metrics', emoji: '📊' },
     { to: '/whatsapp', icon: MessageSquare, label: 'WhatsApp Farmer', sub: 'Conversational assistant', emoji: '💬', badge: 'Chat' },
-    { to: '/help', icon: HelpCircle, label: 'Help & FAQ', sub: 'Knowledge & data sources', emoji: '📚' },
+    { to: '/help', icon: HelpCircle, label: 'Help & Knowledge', sub: 'Knowledge & data sources', emoji: '📚' },
   ];
 
   return (
@@ -68,7 +71,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                   <span className="text-lg leading-none" aria-hidden="true">
                     {item.emoji}
                   </span>
-                  <span className="text-[10px] mt-1 font-medium">{item.label}</span>
+                  <span className="text-[10px] mt-1 font-medium text-center line-clamp-1">{t(item.label)}</span>
                   {item.badge && item.badge > 0 && (
                     <span className="absolute -top-1 -right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white">
                       {item.badge}
@@ -134,7 +137,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                       <div className="flex items-center gap-3">
                         <span className="text-lg">{item.emoji}</span>
                         <div>
-                          <span className="block leading-tight">{item.label}</span>
+                          <span className="block leading-tight">{t(item.label)}</span>
                           <span
                             className={`text-xs ${
                               isActive ? 'text-agri-100' : 'text-stone-400'

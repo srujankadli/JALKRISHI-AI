@@ -24,7 +24,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   anomalyCount = 4,
 }) => {
-  const { t } = useLanguage();
+  const { t, currentLanguage } = useLanguage();
   const navItems = [
     {
       to: '/',
@@ -167,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           isActive ? 'text-agri-100' : 'text-stone-400 group-hover:text-stone-500'
                         }`}
                       >
-                        {item.sublabel}
+                        {currentLanguage === 'en' ? item.sublabel : item.label}
                       </span>
                     </div>
                   </div>

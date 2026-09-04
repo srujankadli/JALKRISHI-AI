@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface PageHeaderProps {
   title: string;
@@ -15,13 +16,15 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   actions,
   farmerNote,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="mb-6 rounded-2xl border border-stone-200/80 bg-gradient-to-r from-stone-50 via-white to-agri-50/30 p-5 shadow-subtle sm:p-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl">
-              {title}
+              {t(title)}
             </h1>
             {badge}
           </div>
