@@ -394,9 +394,9 @@ def resolve_location(
             logger.info(f"[LOCATION RESOLVER SUCCESS] Matched coordinates ({latitude:.4f}, {longitude:.4f}) -> station '{nearest.stationName}' (dist={min_d:.2f}km)")
             return LocationResolution(
                 is_resolved=True,
-                name=nearest.district if min_d > 15.0 else nearest.stationName,
-                district=nearest.district,
-                state=nearest.state,
+                name=nearest.stationName if min_d <= 15.0 else f"Coordinates ({latitude:.2f}, {longitude:.2f})",
+                district=nearest.district if min_d <= 15.0 else None,
+                state=nearest.state if min_d <= 15.0 else None,
                 latitude=latitude,
                 longitude=longitude,
                 matched_station_id=nearest.id if min_d <= 15.0 else None

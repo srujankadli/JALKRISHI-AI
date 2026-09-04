@@ -10,8 +10,9 @@ from typing import Optional
 from fastapi import APIRouter, Query, HTTPException, status
 
 from app.engines.farmer_intelligence import farmer_intelligence_engine
+from app.engines.farmer_dialogue_manager import farmer_dialogue_manager
 from app.routers.satellite_groundwater import validate_coordinates
-from app.models.schemas import GroundwaterIntelligenceSchema
+from app.models.schemas import GroundwaterIntelligenceSchema, VoiceQueryRequest, VoiceQueryResponse
 
 router = APIRouter(
     prefix="/intelligence",
@@ -113,3 +114,18 @@ def get_irrigation_advice_for_location(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error generating irrigation advice: {str(e)}",
         )
+
+
+@router.post(
+    "/conversation",
+    response_model=VoiceQueryResponse,
+    summary="Farmer Conversational AI & Dialogue Manager Endpoint",
+    description="Multi-turn conversational dialogue endpoint with slot context, location-first resolution, minimum questions, and data provenance.",
+)
+def handle_farmer_conversation(request: VoiceQueryRequest) -> VoiceQueryResponse:
+    raw_query = request.query.strip() if request.query else ""
+    if not raw_query and not request.audio_base64:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Query message must be provided.")
+    session_id = request.session_id or "default"
+    return farmer_dialogue_manager.process_message(request, session_id=session_id)
+

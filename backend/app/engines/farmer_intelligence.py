@@ -398,8 +398,8 @@ class FarmerIntelligenceEngine:
         )
 
         crop_req = CropRecommendationRequest(
-            state=state_name,
-            district=district_name,
+            state=resolved_state,
+            district=resolved_district,
             soil_type=soil_enum,
             season=CropSeason.RABI,
             water_availability=w_avail,

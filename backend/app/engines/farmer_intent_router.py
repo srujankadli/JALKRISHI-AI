@@ -237,17 +237,27 @@ class FarmerIntentRouter:
         if loc_res.is_resolved:
             ctx.last_location = loc_res
 
+        # Check if query itself contained the location
+        loc_in_query = resolve_location(query_text=raw_text).is_resolved
+
+        domain_terms = [
+            "crop", "crops", "fasal", "irrigation", "sinchai", "recharge", "rain", "rainfall",
+            "groundwater", "bhujal", "forecast", "stress", "dwlr", "anomaly", "weather",
+            "water", "paani", "neeru", "thannir", "need", "give", "how much", "when", "shortage",
+            "problem", "dry", "drying", "pest", "disease", "yellow", "soil", "harvest", "yield",
+            "borewell", "well", "tubewell", "tube well", "advisor", "advice", "level",
+            "hello", "hi", "namaste", "thanks", "bye", "name is", "who are you",
+            "भूजल", "फसल", "सिंचाई", "बारिश", "मौसम", "क्या", "कैसी", "पानी", "कीड़ा",
+            "భూజలం", "పంట", "సాగునీరు", "వర్షం", "ఎలా", "ఉంది", "నీరు",
+            "ಅಂತರ್ಜಲ", "ಬೆಳೆ", "ನೀರಾವರಿ", "ಮಳೆ", "ಹೇಗಿದೆ", "ನೀರು",
+            "நிலத்தடி", "பயிர்", "பாசனம்", "மழை", "எப்படி", "தண்ணீர்",
+            "ভূগর্ভস্থ", "ફસલ", "પાક", "પાણી"
+        ]
+        has_domain_terms = any(dt in clean for dt in domain_terms)
+
         # Check if query is primarily a location answer while a pending intent exists
         if loc_res.is_resolved and ctx.pending_intent:
-            domain_terms = [
-                "crop", "crops", "fasal", "irrigation", "sinchai", "recharge", "rain", "rainfall",
-                "groundwater", "bhujal", "forecast", "stress", "dwlr", "anomaly", "weather",
-                "advisor", "advice", "level", "भूजल", "फसल", "सिंचाई", "बारिश", "मौसम",
-                "భూజలం", "పంట", "సాగునీరు", "వర్షం", "అంతರ್ಜಲ", "ಬೆಳೆ", "ನೀರಾವರಿ", "ಮಳೆ",
-                "நிலத்தடி", "பயிர்", "பாசனம்", "மழை", "ভূগর্ভস্থ", "ફસલ", "પાક"
-            ]
-            has_other_domain_intent = any(dt in clean for dt in domain_terms)
-            if not has_other_domain_intent:
+            if not has_domain_terms:
                 res_intent = ctx.pending_intent
                 ctx.pending_intent = None
                 ctx.awaiting_location = False
@@ -259,18 +269,7 @@ class FarmerIntentRouter:
                 )
 
         # Check if query is primarily a location answer without a pending intent
-        if loc_res.is_resolved and not ctx.pending_intent:
-            domain_terms = [
-                "crop", "crops", "fasal", "irrigation", "sinchai", "recharge", "rain", "rainfall",
-                "groundwater", "bhujal", "forecast", "stress", "dwlr", "anomaly", "weather",
-                "hello", "hi", "namaste", "thanks", "bye", "name is",
-                "भूजल", "फसल", "सिंचाई", "बारिश", "मौसम", "क्या", "कैसी",
-                "భూజలం", "పంట", "సాగునీరు", "వర్షం", "ఎలా", "ఉంది",
-                "ಅಂತರ್ಜಲ", "ಬೆಳೆ", "ನೀರಾವರಿ", "ಮಳೆ", "ಹೇಗಿದೆ",
-                "நிலத்தடி", "பயிர்", "பாசனம்", "மழை", "எப்படி",
-                "ভূগর্ভস্থ", "ફસલ", "પાક"
-            ]
-            has_domain_terms = any(dt in clean for dt in domain_terms)
+        if loc_in_query and loc_res.is_resolved and not ctx.pending_intent:
             if not has_domain_terms:
                 return IntentClassificationResult(
                     intent="LOCATION_SELECTION",
@@ -293,6 +292,11 @@ class FarmerIntentRouter:
             "WEATHER_OR_RAINFALL": 0.0,
             "GENERAL_FARMING": 0.0,
             "GROUNDWATER_LEVEL": 0.0,
+            "CROP_HEALTH_PROBLEM": 0.0,
+            "WATER_SHORTAGE": 0.0,
+            "FARM_WATER_MANAGEMENT": 0.0,
+            "CROP_WATER_REQUIREMENT": 0.0,
+            "WEATHER_IMPACT_ON_CROP": 0.0,
         }
 
         # --- A. CROP_RECOMMENDATION SIGNALS ---
@@ -450,6 +454,48 @@ class FarmerIntentRouter:
             scores["GROUNDWATER_LEVEL"] += 0.4
         if loc_res.is_resolved and not any(scores[k] > 0.8 for k in scores if k != "GROUNDWATER_LEVEL"):
             scores["GROUNDWATER_LEVEL"] += 0.8
+
+        # --- K. CROP_HEALTH_PROBLEM SIGNALS ---
+        health_primary = [
+            "yellow leaves", "leaf yellowing", "leaves are yellow", "leaves turning yellow",
+            "pest", "disease", "wilting", "fungal", "peeli patti", "peela", "keeda",
+            "ಎಲೆ ಹಳದಿ", "ಕೀಟ", "இலை மஞ்சள்", "பூச்சி", "ఆకులు పసుపు", "పురుగు"
+        ]
+        if any(w in clean for w in health_primary):
+            scores["CROP_HEALTH_PROBLEM"] += 1.2
+
+        # --- L. WATER_SHORTAGE SIGNALS ---
+        shortage_primary = [
+            "well is drying", "well drying", "borewell drying", "water drying up", "no water in well",
+            "well dried", "borewell failed", "water table dropping", "paani sookh gaya", "kuan sookh",
+            "ಬಾವಿ ಒಣಗುತ್ತಿದೆ", "கிணறு வற்றுகிறது", "బావి ఎండిపోతోంది"
+        ]
+        if any(w in clean for w in shortage_primary):
+            scores["WATER_SHORTAGE"] += 1.2
+
+        # --- M. FARM_WATER_MANAGEMENT SIGNALS ---
+        mgmt_primary = [
+            "how can i save water", "how to save water", "water conservation", "save water on farm",
+            "drip irrigation benefits", "mulching", "paani kaise bachaye"
+        ]
+        if any(w in clean for w in mgmt_primary):
+            scores["FARM_WATER_MANAGEMENT"] += 1.1
+
+        # --- N. CROP_WATER_REQUIREMENT SIGNALS ---
+        req_primary = [
+            "water requirement", "how much water does", "how much water for", "water budget",
+            "kitna paani chahiye", "yastu neeru beku", "evvalavu thannir"
+        ]
+        if any(w in clean for w in req_primary):
+            scores["CROP_WATER_REQUIREMENT"] += 1.1
+
+        # --- O. WEATHER_IMPACT_ON_CROP SIGNALS ---
+        impact_primary = [
+            "heavy rain damage", "will rain damage", "excess rain on", "waterlogging",
+            "barish se nuksan", "maleyinda hani", "mazhai baathippu"
+        ]
+        if any(w in clean for w in impact_primary):
+            scores["WEATHER_IMPACT_ON_CROP"] += 1.1
 
         # Find intent with maximum score
         max_intent = max(scores, key=scores.get)
@@ -666,7 +712,7 @@ class FarmerIntentRouter:
             elif lang == "kn":
                 return "ಜಲಕೃಷಿ AI ನಿಮಗೆ ನೈಜ-ಸಮಯದ ಅಂತರ್ಜಲ ಮಟ್ಟಗಳು, 30-ದಿನಗಳ ಮುನ್ಸೂಚನೆ, ಸೂಕ್ತ ಬೆಳೆ ಆಯ್ಕೆ ಮತ್ತು ನೀರಾವರಿ ಸಲಹೆಗಳನ್ನು ನೀಡಬಲ್ಲದು."
             else:
-                return "I can provide real-time groundwater levels (DWLR or Satellite-Assisted), 30-day water level forecasts, water-smart crop recommendations, custom irrigation scheduling, groundwater risk alerts, and recharge guidance across India."
+                return "I am JalKrishi AI. I can provide real-time groundwater levels (DWLR or Satellite-Assisted), 30-day water level forecasts, water-smart crop recommendations, custom irrigation scheduling, groundwater risk alerts, and recharge guidance across India."
 
         elif intent == "THANKS":
             if lang == "hi":
