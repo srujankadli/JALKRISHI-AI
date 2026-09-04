@@ -10,7 +10,6 @@ import { stationService } from '../services/stationService';
 
 // Dashboard Components
 import { HeroSection } from '../components/dashboard/HeroSection';
-import { WaterSituationCard } from '../components/dashboard/WaterSituationCard';
 import { StatCardsGrid } from '../components/dashboard/StatCardsGrid';
 import { GroundwaterTrendCard } from '../components/dashboard/GroundwaterTrendCard';
 import { RainfallRechargeCard } from '../components/dashboard/RainfallRechargeCard';
@@ -25,7 +24,8 @@ import { JalKrishiWaterWatchCard } from '../components/dashboard/JalKrishiWaterW
 // Executive Water Brief
 import { ExecutiveWaterBrief } from '../components/intelligence/ExecutiveWaterBrief';
 
-import { FarmerVoiceAssistant } from '../components/voice/FarmerVoiceAssistant';
+// Farmer Water Advisor
+import { FarmerWaterAdvisor } from '../components/farmer/FarmerWaterAdvisor';
 import { useLanguage } from '../context/LanguageContext';
 
 interface OutletContextType {
@@ -35,7 +35,7 @@ interface OutletContextType {
 
 export const Dashboard: React.FC = () => {
   const { onSelectStation, selectedStation } = useOutletContext<OutletContextType>();
-  const { currentLanguage, t } = useLanguage();
+  const { t } = useLanguage();
 
   const [metrics, setMetrics] = useState<DashboardSummary | null>(null);
   const [lastUpdatedText, setLastUpdatedText] = useState('Just now');
@@ -109,11 +109,10 @@ export const Dashboard: React.FC = () => {
       {/* 2. Executive Water Situation Brief */}
       <ExecutiveWaterBrief />
 
-      {/* 2.5 Phase P Multilingual Farmer Voice Assistant */}
-      <FarmerVoiceAssistant
-        currentLanguage={currentLanguage}
-        selectedStation={selectedStation}
-        onLocationEstablished={(loc) => setConversationalLocation(loc)}
+      {/* 2.5 Rebuilt Farmer Water Advisor */}
+      <FarmerWaterAdvisor
+        initialLocation={effectiveLocation}
+        onLocationChange={(loc) => setConversationalLocation(loc)}
       />
 
       {/* 2.8 Proactive Groundwater Intelligence & Water Watch */}
@@ -121,9 +120,6 @@ export const Dashboard: React.FC = () => {
         location={effectiveLocation}
         selectedStation={selectedStation}
       />
-
-      {/* 3. Your Water Situation Card */}
-      <WaterSituationCard metrics={metrics} />
 
       {/* 4. Four Simplified Stat Cards */}
       <StatCardsGrid metrics={metrics} />
