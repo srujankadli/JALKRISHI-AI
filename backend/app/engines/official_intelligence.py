@@ -381,12 +381,15 @@ class OfficialIntelligenceEngine:
         level: str = "district",
         sort_by: str = "risk_score",
         target_region: Optional[str] = None,
+        page: int = 1,
+        page_size: int = 25,
     ) -> RiskRankingResponse:
         stations = self.validate_and_filter_stations(user, target_region)
 
         district_map: Dict[str, List[DWLRStationSchema]] = {}
         for s in stations:
-            district_map.setdefault(s.district, []).append(s)
+            group_key = s.state if level == "state" else s.district
+            district_map.setdefault(group_key, []).append(s)
 
         rankings: List[RiskRankingItem] = []
         for dist_name, st_list in district_map.items():
@@ -416,12 +419,12 @@ class OfficialIntelligenceEngine:
                 RiskRankingComponent(name="Anomaly Frequency", weight_pct=10, score=round(c5_score, 1), description="Recent telemetry spike or drop occurrences"),
             ]
 
-            state_name = st_list[0].state if st_list else "India"
+            parent_name = "India" if level == "state" else (st_list[0].state if st_list else "India")
 
             item = RiskRankingItem(
                 rank=0,
                 region_name=dist_name,
-                parent_region=state_name,
+                parent_region=parent_name,
                 risk_score=overall_score,
                 risk_category=cat,
                 trend=trend_str,
@@ -444,6 +447,11 @@ class OfficialIntelligenceEngine:
         for r_idx, item in enumerate(rankings):
             item.rank = r_idx + 1
 
+        total_items = len(rankings)
+        total_pages = max(1, math.ceil(total_items / max(1, page_size)))
+        offset = (page - 1) * page_size
+        paginated_rankings = rankings[offset : offset + page_size]
+
         methodology = (
             "Composite Risk Index = Groundwater Stress (30%) + Trend (25%) + "
             "Rainfall Signal (20%) + Forecast Risk (15%) + Anomaly Frequency (10%). "
@@ -454,7 +462,11 @@ class OfficialIntelligenceEngine:
             timestamp=datetime.now(timezone.utc).isoformat(),
             user_scope=self.get_user_scope_description(user),
             methodology=methodology,
-            rankings=rankings,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages,
+            total_items=total_items,
+            rankings=paginated_rankings,
             disclaimer=self._disclaimer,
         )
 
@@ -501,18 +513,29 @@ class OfficialIntelligenceEngine:
             "observed_series": observed_points,
             "forecast_series": forecast_points,
             "demarcation_note": "Observed DWLR telemetry vs Model Forecast trajectory are visually separated.",
-            "data_mode": settings.DATA_MODE,
+            "data_mode": settings.DATA_MODE if hasattr(settings, "DATA_MODE") else "DEMO_SIMULATION",
             "disclaimer": self._disclaimer,
         }
 
     # --------------------------------------------------------------------------
     # 7. DWLR NETWORK HEALTH MONITORING
     # --------------------------------------------------------------------------
-    def get_network_health(self, user: UserProfile) -> NetworkHealthResponse:
+    def get_network_health(
+        self,
+        user: UserProfile,
+        page: int = 1,
+        page_size: int = 25,
+        search: Optional[str] = None,
+        state: Optional[str] = None,
+        district: Optional[str] = None,
+        block: Optional[str] = None,
+        risk: Optional[str] = None,
+        telemetry_status: Optional[str] = None,
+        sensor_status: Optional[str] = None,
+    ) -> NetworkHealthResponse:
         stations = self.validate_and_filter_stations(user)
         total = len(stations)
 
-        items: List[NetworkStationItem] = []
         online_c = 0
         delayed_c = 0
         offline_c = 0
@@ -524,8 +547,37 @@ class OfficialIntelligenceEngine:
             elif t_status == "delayed":
                 delayed_c += 1
             else:
-                t_status = "online"
                 online_c += 1
+
+        reporting_pct = round((online_c / max(total, 1)) * 100, 1)
+        missing_pings = delayed_c + offline_c
+
+        filtered_stations = stations
+        if search:
+            q = search.lower().strip()
+            filtered_stations = [
+                s for s in filtered_stations
+                if q in s.id.lower()
+                or q in s.stationName.lower()
+                or q in s.district.lower()
+                or q in s.state.lower()
+                or q in (s.block or "").lower()
+            ]
+        if state:
+            s_clean = state.lower().strip()
+            filtered_stations = [s for s in filtered_stations if s_clean in s.state.lower()]
+        if district:
+            d_clean = district.lower().strip()
+            filtered_stations = [s for s in filtered_stations if d_clean in s.district.lower()]
+        if block:
+            b_clean = block.lower().strip()
+            filtered_stations = [s for s in filtered_stations if b_clean in (s.block or "").lower()]
+
+        items: List[NetworkStationItem] = []
+        for s in filtered_stations:
+            t_status = self._get_status_str(s.telemetryStatus).lower()
+            if t_status not in ["offline", "delayed"]:
+                t_status = "online"
 
             q_status = "critical" if s.waterLevel > 24.0 else ("warning" if s.waterLevel > 18.0 else "healthy")
             risk_val = round(min(100.0, (s.waterLevel / 32.0) * 100.0), 1)
@@ -537,6 +589,13 @@ class OfficialIntelligenceEngine:
                 calib_status = "CALIBRATION_DUE"
             else:
                 calib_status = "CALIBRATED"
+
+            if telemetry_status and telemetry_status.lower() != t_status:
+                continue
+            if risk and risk.lower() != q_status:
+                continue
+            if sensor_status and sensor_status.upper() != calib_status:
+                continue
 
             item = NetworkStationItem(
                 station_id=s.id,
@@ -556,8 +615,10 @@ class OfficialIntelligenceEngine:
             )
             items.append(item)
 
-        reporting_pct = round((online_c / max(total, 1)) * 100, 1)
-        missing_pings = delayed_c + offline_c
+        total_items = len(items)
+        total_pages = max(1, math.ceil(total_items / max(1, page_size)))
+        offset = (page - 1) * page_size
+        paginated_items = items[offset : offset + page_size]
 
         return NetworkHealthResponse(
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -568,7 +629,11 @@ class OfficialIntelligenceEngine:
             offline_stations=offline_c,
             missing_pings_count=missing_pings,
             reporting_pct=reporting_pct,
-            stations=items,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages,
+            total_items=total_items,
+            stations=paginated_items,
             disclaimer=self._disclaimer,
         )
 

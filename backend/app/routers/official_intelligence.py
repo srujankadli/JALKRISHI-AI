@@ -111,10 +111,12 @@ def get_risk_ranking(
     level: str = Query("district", description="district or state"),
     sort_by: str = Query("risk_score", description="risk_score, fastest_decline, lowest_confidence, recharge_opportunity"),
     target_region: Optional[str] = Query(None, description="Optional region filter"),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(25, ge=1, le=500, description="Items per page"),
     user: UserProfile = Depends(require_roles(OFFICIAL_ROLES)),
 ) -> RiskRankingResponse:
     return official_intelligence_engine.get_risk_ranking(
-        user=user, level=level, sort_by=sort_by, target_region=target_region
+        user=user, level=level, sort_by=sort_by, target_region=target_region, page=page, page_size=page_size
     )
 
 
@@ -142,9 +144,29 @@ def get_official_trends(
     description="Dedicated monitoring endpoint for online, delayed, and offline telemetry stations.",
 )
 def get_network_health(
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(25, ge=1, le=500, description="Items per page"),
+    search: Optional[str] = Query(None, description="Search query across ID, name, district, state, block"),
+    state: Optional[str] = Query(None, description="State filter"),
+    district: Optional[str] = Query(None, description="District filter"),
+    block: Optional[str] = Query(None, description="Block filter"),
+    risk: Optional[str] = Query(None, description="Risk level filter (critical, warning, healthy)"),
+    telemetry_status: Optional[str] = Query(None, description="Telemetry status filter (online, delayed, offline)"),
+    sensor_status: Optional[str] = Query(None, description="Sensor status filter (CALIBRATED, CALIBRATION_DUE, NO_PING)"),
     user: UserProfile = Depends(require_roles(OFFICIAL_ROLES)),
 ) -> NetworkHealthResponse:
-    return official_intelligence_engine.get_network_health(user)
+    return official_intelligence_engine.get_network_health(
+        user=user,
+        page=page,
+        page_size=page_size,
+        search=search,
+        state=state,
+        district=district,
+        block=block,
+        risk=risk,
+        telemetry_status=telemetry_status,
+        sensor_status=sensor_status,
+    )
 
 
 @router.get(

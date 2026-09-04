@@ -1398,6 +1398,10 @@ class RiskRankingResponse(BaseModel):
     timestamp: str
     user_scope: str
     methodology: str
+    page: int = 1
+    page_size: int = 25
+    total_pages: int = 1
+    total_items: int = 0
     rankings: List[RiskRankingItem]
     disclaimer: str
 
@@ -1428,6 +1432,10 @@ class NetworkHealthResponse(BaseModel):
     offline_stations: int
     missing_pings_count: int
     reporting_pct: float
+    page: int = 1
+    page_size: int = 25
+    total_pages: int = 1
+    total_items: int = 0
     stations: List[NetworkStationItem]
     disclaimer: str
 

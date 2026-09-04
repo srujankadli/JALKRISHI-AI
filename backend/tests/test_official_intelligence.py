@@ -240,3 +240,66 @@ def test_read_only_official_read_access():
     assert res_net.status_code == 200
     assert "missing_pings_count" in res_net.json()
 
+
+def test_network_health_pagination_and_search():
+    """Verifies server-side pagination, search queries, and multi-field filters on /official/network."""
+    headers = {"Authorization": f"Bearer {ADMIN_TOKEN}"}
+
+    # Page 1 vs Page 2 differentiation
+    res1 = client.get("/api/v1/official/network?page=1&page_size=10", headers=headers)
+    assert res1.status_code == 200
+    d1 = res1.json()
+    assert d1["page"] == 1
+    assert d1["page_size"] == 10
+    assert len(d1["stations"]) == 10
+    assert d1["total_stations"] == 5260
+
+    res2 = client.get("/api/v1/official/network?page=2&page_size=10", headers=headers)
+    assert res2.status_code == 200
+    d2 = res2.json()
+    assert d2["page"] == 2
+    assert d2["page_size"] == 10
+    assert len(d2["stations"]) == 10
+
+    # Ensure page 1 and page 2 stations are distinct
+    p1_ids = [s["station_id"] for s in d1["stations"]]
+    p2_ids = [s["station_id"] for s in d2["stations"]]
+    assert set(p1_ids).isdisjoint(set(p2_ids))
+
+    # Search filter
+    res_search = client.get("/api/v1/official/network?search=Sangrur", headers=headers)
+    assert res_search.status_code == 200
+    d_search = res_search.json()
+    assert all("sangrur" in s["district"].lower() or "sangrur" in s["station_name"].lower() for s in d_search["stations"])
+
+    # Multi-field filtering
+    res_filter = client.get("/api/v1/official/network?risk=critical&telemetry_status=online", headers=headers)
+    assert res_filter.status_code == 200
+    d_filter = res_filter.json()
+    for st in d_filter["stations"]:
+        assert st["data_quality_status"] == "critical"
+        assert st["telemetry_status"] == "online"
+
+
+def test_risk_ranking_pagination_and_level():
+    """Verifies server-side pagination and level (district vs state) on /official/risk-ranking."""
+    headers = {"Authorization": f"Bearer {ADMIN_TOKEN}"}
+
+    # District level paginated
+    res_dist = client.get("/api/v1/official/risk-ranking?level=district&page=1&page_size=10", headers=headers)
+    assert res_dist.status_code == 200
+    d_dist = res_dist.json()
+    assert d_dist["page"] == 1
+    assert d_dist["page_size"] == 10
+    assert len(d_dist["rankings"]) <= 10
+    assert d_dist["total_items"] > 0
+
+    # State level paginated
+    res_state = client.get("/api/v1/official/risk-ranking?level=state&page=1&page_size=10", headers=headers)
+    assert res_state.status_code == 200
+    d_state = res_state.json()
+    assert d_state["page"] == 1
+    assert len(d_state["rankings"]) > 0
+    assert d_state["rankings"][0]["parent_region"] == "India"
+
+

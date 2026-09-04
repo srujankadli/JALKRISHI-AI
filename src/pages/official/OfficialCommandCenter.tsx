@@ -178,14 +178,84 @@ export const OfficialCommandCenter: React.FC = () => {
     }
   };
 
-  const handleRankingSortChange = async (newSort: string) => {
-    setRankingSort(newSort);
+  // Network Pagination & Filtering State
+  const [networkPage, setNetworkPage] = useState<number>(1);
+  const [networkPageSize, setNetworkPageSize] = useState<number>(25);
+  const [networkSearch, setNetworkSearch] = useState<string>('');
+  const [networkStateFilter, setNetworkStateFilter] = useState<string>('');
+  const [networkDistrictFilter, setNetworkDistrictFilter] = useState<string>('');
+  const [networkRiskFilter, setNetworkRiskFilter] = useState<string>('');
+  const [networkTelemetryFilter, setNetworkTelemetryFilter] = useState<string>('');
+  const [networkSensorFilter, setNetworkSensorFilter] = useState<string>('');
+
+  // Risk Leaderboard Pagination State
+  const [rankingPage, setRankingPage] = useState<number>(1);
+  const [rankingPageSize, setRankingPageSize] = useState<number>(25);
+  const [rankingLevel, setRankingLevel] = useState<string>('district');
+
+  const fetchNetworkWithParams = async (params: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    state?: string;
+    district?: string;
+    risk?: string;
+    telemetry?: string;
+    sensor?: string;
+  }) => {
+    const nextPage = params.page ?? networkPage;
+    const nextPageSize = params.pageSize ?? networkPageSize;
+    const nextSearch = params.search ?? networkSearch;
+    const nextState = params.state ?? networkStateFilter;
+    const nextDistrict = params.district ?? networkDistrictFilter;
+    const nextRisk = params.risk ?? networkRiskFilter;
+    const nextTelemetry = params.telemetry ?? networkTelemetryFilter;
+    const nextSensor = params.sensor ?? networkSensorFilter;
+
     try {
-      const res = await officialService.getRiskRanking(newSort);
-      setRankingData(res);
+      const res = await officialService.getNetworkHealth({
+        page: nextPage,
+        page_size: nextPageSize,
+        search: nextSearch,
+        state: nextState,
+        district: nextDistrict,
+        risk: nextRisk,
+        telemetry_status: nextTelemetry,
+        sensor_status: nextSensor,
+      });
+      setNetworkData(res);
+      setNetworkPage(nextPage);
+      setNetworkPageSize(nextPageSize);
     } catch (e) {
-      console.error('Ranking sort error', e);
+      console.error('Error loading network health', e);
     }
+  };
+
+  const fetchRankingWithParams = async (params: {
+    sort?: string;
+    level?: string;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const nextSort = params.sort ?? rankingSort;
+    const nextLevel = params.level ?? rankingLevel;
+    const nextPage = params.page ?? rankingPage;
+    const nextPageSize = params.pageSize ?? rankingPageSize;
+
+    try {
+      const res = await officialService.getRiskRanking(nextSort, nextLevel, undefined, nextPage, nextPageSize);
+      setRankingData(res);
+      setRankingSort(nextSort);
+      setRankingLevel(nextLevel);
+      setRankingPage(nextPage);
+      setRankingPageSize(nextPageSize);
+    } catch (e) {
+      console.error('Error loading risk ranking', e);
+    }
+  };
+
+  const handleRankingSortChange = async (newSort: string) => {
+    await fetchRankingWithParams({ sort: newSort, page: 1 });
   };
 
   return (
@@ -531,21 +601,59 @@ export const OfficialCommandCenter: React.FC = () => {
             <div className="space-y-4">
               <div className="p-4 rounded-2xl border border-stone-750 bg-stone-850 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-lg font-bold text-white">{t('Transparent Groundwater Risk Index Leaderboard')}</h2>
+                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                    <TrendingDown className="h-5 w-5 text-amber-400" />
+                    {t('Transparent Groundwater Risk Index Leaderboard')}
+                  </h2>
                   <p className="text-xs text-stone-400 mt-0.5">{rankingData.methodology}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-stone-400">{t('Sort By')}:</span>
-                  <select
-                    value={rankingSort}
-                    onChange={(e) => handleRankingSortChange(e.target.value)}
-                    className="bg-stone-900 border border-stone-700 text-stone-200 text-xs font-semibold rounded-lg px-3 py-1.5"
-                  >
-                    <option value="risk_score">{t('Highest Risk Index')}</option>
-                    <option value="fastest_decline">{t('Fastest Decline')}</option>
-                    <option value="recharge_opportunity">{t('Recharge Opportunity')}</option>
-                    <option value="lowest_confidence">{t('Lowest Confidence')}</option>
-                  </select>
+                <div className="flex flex-wrap items-center gap-3 text-xs">
+                  <div className="flex items-center gap-1.5 bg-stone-900 border border-stone-700 rounded-lg p-1">
+                    <button
+                      onClick={() => fetchRankingWithParams({ level: 'district', page: 1 })}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        rankingLevel === 'district' ? 'bg-agri-600 text-white' : 'text-stone-400 hover:text-white'
+                      }`}
+                    >
+                      {t('District Level')}
+                    </button>
+                    <button
+                      onClick={() => fetchRankingWithParams({ level: 'state', page: 1 })}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        rankingLevel === 'state' ? 'bg-agri-600 text-white' : 'text-stone-400 hover:text-white'
+                      }`}
+                    >
+                      {t('State Level')}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-stone-400 font-semibold">{t('Sort By')}:</span>
+                    <select
+                      value={rankingSort}
+                      onChange={(e) => handleRankingSortChange(e.target.value)}
+                      className="bg-stone-900 border border-stone-700 text-stone-200 text-xs font-semibold rounded-lg px-3 py-1.5"
+                    >
+                      <option value="risk_score">{t('Highest Risk Index')}</option>
+                      <option value="fastest_decline">{t('Fastest Decline')}</option>
+                      <option value="recharge_opportunity">{t('Recharge Opportunity')}</option>
+                      <option value="lowest_confidence">{t('Lowest Confidence')}</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-stone-400 font-semibold">{t('Rows')}:</span>
+                    <select
+                      value={rankingPageSize}
+                      onChange={(e) => fetchRankingWithParams({ pageSize: Number(e.target.value), page: 1 })}
+                      className="bg-stone-900 border border-stone-700 text-stone-200 text-xs font-semibold rounded-lg px-2.5 py-1.5 font-mono"
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -554,8 +662,8 @@ export const OfficialCommandCenter: React.FC = () => {
                   <thead className="bg-stone-900 text-stone-400 font-bold border-b border-stone-750 uppercase tracking-wider">
                     <tr>
                       <th className="p-3.5">#</th>
-                      <th className="p-3.5">{t('District')}</th>
-                      <th className="p-3.5">{t('State')}</th>
+                      <th className="p-3.5">{rankingLevel === 'state' ? t('State') : t('District')}</th>
+                      <th className="p-3.5">{rankingLevel === 'state' ? t('Region') : t('State')}</th>
                       <th className="p-3.5">{t('Risk Score')}</th>
                       <th className="p-3.5">{t('Category')}</th>
                       <th className="p-3.5">{t('Trend')}</th>
@@ -584,6 +692,32 @@ export const OfficialCommandCenter: React.FC = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Ranking Pagination Controls */}
+              <div className="p-4 rounded-2xl border border-stone-750 bg-stone-850 flex flex-wrap items-center justify-between gap-4 text-xs">
+                <span className="text-stone-400 font-mono">
+                  {t('Showing Page')} <strong className="text-white">{rankingData.page || 1}</strong> {t('of')} <strong className="text-white">{rankingData.total_pages || 1}</strong> ({rankingData.total_items || rankingData.rankings.length} {t('Ranked Regions')})
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={(rankingData.page || 1) <= 1}
+                    onClick={() => fetchRankingWithParams({ page: (rankingData.page || 1) - 1 })}
+                    className="px-3 py-1.5 rounded-lg border border-stone-700 bg-stone-900 text-stone-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-800 transition font-semibold"
+                  >
+                    {t('Previous')}
+                  </button>
+                  <span className="px-3 py-1.5 rounded-lg bg-stone-900 border border-stone-750 font-mono font-bold text-amber-400">
+                    {rankingData.page || 1} / {rankingData.total_pages || 1}
+                  </span>
+                  <button
+                    disabled={(rankingData.page || 1) >= (rankingData.total_pages || 1)}
+                    onClick={() => fetchRankingWithParams({ page: (rankingData.page || 1) + 1 })}
+                    className="px-3 py-1.5 rounded-lg border border-stone-700 bg-stone-900 text-stone-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-800 transition font-semibold"
+                  >
+                    {t('Next')}
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -638,29 +772,173 @@ export const OfficialCommandCenter: React.FC = () => {
           {/* TAB 6: DWLR NETWORK HEALTH */}
           {activeTab === 'network' && networkData && (
             <div className="space-y-4">
+              {/* Network-wide Operational KPIs */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div className="p-4 rounded-xl border border-stone-750 bg-stone-850">
-                  <span className="text-xs text-stone-400">{t('Total Telemetry Nodes')}</span>
+                  <span className="text-xs text-stone-400">{t('Total DWLR Network Nodes')}</span>
                   <span className="text-2xl font-extrabold text-white block font-mono">{networkData.total_stations}</span>
+                  <span className="text-[10px] text-stone-500 font-sans">{t('Full Authorized Scope')}</span>
                 </div>
                 <div className="p-4 rounded-xl border border-stone-750 bg-stone-850">
-                  <span className="text-xs text-emerald-400">{t('Online Nodes')}</span>
+                  <span className="text-xs text-emerald-400">{t('Online Telemetry Nodes')}</span>
                   <span className="text-2xl font-extrabold text-emerald-400 block font-mono">{networkData.online_stations}</span>
+                  <span className="text-[10px] text-emerald-500 font-mono">{networkData.reporting_pct}% {t('Reporting Rate')}</span>
                 </div>
                 <div className="p-4 rounded-xl border border-stone-750 bg-stone-850">
                   <span className="text-xs text-amber-400">{t('Delayed Telemetry')}</span>
                   <span className="text-2xl font-extrabold text-amber-400 block font-mono">{networkData.delayed_stations}</span>
+                  <span className="text-[10px] text-amber-500">{t('Latency > 24 Hours')}</span>
                 </div>
                 <div className="p-4 rounded-xl border border-stone-750 bg-stone-850">
                   <span className="text-xs text-rose-400">{t('Offline Nodes')}</span>
                   <span className="text-2xl font-extrabold text-rose-400 block font-mono">{networkData.offline_stations}</span>
+                  <span className="text-[10px] text-rose-500">{t('No Connection Signal')}</span>
                 </div>
                 <div className="p-4 rounded-xl border border-stone-750 bg-stone-850">
-                  <span className="text-xs text-purple-400">{t('Missing Pings')}</span>
+                  <span className="text-xs text-purple-400">{t('Missing Pings Count')}</span>
                   <span className="text-2xl font-extrabold text-purple-400 block font-mono">{networkData.missing_pings_count}</span>
+                  <span className="text-[10px] text-purple-500">{t('Delayed + Offline Pings')}</span>
                 </div>
               </div>
 
+              {/* Station Search & Multi-Field Filter Controls */}
+              <div className="p-4 rounded-2xl border border-stone-750 bg-stone-850 space-y-3">
+                <div className="flex items-center justify-between border-b border-stone-750 pb-2">
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <Radio className="h-4 w-4 text-agri-400" />
+                    {t('Station-Level Telemetry Network Inspector')}
+                  </h3>
+                  <button
+                    onClick={() => {
+                      setNetworkSearch('');
+                      setNetworkStateFilter('');
+                      setNetworkDistrictFilter('');
+                      setNetworkRiskFilter('');
+                      setNetworkTelemetryFilter('');
+                      setNetworkSensorFilter('');
+                      fetchNetworkWithParams({
+                        search: '',
+                        state: '',
+                        district: '',
+                        risk: '',
+                        telemetry: '',
+                        sensor: '',
+                        page: 1,
+                      });
+                    }}
+                    className="flex items-center gap-1 text-xs text-stone-400 hover:text-amber-400 transition"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    {t('Reset Filters')}
+                  </button>
+                </div>
+
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  {/* Search input */}
+                  <div className="relative">
+                    <Search className="h-4 w-4 absolute left-3 top-2.5 text-stone-500" />
+                    <input
+                      type="text"
+                      placeholder={t('Search by ID, name, district, state...')}
+                      value={networkSearch}
+                      onChange={(e) => {
+                        setNetworkSearch(e.target.value);
+                        fetchNetworkWithParams({ search: e.target.value, page: 1 });
+                      }}
+                      className="w-full pl-9 pr-3 py-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-200 placeholder-stone-500 focus:outline-none focus:border-agri-500"
+                    />
+                  </div>
+
+                  {/* State Filter */}
+                  <input
+                    type="text"
+                    placeholder={t('Filter by State (e.g. Punjab, Rajasthan)...')}
+                    value={networkStateFilter}
+                    onChange={(e) => {
+                      setNetworkStateFilter(e.target.value);
+                      fetchNetworkWithParams({ state: e.target.value, page: 1 });
+                    }}
+                    className="w-full px-3 py-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-200 placeholder-stone-500 focus:outline-none focus:border-agri-500"
+                  />
+
+                  {/* District Filter */}
+                  <input
+                    type="text"
+                    placeholder={t('Filter by District (e.g. Sangrur, Kolar)...')}
+                    value={networkDistrictFilter}
+                    onChange={(e) => {
+                      setNetworkDistrictFilter(e.target.value);
+                      fetchNetworkWithParams({ district: e.target.value, page: 1 });
+                    }}
+                    className="w-full px-3 py-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-200 placeholder-stone-500 focus:outline-none focus:border-agri-500"
+                  />
+
+                  {/* Risk Level Filter */}
+                  <select
+                    value={networkRiskFilter}
+                    onChange={(e) => {
+                      setNetworkRiskFilter(e.target.value);
+                      fetchNetworkWithParams({ risk: e.target.value, page: 1 });
+                    }}
+                    className="w-full px-3 py-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-200 focus:outline-none focus:border-agri-500 font-semibold"
+                  >
+                    <option value="">{t('All Risk Categories')}</option>
+                    <option value="critical">{t('CRITICAL (>24m bgl)')}</option>
+                    <option value="warning">{t('WARNING (18-24m bgl)')}</option>
+                    <option value="healthy">{t('HEALTHY (<18m bgl)')}</option>
+                  </select>
+
+                  {/* Telemetry Status Filter */}
+                  <select
+                    value={networkTelemetryFilter}
+                    onChange={(e) => {
+                      setNetworkTelemetryFilter(e.target.value);
+                      fetchNetworkWithParams({ telemetry: e.target.value, page: 1 });
+                    }}
+                    className="w-full px-3 py-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-200 focus:outline-none focus:border-agri-500 font-semibold"
+                  >
+                    <option value="">{t('All Telemetry Statuses')}</option>
+                    <option value="online">{t('ONLINE')}</option>
+                    <option value="delayed">{t('DELAYED')}</option>
+                    <option value="offline">{t('OFFLINE')}</option>
+                  </select>
+
+                  {/* Sensor Status Filter */}
+                  <select
+                    value={networkSensorFilter}
+                    onChange={(e) => {
+                      setNetworkSensorFilter(e.target.value);
+                      fetchNetworkWithParams({ sensor: e.target.value, page: 1 });
+                    }}
+                    className="w-full px-3 py-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-200 focus:outline-none focus:border-agri-500 font-semibold"
+                  >
+                    <option value="">{t('All Sensor Statuses')}</option>
+                    <option value="CALIBRATED">{t('CALIBRATED')}</option>
+                    <option value="CALIBRATION_DUE">{t('CALIBRATION_DUE')}</option>
+                    <option value="NO_PING">{t('NO_PING')}</option>
+                  </select>
+
+                  {/* Rows Per Page */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-stone-400 font-semibold">{t('Page Size')}:</span>
+                    <select
+                      value={networkPageSize}
+                      onChange={(e) => {
+                        const newSz = Number(e.target.value);
+                        fetchNetworkWithParams({ pageSize: newSz, page: 1 });
+                      }}
+                      className="bg-stone-900 border border-stone-700 text-stone-200 px-3 py-2 rounded-lg font-mono font-semibold"
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Station Data Table */}
               <div className="overflow-x-auto rounded-2xl border border-stone-750 bg-stone-850">
                 <table className="w-full text-left text-xs text-stone-300">
                   <thead className="bg-stone-900 text-stone-400 font-bold border-b border-stone-750">
@@ -668,6 +946,7 @@ export const OfficialCommandCenter: React.FC = () => {
                       <th className="p-3.5">{t('Station ID')}</th>
                       <th className="p-3.5">{t('Station Name')}</th>
                       <th className="p-3.5">{t('District')}</th>
+                      <th className="p-3.5">{t('State')}</th>
                       <th className="p-3.5">{t('Latest Reading')}</th>
                       <th className="p-3.5">{t('Telemetry Status')}</th>
                       <th className="p-3.5">{t('Battery')}</th>
@@ -676,15 +955,16 @@ export const OfficialCommandCenter: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-800">
-                    {networkData.stations.slice(0, 15).map((st) => (
+                    {networkData.stations.map((st) => (
                       <tr key={st.station_id} className="hover:bg-stone-800/50">
                         <td className="p-3.5 font-mono font-bold text-agri-400">{st.station_id}</td>
                         <td className="p-3.5 font-semibold text-white">{st.station_name}</td>
                         <td className="p-3.5 text-stone-400">{st.district}</td>
+                        <td className="p-3.5 text-stone-400">{st.state}</td>
                         <td className="p-3.5 font-mono font-bold">{st.latest_reading} m bgl</td>
                         <td className="p-3.5">
                           <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
-                            st.telemetry_status === 'online' ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'
+                            st.telemetry_status === 'online' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : (st.telemetry_status === 'delayed' ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-rose-950 text-rose-300 border border-rose-800')
                           }`}>
                             {st.telemetry_status}
                           </span>
@@ -694,16 +974,62 @@ export const OfficialCommandCenter: React.FC = () => {
                         </td>
                         <td className="p-3.5">
                           <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold ${
-                            st.sensor_status === 'CALIBRATED' ? 'bg-blue-950 text-blue-300' : 'bg-amber-950 text-amber-300'
+                            st.sensor_status === 'CALIBRATED' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-amber-950 text-amber-300 border border-amber-800'
                           }`}>
                             {st.sensor_status || 'CALIBRATED'}
                           </span>
                         </td>
-                        <td className="p-3.5 font-semibold uppercase">{st.data_quality_status}</td>
+                        <td className="p-3.5">
+                          <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
+                            st.data_quality_status === 'critical' ? 'bg-rose-900 text-rose-200' : (st.data_quality_status === 'warning' ? 'bg-amber-900 text-amber-200' : 'bg-emerald-900 text-emerald-200')
+                          }`}>
+                            {st.data_quality_status}
+                          </span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* DWLR Network Pagination Controls */}
+              <div className="p-4 rounded-2xl border border-stone-750 bg-stone-850 flex flex-wrap items-center justify-between gap-4 text-xs">
+                <span className="text-stone-400 font-mono">
+                  {t('Showing Page')} <strong className="text-white">{networkData.page || 1}</strong> {t('of')} <strong className="text-white">{networkData.total_pages || 1}</strong> ({networkData.total_items || networkData.stations.length} {t('Matching DWLR Stations out of')} {networkData.total_stations} {t('Total Authorized Stations')})
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={(networkData.page || 1) <= 1}
+                    onClick={() => fetchNetworkWithParams({ page: 1 })}
+                    className="px-2.5 py-1.5 rounded-lg border border-stone-700 bg-stone-900 text-stone-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-800 font-semibold"
+                  >
+                    {t('First')}
+                  </button>
+                  <button
+                    disabled={(networkData.page || 1) <= 1}
+                    onClick={() => fetchNetworkWithParams({ page: (networkData.page || 1) - 1 })}
+                    className="px-3 py-1.5 rounded-lg border border-stone-700 bg-stone-900 text-stone-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-800 transition font-semibold"
+                  >
+                    {t('Previous')}
+                  </button>
+                  <span className="px-3 py-1.5 rounded-lg bg-stone-900 border border-stone-750 font-mono font-bold text-emerald-400">
+                    {networkData.page || 1} / {networkData.total_pages || 1}
+                  </span>
+                  <button
+                    disabled={(networkData.page || 1) >= (networkData.total_pages || 1)}
+                    onClick={() => fetchNetworkWithParams({ page: (networkData.page || 1) + 1 })}
+                    className="px-3 py-1.5 rounded-lg border border-stone-700 bg-stone-900 text-stone-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-800 transition font-semibold"
+                  >
+                    {t('Next')}
+                  </button>
+                  <button
+                    disabled={(networkData.page || 1) >= (networkData.total_pages || 1)}
+                    onClick={() => fetchNetworkWithParams({ page: networkData.total_pages || 1 })}
+                    className="px-2.5 py-1.5 rounded-lg border border-stone-700 bg-stone-900 text-stone-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-800 font-semibold"
+                  >
+                    {t('Last')}
+                  </button>
+                </div>
               </div>
             </div>
           )}

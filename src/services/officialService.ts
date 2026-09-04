@@ -117,6 +117,10 @@ export interface RiskRankingResponse {
   timestamp: string;
   user_scope: string;
   methodology: string;
+  page?: number;
+  page_size?: number;
+  total_pages?: number;
+  total_items?: number;
   rankings: RiskRankingItem[];
   disclaimer: string;
 }
@@ -147,6 +151,10 @@ export interface NetworkHealthResponse {
   offline_stations: number;
   missing_pings_count: number;
   reporting_pct: number;
+  page?: number;
+  page_size?: number;
+  total_pages?: number;
+  total_items?: number;
   stations: NetworkStationItem[];
   disclaimer: string;
 }
@@ -444,9 +452,20 @@ class OfficialService {
     };
   }
 
-  async getRiskRanking(sortBy: string = 'risk_score', targetRegion?: string): Promise<RiskRankingResponse> {
+  async getRiskRanking(
+    sortBy: string = 'risk_score',
+    level: string = 'district',
+    targetRegion?: string,
+    page: number = 1,
+    pageSize: number = 25,
+  ): Promise<RiskRankingResponse> {
     try {
-      const params: Record<string, string> = { sort_by: sortBy };
+      const params: Record<string, string> = {
+        sort_by: sortBy,
+        level,
+        page: page.toString(),
+        page_size: pageSize.toString(),
+      };
       if (targetRegion) params.target_region = targetRegion;
       const res = await fetch(this.buildUrl('/official/risk-ranking', params), { headers: this.getHeaders() });
       if (res.ok) return await res.json();
@@ -458,6 +477,10 @@ class OfficialService {
       timestamp: new Date().toISOString(),
       user_scope: 'Pan-India National Network (5,260 DWLR Stations)',
       methodology: 'Composite Risk Index = Groundwater Stress (30%) + Trend (25%) + Infiltration Signal (20%) + Forecast Risk (15%) + Telemetry Anomaly (10%). Transparent methodology based on reference simulation telemetry and model estimates.',
+      page,
+      page_size: pageSize,
+      total_pages: 1,
+      total_items: 1,
       rankings: [
         {
           rank: 1,
@@ -478,7 +501,7 @@ class OfficialService {
           recharge_score: 31.5,
         },
       ],
-      disclaimer: 'JalKrishi Reference Simulation Dataset & Hydrogeological Decision Support Model.',
+      disclaimer: 'Local Reference Fallback — Backend Unavailable. JalKrishi Reference Simulation Dataset & Hydrogeological Model Output.',
     };
   }
 
@@ -513,13 +536,34 @@ class OfficialService {
       ],
       demarcation_note: 'Reference simulation telemetry vs Model Forecast trajectory are visually separated.',
       data_mode: 'DEMO_SIMULATION',
-      disclaimer: 'JalKrishi Reference Simulation Dataset & Hydrogeological Decision Support Model.',
+      disclaimer: 'Local Reference Fallback — Backend Unavailable. JalKrishi Reference Simulation Dataset & Hydrogeological Model Output.',
     };
   }
 
-  async getNetworkHealth(): Promise<NetworkHealthResponse> {
+  async getNetworkHealth(params?: {
+    page?: number;
+    page_size?: number;
+    search?: string;
+    state?: string;
+    district?: string;
+    block?: string;
+    risk?: string;
+    telemetry_status?: string;
+    sensor_status?: string;
+  }): Promise<NetworkHealthResponse> {
     try {
-      const res = await fetch(this.buildUrl('/official/network'), { headers: this.getHeaders() });
+      const queryParams: Record<string, string> = {};
+      if (params?.page) queryParams.page = params.page.toString();
+      if (params?.page_size) queryParams.page_size = params.page_size.toString();
+      if (params?.search) queryParams.search = params.search;
+      if (params?.state) queryParams.state = params.state;
+      if (params?.district) queryParams.district = params.district;
+      if (params?.block) queryParams.block = params.block;
+      if (params?.risk) queryParams.risk = params.risk;
+      if (params?.telemetry_status) queryParams.telemetry_status = params.telemetry_status;
+      if (params?.sensor_status) queryParams.sensor_status = params.sensor_status;
+
+      const res = await fetch(this.buildUrl('/official/network', queryParams), { headers: this.getHeaders() });
       if (res.ok) return await res.json();
     } catch {
       // Network fallback
@@ -534,6 +578,10 @@ class OfficialService {
       offline_stations: 264,
       missing_pings_count: 632,
       reporting_pct: 88.0,
+      page: params?.page || 1,
+      page_size: params?.page_size || 25,
+      total_pages: 1,
+      total_items: 1,
       stations: [
         {
           station_id: 'DWLR-PB-001',
@@ -552,7 +600,7 @@ class OfficialService {
           data_source: 'DWLR Reference Simulation Telemetry',
         },
       ],
-      disclaimer: 'JalKrishi Reference Simulation Dataset & Hydrogeological Decision Support Model.',
+      disclaimer: 'Local Reference Fallback — Backend Unavailable. JalKrishi Reference Simulation Dataset & Hydrogeological Model Output.',
     };
   }
 
