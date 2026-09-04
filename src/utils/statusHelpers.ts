@@ -3,13 +3,13 @@ import type { StationStatus, TrendDirection } from '../types';
 export function getStatusLabel(status: StationStatus): string {
   switch (status) {
     case 'healthy':
-      return 'Healthy (सुरक्षित)';
+      return 'Healthy';
     case 'moderate':
-      return 'Moderate (मध्यम)';
+      return 'Moderate';
     case 'warning':
-      return 'Warning (चेतावनी)';
+      return 'Warning';
     case 'critical':
-      return 'Critical (संकटग्रस्त)';
+      return 'Critical';
     default:
       return 'Unknown';
   }
@@ -80,7 +80,7 @@ export function getTrendDetails(trend: TrendDirection) {
     case 'rising':
       return {
         label: 'Recharging / Rising',
-        farmerText: 'Water level is rising (जल स्तर बढ़ रहा है)',
+        farmerText: 'Water level is rising',
         color: 'text-emerald-600',
         bgColor: 'bg-emerald-50',
         arrow: '↑'
@@ -88,7 +88,7 @@ export function getTrendDetails(trend: TrendDirection) {
     case 'stable':
       return {
         label: 'Stable',
-        farmerText: 'Water level is steady (जल स्तर स्थिर है)',
+        farmerText: 'Water level is steady',
         color: 'text-blue-600',
         bgColor: 'bg-blue-50',
         arrow: '→'
@@ -96,7 +96,7 @@ export function getTrendDetails(trend: TrendDirection) {
     case 'falling':
       return {
         label: 'Depleting / Falling',
-        farmerText: 'Water level is falling (जल स्तर गिर रहा है)',
+        farmerText: 'Water level is falling',
         color: 'text-rose-600',
         bgColor: 'bg-rose-50',
         arrow: '↓'

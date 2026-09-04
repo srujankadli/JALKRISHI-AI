@@ -46,15 +46,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   ];
 
   const fullNav = [
-    { to: '/', icon: LayoutDashboard, label: 'Dashboard', sub: 'Home & summary', emoji: '🌾' },
-    ...(!isFarmer ? [{ to: '/official', icon: Landmark, label: 'Official Command Center', sub: 'Decision & policy engine', emoji: '🏛️', badge: 'Admin' }] : []),
-    { to: '/map', icon: MapPin, label: 'Groundwater Map', sub: 'Interactive station map', emoji: '🗺️' },
-    { to: '/forecast', icon: TrendingUp, label: 'Forecast & Predictions', sub: 'Water level projections', emoji: '🔮' },
-    { to: '/anomalies', icon: AlertTriangle, label: 'Anomaly Detection', sub: 'Critical drawdowns', emoji: '⚠️', badge: anomalyCount },
-    { to: '/crops', icon: Sprout, label: 'Crop Advisor', sub: 'Water-smart crop engine', emoji: '🌱' },
-    { to: '/analytics', icon: BarChart3, label: 'Regional Analytics', sub: 'State & district metrics', emoji: '📊' },
-    { to: '/whatsapp', icon: MessageSquare, label: 'WhatsApp Farmer', sub: 'Conversational assistant', emoji: '💬', badge: 'Chat' },
-    { to: '/help', icon: HelpCircle, label: 'Help & Knowledge', sub: 'Knowledge & data sources', emoji: '📚' },
+    { to: '/', icon: LayoutDashboard, label: 'Dashboard', emoji: '🌾' },
+    ...(!isFarmer ? [{ to: '/official', icon: Landmark, label: 'Official Command Center', emoji: '🏛️', badge: 'Command' }] : []),
+    { to: '/map', icon: MapPin, label: 'Groundwater Map', emoji: '🗺️' },
+    { to: '/forecast', icon: TrendingUp, label: 'Forecast & Predictions', emoji: '🔮' },
+    { to: '/anomalies', icon: AlertTriangle, label: 'Anomaly Detection', emoji: '⚠️', badge: anomalyCount },
+    { to: '/crops', icon: Sprout, label: 'Crop Advisor', emoji: '🌱' },
+    { to: '/analytics', icon: BarChart3, label: 'Regional Analytics', emoji: '📊' },
+    { to: '/whatsapp', icon: MessageSquare, label: 'WhatsApp Farmer', emoji: '💬', badge: 'Chat' },
+    { to: '/help', icon: HelpCircle, label: 'Help & Knowledge', emoji: '📚' },
   ];
 
   return (
@@ -141,20 +141,11 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                     }`
                   }
                 >
-                  {({ isActive }) => (
+                  {() => (
                     <>
                       <div className="flex items-center gap-3">
                         <span className="text-lg">{item.emoji}</span>
-                        <div>
-                          <span className="block leading-tight">{t(item.label)}</span>
-                          <span
-                            className={`text-xs ${
-                              isActive ? 'text-agri-100' : 'text-stone-400'
-                            }`}
-                          >
-                            {item.sub}
-                          </span>
-                        </div>
+                        <span className="block leading-tight font-medium">{t(item.label)}</span>
                       </div>
                       {item.badge !== undefined && (typeof item.badge === 'number' ? item.badge > 0 : Boolean(item.badge)) && (
                         <span className="bg-rose-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
@@ -170,7 +161,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             {/* Footer */}
             <div className="border-t border-stone-200 pt-4 text-xs text-stone-500">
               <p className="font-bold text-stone-700">{APP_CONFIG.appName} Platform</p>
-              <p className="text-[11px]">Real-Time DWLR Groundwater Intelligence</p>
+              <p className="text-[11px]">{t('Real-Time DWLR Groundwater Intelligence')}</p>
             </div>
           </div>
         </div>

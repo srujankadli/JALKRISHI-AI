@@ -26,7 +26,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   anomalyCount = 4,
 }) => {
-  const { t, currentLanguage } = useLanguage();
+  const { t } = useLanguage();
   const { user } = useAuth();
 
   const isFarmer =
@@ -39,14 +39,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/',
       icon: LayoutDashboard,
       label: 'Dashboard',
-      sublabel: 'मुख्य पृष्ठ',
       emoji: '🌾',
     },
     ...(!isFarmer ? [{
       to: '/official',
       icon: Landmark,
       label: 'Official Command Center',
-      sublabel: 'कमांड एंड डिसीजन सेंटर',
       badge: 'Command',
       badgeColor: 'bg-amber-600 text-white',
       emoji: '🏛️',
@@ -55,7 +53,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/map',
       icon: MapPin,
       label: 'Groundwater Map',
-      sublabel: 'भूजल मानचित्र',
       badge: `${APP_CONFIG.totalDwlrStationsCount}`,
       emoji: '🗺️',
     },
@@ -63,14 +60,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/forecast',
       icon: TrendingUp,
       label: 'Forecast & Predictions',
-      sublabel: 'भविष्यवाणी',
       emoji: '🔮',
     },
     {
       to: '/anomalies',
       icon: AlertTriangle,
       label: 'Anomaly Detection',
-      sublabel: 'असामान्य गिरावट',
       badge: anomalyCount > 0 ? `${anomalyCount}` : undefined,
       badgeColor: 'bg-rose-600 text-white',
       emoji: '⚠️',
@@ -79,7 +74,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/crops',
       icon: Sprout,
       label: 'Crop Advisor',
-      sublabel: 'फसल सलाहकार',
       badge: 'AI Smart',
       badgeColor: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
       emoji: '🌱',
@@ -88,14 +82,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/analytics',
       icon: BarChart3,
       label: 'Regional Analytics',
-      sublabel: 'क्षेत्रीय विश्लेषण',
       emoji: '📊',
     },
     {
       to: '/whatsapp',
       icon: MessageSquare,
       label: 'WhatsApp Farmer',
-      sublabel: 'व्हाट्सएप किसान सेवा',
       badge: 'Chat',
       badgeColor: 'bg-emerald-600 text-white',
       emoji: '💬',
@@ -104,14 +96,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       to: '/help',
       icon: HelpCircle,
       label: 'Help & Knowledge',
-      sublabel: 'सहायता व स्रोत',
       emoji: '📚',
     },
     {
       to: '/login',
       icon: LogIn,
       label: 'Officer Login Portal',
-      sublabel: 'लॉगइन पोर्टल',
       emoji: '🔐',
     },
   ];
@@ -146,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-semibold text-emerald-900">DWLR Telemetry Network</span>
+            <span className="text-xs font-semibold text-emerald-900">{t('DWLR Telemetry Network')}</span>
           </div>
           <span className="text-[11px] font-bold font-mono text-emerald-800">5,260 Nodes</span>
         </div>
@@ -155,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Navigation Links */}
       <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
         <p className="px-3 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-stone-400">
-          Navigation
+          {t('Navigation')}
         </p>
 
         {navItems.map((item) => {
@@ -178,16 +168,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className="text-base" aria-hidden="true">
                       {item.emoji}
                     </span>
-                    <div>
-                      <span className="block leading-tight">{t(item.label)}</span>
-                      <span
-                        className={`text-[10px] block ${
-                          isActive ? 'text-agri-100' : 'text-stone-400 group-hover:text-stone-500'
-                        }`}
-                      >
-                        {currentLanguage === 'en' ? item.sublabel : item.label}
-                      </span>
-                    </div>
+                    <span className="block leading-tight font-medium">{t(item.label)}</span>
                   </div>
 
                   {item.badge && (
@@ -217,7 +198,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </span>
         </div>
         <p className="text-[10px] text-stone-500 leading-tight">
-          Real-Time DWLR Groundwater Intelligence
+          {t('Real-Time DWLR Groundwater Intelligence')}
         </p>
       </div>
     </aside>

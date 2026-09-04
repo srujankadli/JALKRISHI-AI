@@ -3,7 +3,6 @@ import React from 'react';
 interface QuickReplyOption {
   label: string;
   query: string;
-  hindiLabel?: string;
 }
 
 interface WhatsAppQuickRepliesProps {
@@ -16,12 +15,12 @@ export const WhatsAppQuickReplies: React.FC<WhatsAppQuickRepliesProps> = ({
   disabled = false,
 }) => {
   const options: QuickReplyOption[] = [
-    { label: '💧 Water Status', query: 'Kolar water', hindiLabel: '💧 पानी की स्थिति' },
-    { label: '🔮 30d Forecast', query: 'Kolar forecast', hindiLabel: '🔮 30-दिन पूर्वानुमान' },
-    { label: '🌱 Crop Advice', query: 'What crop should I grow?', hindiLabel: '🌱 फसल सलाह' },
-    { label: '⚠️ Depletion Alerts', query: 'Any warnings or alerts?', hindiLabel: '⚠️ अलर्ट व चेतावनी' },
-    { label: '📍 Nearest Station', query: 'Nearest station', hindiLabel: '📍 नजदीकी कुआं' },
-    { label: '❓ Help & Commands', query: 'help', hindiLabel: '❓ सहायता' },
+    { label: '💧 Water Status', query: 'Kolar water' },
+    { label: '🔮 30d Forecast', query: 'Kolar forecast' },
+    { label: '🌱 Crop Advice', query: 'What crop should I grow?' },
+    { label: '⚠️ Depletion Alerts', query: 'Any warnings or alerts?' },
+    { label: '📍 Nearest Station', query: 'Nearest station' },
+    { label: '❓ Help & Commands', query: 'help' },
   ];
 
   return (
