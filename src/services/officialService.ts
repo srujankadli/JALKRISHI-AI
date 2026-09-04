@@ -284,12 +284,12 @@ class OfficialService {
         improving_zones: 680,
         recharge_opportunity_zones: 1840,
         forecast_stress_areas: 420,
-        data_mode: 'DEMO_SIMULATION',
-        disclaimer: 'JalKrishi Reference Simulation Dataset & Hydrogeological Decision Support Model.',
+        data_mode: 'DEMO_SIMULATION_FALLBACK',
+        disclaimer: 'Local Reference Fallback — Backend Unavailable. JalKrishi Reference Simulation Dataset & Hydrogeological Model Output.',
       },
       recent_anomalies_count: 14,
       high_risk_districts: ['Sangrur', 'Kolar', 'Jodhpur', 'Mehsana', 'Bathinda'],
-      disclaimer: 'JalKrishi Reference Simulation Dataset & Hydrogeological Decision Support Model.',
+      disclaimer: 'Local Reference Fallback — Backend Unavailable. JalKrishi Reference Simulation Dataset & Hydrogeological Model Output.',
     };
   }
 

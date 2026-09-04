@@ -213,12 +213,23 @@ export const OfficialCommandCenter: React.FC = () => {
 
         {/* Data Honesty Disclosures */}
         <div className="rounded-xl border border-stone-700 bg-stone-950/80 p-3 text-xs space-y-1 max-w-md">
-          <div className="flex items-center gap-1.5 font-bold text-amber-400">
-            <Info className="h-4 w-4 shrink-0" />
-            <span>{t('Data Mode & Provenance Disclosure')}</span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 font-bold text-amber-400">
+              <Info className="h-4 w-4 shrink-0" />
+              <span>{t('Data Mode & Provenance Disclosure')}</span>
+            </div>
+            {overview?.kpis.data_mode?.includes('FALLBACK') ? (
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700 font-mono">
+                {t('Local Reference Fallback — Backend Unavailable')}
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700 font-mono">
+                {t('Reference Simulation Dataset — Active Backend')}
+              </span>
+            )}
           </div>
           <p className="text-stone-300 text-[11px] leading-relaxed">
-            {t('JalKrishi Reference Simulation Dataset & Hydrogeological Model Output. Unconfigured external feeds are reported as NOT_CONFIGURED.')}
+            {overview?.disclaimer || t('JalKrishi Reference Simulation Dataset & Hydrogeological Model Output. Unconfigured external feeds are reported as NOT_CONFIGURED.')}
           </p>
         </div>
       </div>
