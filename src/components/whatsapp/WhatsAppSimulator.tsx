@@ -179,7 +179,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
             className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-800/70 hover:bg-emerald-800 text-[11px] font-bold text-emerald-100 border border-emerald-700/60 transition-colors cursor-pointer"
           >
             <Languages className="h-3.5 w-3.5" />
-            <span>{currentLang === 'en' ? 'हिंदी' : 'EN'}</span>
+            <span>{currentLang === 'en' ? 'Hindi' : 'English'}</span>
           </button>
 
           {/* Reset Chat */}

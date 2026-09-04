@@ -20,8 +20,8 @@ export const WhatsAppPage: React.FC = () => {
       {/* 1. Page Header */}
       <PageHeader
         title={t('WhatsApp Farmer Interface')}
-        subtitle={t('Accessible, low-bandwidth conversational AI for Indian farmers. Delivers localized DWLR groundwater telemetry, forecasts, and crop advice in Hindi & English.')}
-        farmerNote={t("Farmers don't need complex apps. A simple WhatsApp message like 'Kolar water' or 'फसल सलाह' delivers actionable groundwater guidance in seconds.")}
+        subtitle={t('Accessible, low-bandwidth conversational AI for Indian farmers. Delivers localized DWLR groundwater telemetry, forecasts, and crop advice in regional Indian languages.')}
+        farmerNote={t("Farmers don't need complex apps. A simple WhatsApp message like 'Kolar water' or 'crop advice' delivers actionable groundwater guidance in seconds.")}
         badge={
           <span className="rounded-full bg-emerald-700 px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 shadow-xs">
             <MessageSquare className="h-3.5 w-3.5 text-emerald-300" />
@@ -76,22 +76,22 @@ export const WhatsAppPage: React.FC = () => {
             <div className="space-y-2.5 text-xs text-stone-700">
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <span className="font-bold text-emerald-800">💧 Water Level & Risk:</span>
-                <p className="text-stone-600 font-mono text-[11px]">“Kolar water” or “कोलार में पानी कितना है”</p>
+                <p className="text-stone-600 font-mono text-[11px]">“Kolar water” or “Water level status”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <span className="font-bold text-water-800">🔮 30-Day Forward Forecast:</span>
-                <p className="text-stone-600 font-mono text-[11px]">“Kolar forecast” or “आगे का पानी”</p>
+                <p className="text-stone-600 font-mono text-[11px]">“Kolar forecast” or “Future groundwater outlook”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <span className="font-bold text-agri-800">🌱 Water-Smart Crop Advice:</span>
-                <p className="text-stone-600 font-mono text-[11px]">“What crop should I grow?” or “फसल सलाह”</p>
+                <p className="text-stone-600 font-mono text-[11px]">“What crop should I grow?” or “Crop advice”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
                 <span className="font-bold text-rose-800">⚠️ Depletion & Critical Alerts:</span>
-                <p className="text-stone-600 font-mono text-[11px]">“Any warnings or alerts?” or “अलर्ट”</p>
+                <p className="text-stone-600 font-mono text-[11px]">“Any warnings or alerts?” or “Critical alert check”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
