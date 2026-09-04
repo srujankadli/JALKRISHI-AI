@@ -1,9 +1,8 @@
 """
-JalKrishi AI — Farmer Conversational Intent Router Module
----------------------------------------------------------
+JalKrishi AI — Semantic & Tolerant Farmer Intent Router Module
+--------------------------------------------------------------
 Classifies farmer queries (spoken or typed) into canonical intents across 13 Indian regional languages.
-Prevents non-groundwater queries (greetings, introductions, crop advice, irrigation, thanks)
-from being misrouted to groundwater location assessments.
+Uses pre-normalization typo tolerance, weighted semantic scoring, and context memory.
 
 Supports 16 Canonical Intents:
 - GREETING
@@ -49,9 +48,30 @@ class ConversationSessionContext:
     farmer_name: Optional[str] = None
 
 
+# Common farmer typo normalization dictionary
+TYPO_CORRECTIONS = {
+    "advicer": "advisor",
+    "advisr": "advisor",
+    "adviser": "advisor",
+    "advic": "advice",
+    "recomentation": "recommendation",
+    "recomended": "recommended",
+    "recomending": "recommending",
+    "irrigtion": "irrigation",
+    "irigation": "irrigation",
+    "groundwatr": "groundwater",
+    "goundwater": "groundwater",
+    "ground-water": "groundwater",
+    "recharg": "recharge",
+    "rainfal": "rainfall",
+    "weathr": "weather",
+    "crop-advisor": "crop advisor",
+}
+
+
 class FarmerIntentRouter:
     """
-    Multilingual Intent Router for JalKrishi AI.
+    Semantic, Weighted & Tolerant Intent Router for JalKrishi AI.
     Routes query to CONVERSATIONAL or INTELLIGENCE pipelines.
     """
 
@@ -65,6 +85,13 @@ class FarmerIntentRouter:
 
     def reset_context(self, session_id: str = "default"):
         self._session_contexts[session_id] = ConversationSessionContext()
+
+    def _normalize_text(self, text: str) -> str:
+        clean = text.lower().strip()
+        clean = re.sub(r"[^\w\s\u0900-\u0D7F]", " ", clean)
+        words = clean.split()
+        normalized_words = [TYPO_CORRECTIONS.get(w, w) for w in words]
+        return " ".join(normalized_words)
 
     def classify_intent(
         self,
@@ -80,12 +107,13 @@ class FarmerIntentRouter:
                 confidence=1.0
             )
 
-        clean = raw_text.lower()
+        clean = self._normalize_text(raw_text)
         detected_lang = language or LanguageDetector.detect_language(raw_text, default="en")
         ctx = self.get_context(session_id)
 
         # ----------------------------------------------------------------------
-        # 1. IDENTITY INTRODUCTION ("My name is Srujan", "I am a farmer", etc.)
+        # 1. CONVERSATIONAL INTENT CHECK: IDENTITY INTRODUCTION
+        # ("My name is Srujan", "I am a farmer", "My name is Bengaluru")
         # ----------------------------------------------------------------------
         name_patterns = [
             r"(?:my name is|i am|myself|this is|i'm|name is|naam hai|hesaru|peyar|peru|naam)\s+([a-zA-Z\u0900-\u0D7F]+)",
@@ -126,7 +154,7 @@ class FarmerIntentRouter:
                 )
 
         # ----------------------------------------------------------------------
-        # 2. GREETINGS ("Hello", "Namaste", "Hi", "Good morning")
+        # 2. CONVERSATIONAL INTENT CHECK: GREETINGS ("Hello", "Namaste", "Hi")
         # ----------------------------------------------------------------------
         greetings = [
             "hello", "hi", "namaste", "namaskar", "namaskara", "vanakkam", "sat sri akal",
@@ -143,7 +171,7 @@ class FarmerIntentRouter:
             )
 
         # ----------------------------------------------------------------------
-        # 3. CAPABILITIES ("What can you do?", "How can you help me?")
+        # 3. CONVERSATIONAL INTENT CHECK: CAPABILITIES ("What can you do?")
         # ----------------------------------------------------------------------
         capability_keywords = [
             "what can you do", "how can you help", "what information", "what are your features",
@@ -160,7 +188,7 @@ class FarmerIntentRouter:
             )
 
         # ----------------------------------------------------------------------
-        # 4. THANKS ("Thank you", "Thanks", "Dhanyavad")
+        # 4. CONVERSATIONAL INTENT CHECK: THANKS ("Thank you", "Thanks")
         # ----------------------------------------------------------------------
         thanks_keywords = [
             "thank you", "thanks", "that's helpful", "that is helpful", "thank you so much",
@@ -175,7 +203,7 @@ class FarmerIntentRouter:
             )
 
         # ----------------------------------------------------------------------
-        # 5. GOODBYE ("Bye", "Goodbye", "Phir milenge")
+        # 5. CONVERSATIONAL INTENT CHECK: GOODBYE ("Bye", "Goodbye")
         # ----------------------------------------------------------------------
         goodbye_keywords = [
             "bye", "goodbye", "see you", "talk to you later", "phir milenge",
@@ -189,183 +217,219 @@ class FarmerIntentRouter:
                 confidence=0.95
             )
 
-        # Extract location if any place name exists in query
+        # Location extraction (independent of intent)
         loc_res = resolve_location(query_text=raw_text)
 
-        # If place was explicitly resolved in text, update context memory
+        # If place was explicitly resolved, update context memory
         if loc_res.is_resolved:
             ctx.last_location = loc_res
 
         # ----------------------------------------------------------------------
-        # 6. CROP RECOMMENDATION ("Which crop should I grow?")
+        # 6. WEIGHTED SEMANTIC SCORING ENGINE FOR DOMAIN INTELLIGENCE INTENTS
         # ----------------------------------------------------------------------
-        crop_keywords = [
-            "which crop", "what crop", "suitable crop", "crop to grow", "what to plant",
-            "recommend a crop", "best crop", "millet", "ragi", "paddy", "cotton", "wheat",
-            "sugarcane", "maize", "pulses", "groundnut", "kaunsi fasal", "kaun sa crop",
-            "कौन सी फसल", "क्या बोना चाहिए", "य़ಾವ ಬೆಳೆ", "ಬೆಳೆ ಆಯ್ಕೆ", "என்ன பயிர்",
-            "ஏ పంట", "কোন ফসল", "कोणते पीक", "કયો પાક", "ਕਿਹੜੀ ਫਸਲ"
-        ]
-        if any(ck in clean for ck in crop_keywords):
-            return IntentClassificationResult(
-                intent="CROP_RECOMMENDATION",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.92
-            )
+        scores: Dict[str, float] = {
+            "CROP_RECOMMENDATION": 0.0,
+            "IRRIGATION_ADVICE": 0.0,
+            "RECHARGE_ADVICE": 0.0,
+            "GROUNDWATER_FORECAST": 0.0,
+            "GROUNDWATER_RISK": 0.0,
+            "GROUNDWATER_ANOMALY": 0.0,
+            "DWLR_STATION": 0.0,
+            "WEATHER_OR_RAINFALL": 0.0,
+            "GENERAL_FARMING": 0.0,
+            "GROUNDWATER_LEVEL": 0.0,
+        }
 
-        # ----------------------------------------------------------------------
-        # 7. IRRIGATION ADVICE ("When should I irrigate?", "How much water should I give it?")
-        # ----------------------------------------------------------------------
-        irrigation_keywords = [
-            "how much water", "when to irrigate", "irrigation schedule", "water to give", "water should i give",
-            "how often to water", "should i irrigate", "water requirement", "give it water",
-            "irrigate paddy", "irrigate wheat", "irrigation advice", "paani kab dena",
-            "sinchai kab karein", "पानी कब दें", "सिंचाई", "ಎಷ್ಟು ನೀರು ಕೊಡಬೇಕು", "ಯಾವಾಗ ನೀರುಣಿಸಬೇಕು",
-            "எப்போது பாசனம்", "எவ்வளவு நீர்", "ఎప్పుడు నీరు పెట్టాలి", "కখন সেচ", "कधी पाणी द्यावे"
+        # --- A. CROP_RECOMMENDATION SIGNALS ---
+        crop_primary = [
+            "crop", "crops", "plant", "planting", "grow", "growing", "millet", "ragi", "paddy",
+            "wheat", "cotton", "sugarcane", "maize", "pulses", "groundnut", "fasal", "फ़सल",
+            "ಬೆಳೆ", "பயிர்", "పంట", "ফসল", "पीक", "પાક", "ਫਸਲ"
         ]
-        if any(ik in clean for ik in irrigation_keywords):
-            return IntentClassificationResult(
-                intent="IRRIGATION_ADVICE",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.92
-            )
-
-        # ----------------------------------------------------------------------
-        # 8. RECHARGE ADVICE ("How can I recharge groundwater?")
-        # ----------------------------------------------------------------------
-        recharge_keywords = [
-            "recharge groundwater", "recharge pit", "rainwater harvesting", "improve groundwater",
-            "conserve water", "increase water level", "recharge aquifer", "भूजल रिचार्ज",
-            "वर्षा जल संचयन", "ಅಂತರ್ಜಲ ಮರುಪೂರಣ", "ಮಳೆನೀರು ಕೊಯ್ಲು", "நீர் செறிவூட்டல்",
-            "భూగర్భ జల రీఛార్జ్", "জল রিচার্জ", "भूजल पुनर्भरण"
+        crop_modifiers = [
+            "advisor", "advice", "recommend", "recommendation", "selection", "suitable", "best",
+            "choose", "suggest", "which", "what to", "less water", "water efficient", "ugau", "lagau",
+            "beleyabeku", "ida vendum", "veyali", "bona"
         ]
-        if any(rk in clean for rk in recharge_keywords):
-            return IntentClassificationResult(
-                intent="RECHARGE_ADVICE",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.92
-            )
 
-        # ----------------------------------------------------------------------
-        # 9. GROUNDWATER FORECAST ("Will groundwater increase next month?")
-        # ----------------------------------------------------------------------
-        forecast_keywords = [
-            "forecast", "next month", "30 days", "will groundwater decline", "will groundwater improve",
-            "future water level", "water level prediction", "पूर्वानुमान", "अगले महीने",
-            "ಮುನ್ಸೂಚನೆ", "ಮುಂದಿನ ತಿಂಗಳು", "முன்னறிவிப்பு", "అంచనా", "পূর্বাভাস", "અંદાજ"
+        if any(w in clean for w in crop_primary):
+            scores["CROP_RECOMMENDATION"] += 0.8
+        if any(w in clean for w in crop_modifiers):
+            scores["CROP_RECOMMENDATION"] += 0.4
+        if "crop advisor" in clean or "crop advice" in clean or "crop selection" in clean or "crop recommendation" in clean or "which crop" in clean:
+            scores["CROP_RECOMMENDATION"] += 1.0
+
+        # --- B. IRRIGATION_ADVICE SIGNALS ---
+        irrigation_primary = [
+            "irrigation", "irrigate", "watering", "sinchai", "सिंचाई", "ನೀರುಣಿಸುವುದು", "பாசனம்",
+            "నీరు పెట్టాలి", "সেચ", "sech", "paani kab", "kitna paani"
         ]
-        if any(fk in clean for fk in forecast_keywords):
-            return IntentClassificationResult(
-                intent="GROUNDWATER_FORECAST",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.90
-            )
-
-        # ----------------------------------------------------------------------
-        # 10. GROUNDWATER RISK ("Is my area facing water crisis?")
-        # ----------------------------------------------------------------------
-        risk_keywords = [
-            "is my area at risk", "water stress", "water shortage", "drought risk",
-            "water crisis", "severe stress", "shortage of water", "जोखिम", "जल संकट",
-            "ನೀರಿನ ಕೊರತೆ", "ಅಪಾಯ", "நீர் தட்டுப்பாடு", "நீட்டி కొరత", "ঝুঁকি"
+        irrigation_modifiers = [
+            "schedule", "when to", "how much water", "how often", "give water", "water should i give",
+            "water requirement", "crop needs water", "water my crop", "water paddy", "water wheat", "needs water"
         ]
-        if any(rk in clean for rk in risk_keywords):
-            return IntentClassificationResult(
-                intent="GROUNDWATER_RISK",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.90
-            )
 
-        # ----------------------------------------------------------------------
-        # 11. GROUNDWATER ANOMALY ("Why did groundwater suddenly fall?", "Abnormal drop")
-        # ----------------------------------------------------------------------
-        anomaly_keywords = [
-            "sudden drop", "abnormal drop", "why did water fall", "unusual drop", "abnormal change",
-            "suddenly fall", "suddenly drop", "abnormal fall", "sudden change", "sudden decline",
+        if any(w in clean for w in irrigation_primary):
+            scores["IRRIGATION_ADVICE"] += 0.8
+        if any(w in clean for w in irrigation_modifiers):
+            scores["IRRIGATION_ADVICE"] += 0.6
+        if "when should i water" in clean or "how much water should i give" in clean or "irrigation schedule" in clean or "my crop needs water" in clean:
+            scores["IRRIGATION_ADVICE"] += 1.0
+
+        # --- C. RECHARGE_ADVICE SIGNALS ---
+        recharge_primary = [
+            "recharge", "rainwater harvesting", "recharge pit", "recharge well", "marupoorana",
+            "serivootal", "रीचार्ज", "ಮರುಪೂರಣ", "நீர் செறிவூட்டல்", "రీఛార్జ్", "জল রিচার্জ"
+        ]
+        recharge_modifiers = [
+            "how to recharge", "improve groundwater", "increase groundwater", "save groundwater",
+            "improve water availability", "water conservation", "how can i save groundwater"
+        ]
+
+        if any(w in clean for w in recharge_primary):
+            scores["RECHARGE_ADVICE"] += 0.8
+        if any(w in clean for w in recharge_modifiers):
+            scores["RECHARGE_ADVICE"] += 0.6
+        if "save groundwater" in clean or "how can i save groundwater" in clean or "improve groundwater" in clean or "increase groundwater" in clean:
+            scores["RECHARGE_ADVICE"] += 1.0
+
+        # --- D. GROUNDWATER_FORECAST SIGNALS ---
+        forecast_primary = [
+            "forecast", "prediction", "outlook", "next month", "30 day", "30 days", "future groundwater",
+            "पूर्वानुमान", "ಮುನ್ಸೂಚನೆ", "முன்னறிவிப்பு", "అంచనా", "পূর্বাভাস", "અંદાજ"
+        ]
+        forecast_modifiers = [
+            "will groundwater increase", "will groundwater decrease", "what will groundwater be like", "future water level"
+        ]
+
+        if any(w in clean for w in forecast_primary):
+            scores["GROUNDWATER_FORECAST"] += 0.8
+        if any(w in clean for w in forecast_modifiers):
+            scores["GROUNDWATER_FORECAST"] += 0.6
+        if "will groundwater increase" in clean or "will groundwater get better" in clean or "next month" in clean or "groundwater forecast" in clean:
+            scores["GROUNDWATER_FORECAST"] += 1.0
+
+        # --- E. GROUNDWATER_RISK SIGNALS ---
+        risk_primary = [
+            "stress", "shortage", "scarcity", "crisis", "drought", "risk", "पानी की कमी",
+            "ನೀರಿನ ಕೊರತೆ", "நீர் தட்டுப்பாடு", "నీటి కొరత", "ঝুঁকি"
+        ]
+        risk_modifiers = [
+            "groundwater risk", "water stress", "is my area at risk", "groundwater stress", "is groundwater situation bad", "how severe"
+        ]
+
+        if any(w in clean for w in risk_primary):
+            scores["GROUNDWATER_RISK"] += 0.8
+        if any(w in clean for w in risk_modifiers):
+            scores["GROUNDWATER_RISK"] += 0.6
+
+        # --- F. GROUNDWATER_ANOMALY SIGNALS ---
+        anomaly_primary = [
+            "anomaly", "sudden drop", "suddenly dropped", "suddenly fall", "abnormal", "unusual drop",
             "अचानक गिरावट", "असामान्य", "ಹಠಾತ್ ಕುಸಿತ", "ದಿಡೀರ್ வீழ்ச்சி", "అకస్మాత్తుగా"
         ]
-        if any(ak in clean for ak in anomaly_keywords) or (("sudden" in clean or "abnormal" in clean or "unusual" in clean) and ("fall" in clean or "drop" in clean or "decline" in clean or "groundwater" in clean)):
-            return IntentClassificationResult(
-                intent="GROUNDWATER_ANOMALY",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.90
-            )
-
-        # ----------------------------------------------------------------------
-        # 12. DWLR STATION ("Where is the nearest DWLR?")
-        # ----------------------------------------------------------------------
-        dwlr_keywords = [
-            "nearest dwlr", "monitoring station", "nearby station", "show dwlr well",
-            "telemetry station", "monitoring well", "निगरानी स्टेशन", "ವೀಕ್ಷಣೆ ಕೇಂದ್ರ",
-            "நிலையம", "స్టేషన్"
-        ]
-        if any(dk in clean for dk in dwlr_keywords):
-            return IntentClassificationResult(
-                intent="DWLR_STATION",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.90
-            )
-
-        # ----------------------------------------------------------------------
-        # 13. WEATHER OR RAINFALL ("Will it rain?")
-        # ----------------------------------------------------------------------
-        weather_keywords = [
-            "will it rain", "rainfall forecast", "precipitation", "monsoon", "rain prediction",
-            "बारिश", "वर्षा", "ಮಳೆ", "மழை", "వర్షం", "বৃষ্টি"
-        ]
-        if any(wk in clean for wk in weather_keywords):
-            return IntentClassificationResult(
-                intent="WEATHER_OR_RAINFALL",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.90
-            )
-
-        # ----------------------------------------------------------------------
-        # 14. GENERAL FARMING ("How do I save water on my farm?")
-        # ----------------------------------------------------------------------
-        general_farming_keywords = [
-            "save water", "water conservation", "sustainable farming", "water-saving", "water saving",
-            "soil moisture", "conserve groundwater", "खेत में पानी कैसे बचाएं", "जल संरक्षण",
-            "ನೀರುಳಿಸುವುದು ಹೇಗೆ", "நீரை சேமிப்பது", "నీటిని ఎలా పొదుపు చేయాలి"
-        ]
-        if any(gk in clean for gk in general_farming_keywords):
-            return IntentClassificationResult(
-                intent="GENERAL_FARMING",
-                response_type="INTELLIGENCE",
-                extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.88
-            )
-
-        # ----------------------------------------------------------------------
-        # 15. GROUNDWATER LEVEL ("What is groundwater level of Bengaluru?")
-        # ----------------------------------------------------------------------
-        gw_keywords = [
-            "groundwater level", "ground water level", "water level", "water depth", "groundwater", "ground water",
-            "how deep is groundwater", "groundwater in", "groundwater of", "water availability",
-            "borewell depth", "well water", "bhujal sthar", "antarjala matta", "nilathadi neer matam",
-            "bhugarbha jala matam", "bhujal", "भूजल", "भूजल स्तर", "भूजल का स्तर", "पानी का स्तर", "ಅಂತರ್ಜಲ",
-            "ಅಂತರ್ಜಲ ಮಟ್ಟ", "ನೀರಿನ ಮಟ್ಟ", "நிலத்தடி", "நிலத்தடி நீர் மட்டம்", "భూగర్భ", "భూగర్భ జల మట్టం",
-            "ভূগর্ভস্থ", "ভূগর্ভস্থ জলের স্তর", "ભૂગર્ભજળ", "ભૂગર્ભજળ સ્તર", "भूजल पातळी", "ਧਰਤੀ ਹੇਠਲੇ ਪਾਣੀ", "زیر زمین"
+        anomaly_modifiers = [
+            "why did groundwater fall", "water level suddenly dropped", "unusual change"
         ]
 
-        if any(gk in clean for gk in gw_keywords) or loc_res.is_resolved:
+        if any(w in clean for w in anomaly_primary):
+            scores["GROUNDWATER_ANOMALY"] += 0.8
+        if any(w in clean for w in anomaly_modifiers):
+            scores["GROUNDWATER_ANOMALY"] += 0.6
+
+        # --- G. DWLR_STATION SIGNALS ---
+        dwlr_primary = [
+            "dwlr", "monitoring station", "telemetry well", "observation well", "groundwater station",
+            "ವೀಕ್ಷಣೆ ಕೇಂದ್ರ", "நிலையம", "స్టేషన్"
+        ]
+        dwlr_modifiers = [
+            "nearest dwlr", "nearby dwlr", "where is the nearest station", "show nearby station"
+        ]
+
+        if any(w in clean for w in dwlr_primary):
+            scores["DWLR_STATION"] += 0.8
+        if any(w in clean for w in dwlr_modifiers):
+            scores["DWLR_STATION"] += 0.6
+
+        # --- H. WEATHER_OR_RAINFALL SIGNALS ---
+        weather_primary = [
+            "rain", "rainfall", "monsoon", "weather", "precipitation", "बारिश", "मಳೆ", "மழை", "వర్షం", "বৃষ্টি"
+        ]
+        weather_modifiers = [
+            "will it rain", "rain tomorrow", "rainfall forecast", "weather forecast"
+        ]
+
+        if any(w in clean for w in weather_primary):
+            scores["WEATHER_OR_RAINFALL"] += 0.8
+        if any(w in clean for w in weather_modifiers):
+            scores["WEATHER_OR_RAINFALL"] += 0.6
+
+        # --- I. GENERAL_FARMING SIGNALS ---
+        farming_primary = [
+            "farming advice", "farm advice", "farmer advice", "farming practices", "sustainable farming",
+            "farm water management", "soil moisture"
+        ]
+        farming_modifiers = [
+            "save water on farm", "how can i save water"
+        ]
+
+        if any(w in clean for w in farming_primary):
+            scores["GENERAL_FARMING"] += 0.8
+        if any(w in clean for w in farming_modifiers):
+            scores["GENERAL_FARMING"] += 0.6
+
+        # --- J. GROUNDWATER_LEVEL SIGNALS ---
+        gw_primary = [
+            "groundwater", "ground water", "water table", "water depth", "borewell depth",
+            "bhujal", "antarjala", "nilathadi", "bhugarbha", "भूजल", "ಅಂತರ್ಜಲ", "நிலத்தடி",
+            "భూగర్భ", "ভূগর্ভস্থ", "ભૂગર્ભજળ", "ਧਰਤੀ ਹੇਠਲੇ ਪਾਣੀ", "زیر زمین"
+        ]
+        gw_modifiers = [
+            "level", "status", "depth", "how deep", "how much groundwater", "available",
+            "groundwater level", "water level", "zameen ka paani", "bhujal star"
+        ]
+
+        if any(w in clean for w in gw_primary):
+            scores["GROUNDWATER_LEVEL"] += 0.8
+        if any(w in clean for w in gw_modifiers):
+            scores["GROUNDWATER_LEVEL"] += 0.4
+        if loc_res.is_resolved and not any(scores[k] > 0.8 for k in scores if k != "GROUNDWATER_LEVEL"):
+            scores["GROUNDWATER_LEVEL"] += 0.8
+
+        # Find intent with maximum score
+        max_intent = max(scores, key=scores.get)
+        max_score = scores[max_intent]
+
+        # Single word short query matching for high-priority single terms
+        if len(clean.split()) == 1:
+            short_map = {
+                "crop": "CROP_RECOMMENDATION",
+                "irrigation": "IRRIGATION_ADVICE",
+                "recharge": "RECHARGE_ADVICE",
+                "groundwater": "GROUNDWATER_LEVEL",
+                "forecast": "GROUNDWATER_FORECAST",
+                "dwlr": "DWLR_STATION",
+                "rainfall": "WEATHER_OR_RAINFALL",
+                "weather": "WEATHER_OR_RAINFALL",
+            }
+            if clean in short_map:
+                return IntentClassificationResult(
+                    intent=short_map[clean],
+                    response_type="INTELLIGENCE",
+                    extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
+                    confidence=0.95
+                )
+
+        if max_score >= 0.7:
             return IntentClassificationResult(
-                intent="GROUNDWATER_LEVEL",
+                intent=max_intent,
                 response_type="INTELLIGENCE",
                 extracted_location=loc_res if loc_res.is_resolved else ctx.last_location,
-                confidence=0.95
+                confidence=min(1.0, max_score)
             )
 
         # ----------------------------------------------------------------------
-        # 16. UNKNOWN (Conversational Clarification)
+        # 7. UNKNOWN (Conversational Clarification)
         # ----------------------------------------------------------------------
         return IntentClassificationResult(
             intent="UNKNOWN",
@@ -385,7 +449,6 @@ class FarmerIntentRouter:
         """
         name_str = f" {user_name}" if user_name else ""
 
-        # Language-aware response templates
         if intent == "IDENTITY_INTRODUCTION":
             if lang == "hi":
                 return f"{user_name or 'किसान भाई'}, आपसे मिलकर खुशी हुई! मैं जलकृषि एआई हूँ। मैं आपकी भूजल स्तर, फसल चयन, सिंचाई और जल जोखिम प्रबंधन में मदद कर सकता हूँ।"
@@ -396,21 +459,11 @@ class FarmerIntentRouter:
             elif lang == "te":
                 return f"{user_name or 'రైతు సోదరా'}, మిమ్మల్ని కలవడం సంతోషంగా ఉంది. నేను జల్‌కృషి AI. భూగర్భ జల మట్టం, పంటల ఎంపిక మరియు నీటి యాజమాన్యంలో సహాయం చేయగలను."
             elif lang == "bn":
-                return f"{user_name or 'কৃষক ভাই'}, আপনার সাথে পরিচিত হয়ে আনন্দিত। আমি জলকৃষি এআই। ভূগর্ভস্থ জলের স্তর, ফসল নির্বাচন এবং সেচ পরামর্শে আমি সাহায্য করতে পারি।"
+                return f"{user_name or 'কৃষক ভাই'}, আপনার সাথে পরিচিত হয়ে আনন্দিত। আমি জলকৃষি এআই।"
             elif lang == "mr":
-                return f"{user_name or 'शेतकरी बंधू'}, आपल्याला भेटून आनंद झाला. मी जलकृषी एआय आहे. मी भूजल पातळी, पीक निवड आणि सिंचन सल्ल्यामध्ये मदत करू शकतो."
+                return f"{user_name or 'शेतकरी बंधू'}, आपल्याला भेटून आनंद झाला. मी जलकृषी एआय आहे."
             elif lang == "gu":
-                return f"{user_name or 'ખેડૂત મિત્ર'}, તમને મળીને આનંદ થયો. હું જલકૃષિ AI છું. હું ભૂગર્ભજળ સ્તર, પાક પસંદગી અને પિયત સલાહમાં મદદ કરી શકું છું."
-            elif lang == "ml":
-                return f"{user_name or 'കർഷക സുഹൃത്തേ'}, നിങ്ങളെ പരിചയപ്പെട്ടതിൽ സന്തോഷം. ഞാൻ ജൽകൃഷി AI ആണ്."
-            elif lang == "pa":
-                return f"{user_name or 'ਕਿਸਾਨ ਵੀਰੋ'}, ਤੁਹਾਡੇ ਨਾਲ ਮਿਲ ਕੇ ਖੁਸ਼ੀ ਹੋਈ। ਮੈਂ ਜਲਕ੍ਰਿਸ਼ੀ AI ਹਾਂ।"
-            elif lang == "or":
-                return f"{user_name or 'କୃଷକ ଭାଇ'}, ଆପଣଙ୍କ ସହ ଭେଟି ଖୁସି ହେଲୁ। ମୁଁ ଜଳକୃଷି AI।"
-            elif lang == "as":
-                return f"{user_name or 'কৃষক ভাই'}, আপোনাক লগ পাই ভাল লাগিল। মই জলকৃষি AI।"
-            elif lang == "ur":
-                return f"{user_name or 'کسان بھائی'}, آپ سے مل کر خوشی ہوئی۔ میں جل کرشی AI ہوں۔"
+                return f"{user_name or 'ખેડૂત મિત્ર'}, તમને મળીને આનંદ થયો. હું જલકૃષિ AI છું."
             else:
                 return f"Nice to meet you{name_str}. I am JalKrishi AI, your conversational farming assistant. I can help you with groundwater levels, crop selection, irrigation scheduling, and water-risk decisions."
 
@@ -420,11 +473,9 @@ class FarmerIntentRouter:
             elif lang == "kn":
                 return "ನಮಸ್ಕಾರ! ನಾನು ಜಲಕೃಷಿ AI. ಅಂತರ್ಜಲ ಮಟ್ಟ, ಬೆಳೆ ಆಯ್ಕೆ ಮತ್ತು ನೀರಾವರಿ ಸಲಹೆಗಳಲ್ಲಿ ನಾನು ಸಹಾಯ ಮಾಡಬಲ್ಲೆ. ನೀವು ಏನನ್ನು ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ?"
             elif lang == "ta":
-                return "வணக்கம்! நான் ஜல்க்ரிஷி AI. நிலத்தடி நீர் மட்டம், பயிர் தேர்வு மற்றும் பாசன ஆலோசனைகளில் நான் உதவ முடியும். நீங்கள் என்ன அறிய விரும்புகிறீர்கள்?"
+                return "வணக்கம்! நான் ஜல்க்ரிஷி AI. நிலத்தடி நீர் மட்டம், பயிர் தேர்வு மற்றும் பாசன ஆலோசனைகளில் நான் உதவ முடியும்."
             elif lang == "te":
-                return "నమస్కారం! నేను జల్‌కృషి AI. భూగర్భ జల మట్టం, పంటల ఎంపిక మరియు నీటి యాజమాన్యంలో సహాయం చేయగలను. మీరు ఏమి తెలుసుకోవాలనుకుంటున్నారు?"
-            elif lang == "bn":
-                return "নমস্কার! আমি জলকৃষি এআই। ভূগর্ভস্থ জলের স্তর, ফসল নির্বাচন এবং সেচ পরামর্শে সাহায্য করতে পারি।"
+                return "నమస్కారం! నేను జల్‌కృషి AI. భూగర్భ జల మట్టం, పంటల ఎంపిక మరియు నీటి యాజమాన్యంలో సహాయం చేయగలను."
             else:
                 return "Hello! I am JalKrishi AI. I can help you with groundwater levels, crop selection, irrigation scheduling, groundwater forecasts, and water conservation practices. What would you like to know?"
 
