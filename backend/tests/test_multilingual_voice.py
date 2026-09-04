@@ -72,6 +72,7 @@ def test_unconfigured_stt_and_tts_provider_graceful_fallback():
 def test_voice_query_routes_to_unified_farmer_intelligence_dwlr_location():
     """Test 4: Voice query at DWLR location invokes Unified Farmer Intelligence (Mode A Direct DWLR)."""
     payload = {
+        "session_id": "test_hi_dwlr_session",
         "query": "मेरे खेत के पास भूजल की स्थिति कैसी है?",
         "latitude": 13.1367,
         "longitude": 78.1291,

@@ -69,7 +69,8 @@ def respond_to_voice_query(request: VoiceQueryRequest):
     if not raw_query and not request.audio_base64:
         raise HTTPException(status_code=400, detail="Query text or audio_base64 payload must be provided.")
 
-    return farmer_intelligence_dispatcher.dispatch_query(request)
+    sess_id = request.session_id or "default"
+    return farmer_intelligence_dispatcher.dispatch_query(request, session_id=sess_id)
 
 
 @router.post("/synthesize", response_model=TTSResponse)

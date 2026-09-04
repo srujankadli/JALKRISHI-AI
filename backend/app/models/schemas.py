@@ -1228,6 +1228,9 @@ class VoiceQueryRequest(BaseModel):
     location_query: Optional[str] = Field(None, description="Explicit or extracted location name query")
     language: str = Field("en", description="Farmer requested/interface language code")
     audio_base64: Optional[str] = Field(None, description="Base64 encoded audio bytes if available")
+    session_id: Optional[str] = Field("default", description="Session identifier for multi-turn farmer context")
+    context_location: Optional[str] = Field(None, description="Current established conversational location context")
+    context_crop: Optional[str] = Field(None, description="Current established conversational crop context")
 
 
 class VoiceQueryResponse(BaseModel):
@@ -1254,6 +1257,9 @@ class VoiceQueryResponse(BaseModel):
     translation_provider_status: str = Field("LOCAL_CORE_TRANSLATIONS", description="Translation provider status")
     data_mode: str = Field("DEMO_SIMULATION", description="Data mode")
     disclaimer: str = Field(..., description="Data honesty disclaimer")
+    location_required: bool = Field(False, description="Whether location is required to proceed")
+    awaiting_location: bool = Field(False, description="Whether the assistant is awaiting location input")
+    pending_intent: Optional[str] = Field(None, description="Pending intent awaiting location clarification")
 
 
 class TTSRequest(BaseModel):

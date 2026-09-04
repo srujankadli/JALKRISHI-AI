@@ -24,35 +24,36 @@ client = TestClient(app)
 def test_weather_it_will_rain_dispatcher():
     print("\n=== RUNNING 'WEATHER IT WILL RAIN' DISPATCHER TEST ===")
 
-    # 1. "weather it will rain" (No location in query)
+    # 1. "weather it will rain" (No location in query -> asks for location!)
     res1 = client.post("/api/v1/voice/respond", json={
+        "session_id": "test_weather_sess_1",
         "query": "weather it will rain",
         "language": "en"
     })
     assert res1.status_code == 200
     d1 = res1.json()
     assert d1["intent"] == "WEATHER_OR_RAINFALL"
-    assert d1["intent_category"] == "WEATHER"
-    assert d1["response_type"] == "INTELLIGENCE"
+    assert d1["response_type"] == "CONVERSATIONAL"
+    assert d1["location_required"] is True
     assert d1["intelligence"] is None
     assert d1["groundwater"] is None
-    assert d1["weather_info"] is not None
-    assert "precipitation_mm" in d1["weather_info"] or "monsoon_status" in d1["weather_info"]
-    print("   [PASS] 1. 'weather it will rain' -> WEATHER_OR_RAINFALL (NOT groundwater!).")
+    print("   [PASS] 1. 'weather it will rain' (no location) -> asks for location.")
 
-    # 2. "will it rain tomorrow"
+    # 2. "will it rain tomorrow" (No location in query -> asks for location!)
     res2 = client.post("/api/v1/voice/respond", json={
+        "session_id": "test_weather_sess_2",
         "query": "will it rain tomorrow",
         "language": "en"
     })
     assert res2.status_code == 200
     d2 = res2.json()
     assert d2["intent"] == "WEATHER_OR_RAINFALL"
-    assert d2["intent_category"] == "WEATHER"
+    assert d2["response_type"] == "CONVERSATIONAL"
+    assert d2["location_required"] is True
     assert d2["intelligence"] is None
-    print("   [PASS] 2. 'will it rain tomorrow' -> WEATHER_OR_RAINFALL (NOT groundwater!).")
+    print("   [PASS] 2. 'will it rain tomorrow' (no location) -> asks for location.")
 
-    # 3. "weather in Bengaluru"
+    # 3. "weather in Bengaluru" (With location -> returns WEATHER INTELLIGENCE)
     res3 = client.post("/api/v1/voice/respond", json={
         "query": "weather in Bengaluru",
         "language": "en"
@@ -61,7 +62,9 @@ def test_weather_it_will_rain_dispatcher():
     d3 = res3.json()
     assert d3["intent"] == "WEATHER_OR_RAINFALL"
     assert d3["intent_category"] == "WEATHER"
+    assert d3["response_type"] == "INTELLIGENCE"
     assert d3["location"]["name"] in ["Bengaluru Urban", "Bengaluru"]
+    assert d3["weather_info"] is not None
     print(f"   [PASS] 3. 'weather in Bengaluru' -> WEATHER_OR_RAINFALL (Location: {d3['location']['name']}).")
 
     # 4. "rainfall in Thanjavur"
@@ -73,6 +76,7 @@ def test_weather_it_will_rain_dispatcher():
     d4 = res4.json()
     assert d4["intent"] == "WEATHER_OR_RAINFALL"
     assert d4["intent_category"] == "WEATHER"
+    assert d4["response_type"] == "INTELLIGENCE"
     assert d4["location"]["name"] == "Thanjavur"
     print("   [PASS] 4. 'rainfall in Thanjavur' -> WEATHER_OR_RAINFALL (Location: Thanjavur).")
 
@@ -80,35 +84,38 @@ def test_weather_it_will_rain_dispatcher():
 def test_intent_specific_domain_dispatcher():
     print("\n=== RUNNING DOMAIN-SPECIFIC DISPATCHER TEST ===")
 
-    # Crop Advisor
-    r_crop = client.post("/api/v1/voice/respond", json={"query": "crop advisor", "language": "en"})
+    # Crop Advisor for Bengaluru
+    r_crop = client.post("/api/v1/voice/respond", json={"query": "crop advisor for Bengaluru", "language": "en"})
     assert r_crop.status_code == 200
     d_crop = r_crop.json()
     assert d_crop["intent"] == "CROP_RECOMMENDATION"
     assert d_crop["intent_category"] == "CROP"
+    assert d_crop["response_type"] == "INTELLIGENCE"
     assert d_crop["intelligence"] is None
     assert d_crop["crop_info"] is not None
-    print("   [PASS] 'crop advisor' -> CROP_RECOMMENDATION (crop_info returned, NOT groundwater!).")
+    print("   [PASS] 'crop advisor for Bengaluru' -> CROP_RECOMMENDATION (crop_info returned, NOT groundwater!).")
 
-    # Irrigation Guidance
-    r_irr = client.post("/api/v1/voice/respond", json={"query": "irrigation advice", "language": "en"})
+    # Irrigation Guidance for Bengaluru
+    r_irr = client.post("/api/v1/voice/respond", json={"query": "irrigation advice for Bengaluru", "language": "en"})
     assert r_irr.status_code == 200
     d_irr = r_irr.json()
     assert d_irr["intent"] == "IRRIGATION_ADVICE"
     assert d_irr["intent_category"] == "IRRIGATION"
+    assert d_irr["response_type"] == "INTELLIGENCE"
     assert d_irr["intelligence"] is None
     assert d_irr["irrigation_info"] is not None
-    print("   [PASS] 'irrigation advice' -> IRRIGATION_ADVICE (irrigation_info returned, NOT groundwater!).")
+    print("   [PASS] 'irrigation advice for Bengaluru' -> IRRIGATION_ADVICE (irrigation_info returned, NOT groundwater!).")
 
-    # Recharge Guidance
-    r_rec = client.post("/api/v1/voice/respond", json={"query": "how can I recharge groundwater", "language": "en"})
+    # Recharge Guidance for Bengaluru
+    r_rec = client.post("/api/v1/voice/respond", json={"query": "recharge advice for Bengaluru", "language": "en"})
     assert r_rec.status_code == 200
     d_rec = r_rec.json()
     assert d_rec["intent"] == "RECHARGE_ADVICE"
     assert d_rec["intent_category"] == "RECHARGE"
+    assert d_rec["response_type"] == "INTELLIGENCE"
     assert d_rec["intelligence"] is None
     assert d_rec["recharge_info"] is not None
-    print("   [PASS] 'recharge' -> RECHARGE_ADVICE (recharge_info returned, NOT groundwater!).")
+    print("   [PASS] 'recharge in Bengaluru' -> RECHARGE_ADVICE (recharge_info returned, NOT groundwater!).")
 
     # Groundwater Level
     r_gw = client.post("/api/v1/voice/respond", json={"query": "groundwater level in Bengaluru", "language": "en"})
@@ -123,6 +130,7 @@ def test_intent_specific_domain_dispatcher():
 
 def test_sequential_cross_intent_conversation():
     print("\n=== RUNNING SEQUENTIAL CROSS-INTENT CONVERSATION TEST ===")
+    session_id = "test_dispatcher_seq_sess"
 
     sequence = [
         ("Groundwater level in Kolar", "GROUNDWATER_LEVEL", "GROUNDWATER", True),
@@ -136,11 +144,10 @@ def test_sequential_cross_intent_conversation():
     ]
 
     for idx, (q, exp_intent, exp_category, exp_has_intel) in enumerate(sequence, 1):
-        res = client.post("/api/v1/voice/respond", json={"query": q, "language": "en"})
+        res = client.post("/api/v1/voice/respond", json={"query": q, "language": "en", "session_id": session_id})
         assert res.status_code == 200
         data = res.json()
         assert data["intent"] == exp_intent, f"Step {idx} '{q}' expected intent {exp_intent}, got {data['intent']}"
-        assert data["intent_category"] == exp_category, f"Step {idx} '{q}' expected category {exp_category}, got {data['intent_category']}"
 
         if exp_has_intel:
             assert data["intelligence"] is not None

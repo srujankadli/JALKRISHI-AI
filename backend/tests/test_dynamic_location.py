@@ -19,7 +19,8 @@ client = TestClient(app)
 def test_scenario_a_explicit_station_id():
     """TEST A: Explicit station_id (e.g. DWLR-KA-004) -> DIRECT_DWLR mode."""
     res = client.post("/api/v1/voice/respond", json={
-        "query": "What is my groundwater level?",
+        "query": "What is my groundwater level in Kolar?",
+        "location_query": "Kolar",
         "station_id": "DWLR-KA-004",
         "language": "en"
     })

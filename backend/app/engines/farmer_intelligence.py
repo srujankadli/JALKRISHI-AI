@@ -44,15 +44,15 @@ class FarmerIntelligenceEngine:
         r = radius_km if radius_km is not None else settings.DWLR_COVERAGE_RADIUS_KM
 
         # PRIORITY 1: Explicit location_query or location name extracted from query_text
-        resolved_loc = resolve_location(location_query=location_query, query_text=query_text)
+        resolved_loc = resolve_location(location_query=location_query, query_text=query_text, latitude=lat, longitude=lon)
         if resolved_loc.is_resolved and resolved_loc.latitude is not None and resolved_loc.longitude is not None:
-            target_lat = resolved_loc.latitude
-            target_lon = resolved_loc.longitude
+            target_lat = lat if lat is not None else resolved_loc.latitude
+            target_lon = lon if lon is not None else resolved_loc.longitude
             loc_name = resolved_loc.name
             d_name = resolved_loc.district
             s_name = resolved_loc.state
 
-            if resolved_loc.matched_station_id:
+            if resolved_loc.matched_station_id and target_lat == resolved_loc.latitude:
                 st_schema = station_repo.get_by_id(resolved_loc.matched_station_id)
                 if st_schema:
                     return self._build_mode_a_direct_dwlr(

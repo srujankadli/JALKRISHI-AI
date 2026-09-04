@@ -43,28 +43,52 @@ class FarmerIntelligenceDispatcher:
         detected_lang = LanguageDetector.detect_language(raw_query, default=request.language or "en")
         target_lang = request.language if request.language in [l.language_code for l in SUPPORTED_LANGUAGES] else detected_lang
 
+        # Context location seed if provided in request
+        if request.context_location:
+            c_loc = resolve_location(query_text=request.context_location)
+            if c_loc.is_resolved:
+                farmer_intent_router.get_context(session_id).last_location = c_loc
+
         # 2. Intent Classification
-        intent_res = farmer_intent_router.classify_intent(raw_query, language=target_lang, session_id=session_id)
+        intent_res = farmer_intent_router.classify_intent(
+            raw_query,
+            language=target_lang,
+            session_id=session_id,
+            location_query=request.location_query,
+            latitude=request.latitude,
+            longitude=request.longitude,
+        )
         intent = intent_res.intent
 
         # 3. Branch: CONVERSATIONAL Mode
         if intent_res.response_type == "CONVERSATIONAL":
+            loc_name = intent_res.extracted_location.name if intent_res.extracted_location else None
             conv_text = farmer_intent_router.generate_conversational_response(
                 intent=intent,
                 lang=target_lang,
-                user_name=intent_res.extracted_name
+                user_name=intent_res.extracted_name,
+                location_name=loc_name
             )
             audio_url, tts_status = tts_provider.synthesize(conv_text, target_lang)
+            loc_info = None
+            if intent_res.extracted_location and intent_res.extracted_location.is_resolved:
+                loc_info = LocationInfoSchema(
+                    name=intent_res.extracted_location.name,
+                    district=intent_res.extracted_location.district,
+                    state=intent_res.extracted_location.state,
+                    latitude=intent_res.extracted_location.latitude or 12.9716,
+                    longitude=intent_res.extracted_location.longitude or 77.5946,
+                )
             return VoiceQueryResponse(
                 query_text=raw_query or "Spoken Voice Query",
                 detected_language=detected_lang,
                 farmer_response_language=target_lang,
                 intent=intent,
-                intent_category="CONVERSATIONAL",
+                intent_category="CONVERSATIONAL" if not intent_res.pending_intent else intent,
                 response_type="CONVERSATIONAL",
                 text_response=conv_text,
                 intelligence=None,
-                location=None,
+                location=loc_info,
                 coverage=None,
                 groundwater=None,
                 provenance=None,
@@ -75,11 +99,22 @@ class FarmerIntelligenceDispatcher:
                 translation_provider_status="LOCAL_CORE_TRANSLATIONS",
                 data_mode=settings.DATA_MODE,
                 disclaimer="Conversational Assistant: Responding to farmer dialog query.",
+                location_required=intent_res.location_required,
+                awaiting_location=intent_res.awaiting_location,
+                pending_intent=intent_res.pending_intent,
             )
 
         # 4. Location Resolution for INTELLIGENCE Mode
-        # Only extract location if explicitly present or resolved
-        loc_res = intent_res.extracted_location or resolve_location(location_query=request.location_query, query_text=raw_query)
+        # Only extract location if explicitly present or resolved from conversational context
+        loc_res = intent_res.extracted_location or resolve_location(
+            location_query=request.location_query,
+            query_text=raw_query,
+            latitude=request.latitude,
+            longitude=request.longitude,
+        )
+        if not (loc_res and loc_res.is_resolved) and not request.location_query:
+            loc_res = farmer_intent_router.get_context(session_id).last_location
+
         loc_info = None
         if loc_res and loc_res.is_resolved and loc_res.name:
             loc_info = LocationInfoSchema(
@@ -103,20 +138,18 @@ class FarmerIntelligenceDispatcher:
                     farmer_response_language=target_lang,
                     intent=intent,
                     intent_category="WEATHER",
-                    response_type="INTELLIGENCE",
+                    response_type="CONVERSATIONAL",
                     text_response=text_resp,
                     intelligence=None,
                     location=None,
-                    weather_info={
-                        "precipitation_mm": 120.0,
-                        "monsoon_status": "ACTIVE_SOUTHWEST_MONSOON",
-                        "provider_status": "REFERENCE_SIMULATION"
-                    },
+                    location_required=True,
+                    awaiting_location=True,
+                    pending_intent="WEATHER_OR_RAINFALL",
                     audio_url=audio_url,
                     voice_playback_available=audio_url is not None,
                     stt_provider_status=stt_provider.status,
                     tts_provider_status=tts_status,
-                    disclaimer="Weather Assessment: Derived from JalKrishi Hydro-Meteorological Reference Simulation. Live IMD/Weather API is NOT_CONFIGURED.",
+                    disclaimer="Weather Assessment: Requires location context.",
                 )
 
             text_resp = self._format_multilingual_weather_response(loc_info, target_lang)
@@ -240,15 +273,15 @@ class FarmerIntelligenceDispatcher:
         # ----------------------------------------------------------------------
         # E. GROUNDWATER INTENTS (GROUNDWATER_LEVEL, FORECAST, RISK, ANOMALY, DWLR)
         # ----------------------------------------------------------------------
-        target_loc_query = request.location_query
-        if not target_loc_query and loc_res and loc_res.is_resolved:
-            target_loc_query = loc_res.name
+        target_loc_query = loc_info.name if loc_info else request.location_query
+        target_lat = loc_info.latitude if loc_info else request.latitude
+        target_lon = loc_info.longitude if loc_info else request.longitude
 
         intel = farmer_intelligence_engine.get_unified_groundwater_intelligence(
-            lat=request.latitude,
-            lon=request.longitude,
+            lat=target_lat,
+            lon=target_lon,
             radius_km=15.0,
-            station_id=request.station_id,
+            station_id=None,  # Do NOT pass silent dashboard station_id fallback!
             location_query=target_loc_query,
             query_text=raw_query,
         )

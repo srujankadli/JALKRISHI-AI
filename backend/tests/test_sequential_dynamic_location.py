@@ -155,6 +155,7 @@ def test_bengaluru_all_13_languages():
 def test_unresolved_location_safety():
     print("\n=== RUNNING UNRESOLVED LOCATION SAFETY TEST ===")
     res = client.post("/api/v1/voice/respond", json={
+        "session_id": "test_unresolved_session",
         "query": "What is the groundwater level in Atlantis City?",
         "location_query": "Atlantis City",
         "station_id": "DWLR-KA-004",

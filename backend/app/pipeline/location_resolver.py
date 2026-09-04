@@ -145,6 +145,9 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
     "మెహసానా": "mehsana",
     "బెంగళూరు": "bengaluru",
     "బెంగళూరులో": "bengaluru",
+    "హైదరాబాద్": "hyderabad",
+    "హైదరాబాద్లో": "hyderabad",
+    "హైదరాబాద్‌లో": "hyderabad",
     "ముంబై": "mumbai",
     "ఢిల్లీ": "delhi",
     "లేహ్": "leh",
@@ -229,7 +232,9 @@ MULTILINGUAL_PLACE_MAP: Dict[str, str] = {
 
 def resolve_location(
     location_query: Optional[str] = None,
-    query_text: Optional[str] = None
+    query_text: Optional[str] = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
 ) -> LocationResolution:
     """
     Dynamically resolves place names to geographic coordinates.
@@ -237,7 +242,8 @@ def resolve_location(
     1. Direct match on location_query or query_text in MULTILINGUAL_PLACE_MAP & KNOWN_REFERENCE_LOCATIONS
     2. Station ID / station Code match in DWLR repository
     3. District / Block / State match in DWLR repository
-    4. Return is_resolved=False with clean limitation error message.
+    4. Explicit latitude & longitude coordinate match
+    5. Return is_resolved=False with clean limitation error message.
     """
     import logging
     logger = logging.getLogger("app.location_resolver")
@@ -247,6 +253,29 @@ def resolve_location(
 
     text_to_search = raw_input if raw_input else full_text
     if not text_to_search:
+        if latitude is not None and longitude is not None:
+            import math
+            nearest_st = station_repo.get_all()
+            nearest = None
+            min_d = 9999.0
+            for st in nearest_st:
+                dlat = math.radians(st.latitude - latitude)
+                dlon = math.radians(st.longitude - longitude)
+                a = math.sin(dlat / 2.0)**2 + math.cos(math.radians(latitude)) * math.cos(math.radians(st.latitude)) * math.sin(dlon / 2.0)**2
+                d = 6371.0 * (2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a)))
+                if d < min_d:
+                    min_d = d
+                    nearest = st
+            if nearest:
+                return LocationResolution(
+                    is_resolved=True,
+                    name=nearest.district if min_d > 15.0 else nearest.stationName,
+                    district=nearest.district,
+                    state=nearest.state,
+                    latitude=latitude,
+                    longitude=longitude,
+                    matched_station_id=nearest.id if min_d <= 15.0 else None
+                )
         return LocationResolution(
             is_resolved=False,
             name="Unknown",
@@ -337,7 +366,33 @@ def resolve_location(
                 longitude=st.longitude
             )
 
-    # 4. If unresolvable, return clean limitation message without faking coordinates
+    # 4. Explicit latitude & longitude coordinate match
+    if latitude is not None and longitude is not None:
+        import math
+        all_st = station_repo.get_all()
+        nearest = None
+        min_d = 9999.0
+        for st in all_st:
+            dlat = math.radians(st.latitude - latitude)
+            dlon = math.radians(st.longitude - longitude)
+            a = math.sin(dlat / 2.0)**2 + math.cos(math.radians(latitude)) * math.cos(math.radians(st.latitude)) * math.sin(dlon / 2.0)**2
+            d = 6371.0 * (2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a)))
+            if d < min_d:
+                min_d = d
+                nearest = st
+        if nearest:
+            logger.info(f"[LOCATION RESOLVER SUCCESS] Matched coordinates ({latitude:.4f}, {longitude:.4f}) -> station '{nearest.stationName}' (dist={min_d:.2f}km)")
+            return LocationResolution(
+                is_resolved=True,
+                name=nearest.district if min_d > 15.0 else nearest.stationName,
+                district=nearest.district,
+                state=nearest.state,
+                latitude=latitude,
+                longitude=longitude,
+                matched_station_id=nearest.id if min_d <= 15.0 else None
+            )
+
+    # 5. If unresolvable, return clean limitation message without faking coordinates
     logger.warning(f"[LOCATION RESOLVER UNRESOLVED] Could not resolve location from text: '{clean_text}'")
     return LocationResolution(
         is_resolved=False,

@@ -63,6 +63,9 @@ export interface VoiceQueryResponse {
   translation_provider_status: string;
   data_mode: string;
   disclaimer: string;
+  location_required?: boolean;
+  awaiting_location?: boolean;
+  pending_intent?: string | null;
 }
 
 export interface TranscribeResponse {
@@ -176,7 +179,10 @@ export class VoiceAssistantService {
     language: string = 'en',
     audioBase64?: string,
     stationId?: string,
-    locationQuery?: string
+    locationQuery?: string,
+    sessionId?: string,
+    contextLocation?: string,
+    contextCrop?: string
   ): Promise<VoiceQueryResponse> {
     return await apiClient.post<VoiceQueryResponse>('/voice/respond', {
       query: queryText,
@@ -186,6 +192,9 @@ export class VoiceAssistantService {
       longitude,
       language,
       audio_base64: audioBase64 || null,
+      session_id: sessionId || 'default',
+      context_location: contextLocation || null,
+      context_crop: contextCrop || null,
     });
   }
 

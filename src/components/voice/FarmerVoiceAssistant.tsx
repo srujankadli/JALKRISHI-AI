@@ -47,8 +47,9 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
   const [responseLang, setResponseLang] = useState(currentLanguage);
 
   const recognitionRef = useRef<any>(null);
-
   const activeRequestIdRef = useRef<number>(0);
+  const sessionIdRef = useRef<string>(`session_${Math.random().toString(36).substring(2, 9)}`);
+  const [conversationalLocation, setConversationalLocation] = useState<string | undefined>(undefined);
 
   const hasBrowserSpeechSupport =
     typeof window !== 'undefined' &&
@@ -186,12 +187,17 @@ export const FarmerVoiceAssistant: React.FC<FarmerVoiceAssistantProps> = ({
         undefined, // lng
         langCode,
         undefined, // audioBase64
-        selectedStation?.id || undefined, // Fallback stationId if text contains no explicit place name
-        text // locationQuery candidate
+        undefined, // DO NOT silently default to dashboard selectedStation!
+        text, // locationQuery candidate
+        sessionIdRef.current,
+        conversationalLocation
       );
 
       // Race-condition guard: update state ONLY if this is the latest request!
       if (currentReqId === activeRequestIdRef.current) {
+        if (res.location?.name) {
+          setConversationalLocation(res.location.name);
+        }
         setResponse(res);
         setState('RESPONDING');
       }
