@@ -20,6 +20,7 @@ import { AreasToWatchTable } from '../components/dashboard/AreasToWatchTable';
 import { MiniMapPreview } from '../components/dashboard/MiniMapPreview';
 import { QuickActionsGrid } from '../components/dashboard/QuickActionsGrid';
 import { GroundwaterCoverageCard } from '../components/dashboard/GroundwaterCoverageCard';
+import { JalKrishiWaterWatchCard } from '../components/dashboard/JalKrishiWaterWatchCard';
 
 // Executive Water Brief
 import { ExecutiveWaterBrief } from '../components/intelligence/ExecutiveWaterBrief';
@@ -103,6 +104,9 @@ export const Dashboard: React.FC = () => {
 
       {/* 2.5 Phase P Multilingual Farmer Voice Assistant */}
       <FarmerVoiceAssistant currentLanguage={currentLanguage} selectedStation={selectedStation} />
+
+      {/* 2.8 Proactive Groundwater Intelligence & Water Watch */}
+      <JalKrishiWaterWatchCard selectedStation={selectedStation} />
 
       {/* 3. Your Water Situation Card */}
       <WaterSituationCard metrics={metrics} />

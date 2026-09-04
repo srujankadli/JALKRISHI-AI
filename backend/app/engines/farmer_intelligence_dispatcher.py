@@ -18,6 +18,7 @@ from app.models.schemas import (
 )
 from app.engines.farmer_intent_router import farmer_intent_router, IntentClassificationResult
 from app.engines.farmer_intelligence import farmer_intelligence_engine
+from app.engines.proactive_intelligence import proactive_intelligence_engine
 from app.pipeline.dwlr_ingest import station_repo
 from app.services.speech.multilingual_service import (
     SUPPORTED_LANGUAGES,
@@ -271,7 +272,47 @@ class FarmerIntelligenceDispatcher:
             )
 
         # ----------------------------------------------------------------------
-        # E. GROUNDWATER INTENTS (GROUNDWATER_LEVEL, FORECAST, RISK, ANOMALY, DWLR)
+        # E. PROACTIVE_STATUS / EARLY WARNING INTENT
+        # ----------------------------------------------------------------------
+        if intent == "PROACTIVE_STATUS":
+            loc_name = loc_info.name if loc_info else request.location_query
+            lat = loc_info.latitude if loc_info else request.latitude
+            lon = loc_info.longitude if loc_info else request.longitude
+            station_id = request.station_id
+
+            brief = proactive_intelligence_engine.get_farmer_proactive_brief(
+                lat=lat,
+                lon=lon,
+                station_id=station_id,
+                location_name=loc_name,
+            )
+
+            raw_summary = brief.get("summary", "")
+            if target_lang != "en":
+                text_resp = hydro_translator.translate_text(raw_summary, target_lang)
+            else:
+                text_resp = raw_summary
+
+            audio_url, tts_status = tts_provider.synthesize(text_resp, target_lang)
+            return VoiceQueryResponse(
+                query_text=raw_query,
+                detected_language=detected_lang,
+                farmer_response_language=target_lang,
+                intent=intent,
+                intent_category="PROACTIVE_EARLY_WARNING",
+                response_type="INTELLIGENCE",
+                text_response=text_resp,
+                intelligence=None,
+                location=loc_info,
+                audio_url=audio_url,
+                voice_playback_available=audio_url is not None,
+                stt_provider_status=stt_provider.status,
+                tts_provider_status=tts_status,
+                disclaimer="Proactive Early Warning: Multi-signal hydrogeological risk assessment based on JalKrishi Reference Simulation Network.",
+            )
+
+        # ----------------------------------------------------------------------
+        # F. GROUNDWATER INTENTS (GROUNDWATER_LEVEL, FORECAST, RISK, ANOMALY, DWLR)
         # ----------------------------------------------------------------------
         target_loc_query = loc_info.name if loc_info else request.location_query
         target_lat = loc_info.latitude if loc_info else request.latitude

@@ -18,9 +18,11 @@ import {
   RefreshCw,
   Search,
   Zap,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { ProactiveIntelligenceSection } from '../../components/official/ProactiveIntelligenceSection';
 import {
   officialService,
   type OfficialOverviewResponse,
@@ -41,7 +43,7 @@ export const OfficialCommandCenter: React.FC = () => {
   const { t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'map' | 'alerts' | 'ranking' | 'trends' | 'network' | 'interventions' | 'simulator' | 'analyst' | 'evidence' | 'compare'
+    'overview' | 'proactive' | 'map' | 'alerts' | 'ranking' | 'trends' | 'network' | 'interventions' | 'simulator' | 'analyst' | 'evidence' | 'compare'
   >('overview');
 
   // Loading & Data States
@@ -316,6 +318,7 @@ export const OfficialCommandCenter: React.FC = () => {
       <div className="flex items-center gap-2 border-b border-stone-800 pb-2 overflow-x-auto whitespace-nowrap max-w-full select-none shrink-0 scrollbar-thin">
         {[
           { id: 'overview', label: t('Overview'), icon: Activity },
+          { id: 'proactive', label: t('Proactive Intelligence'), icon: Sparkles },
           { id: 'map', label: t('Intelligence Map'), icon: MapPin },
           { id: 'alerts', label: t('Early Warning'), icon: AlertTriangle, badge: alertsData?.total_alerts },
           { id: 'ranking', label: t('Risk Leaderboard'), icon: TrendingDown },
@@ -445,6 +448,11 @@ export const OfficialCommandCenter: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB: PROACTIVE GROUNDWATER INTELLIGENCE */}
+          {activeTab === 'proactive' && (
+            <ProactiveIntelligenceSection />
           )}
 
           {/* TAB 2: INTELLIGENCE MAP */}

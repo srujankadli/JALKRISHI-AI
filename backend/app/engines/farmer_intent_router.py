@@ -297,6 +297,7 @@ class FarmerIntentRouter:
             "FARM_WATER_MANAGEMENT": 0.0,
             "CROP_WATER_REQUIREMENT": 0.0,
             "WEATHER_IMPACT_ON_CROP": 0.0,
+            "PROACTIVE_STATUS": 0.0,
         }
 
         # --- A. CROP_RECOMMENDATION SIGNALS ---
@@ -497,6 +498,23 @@ class FarmerIntentRouter:
         if any(w in clean for w in impact_primary):
             scores["WEATHER_IMPACT_ON_CROP"] += 1.1
 
+        # --- P. PROACTIVE_STATUS / EARLY WARNING SIGNALS ---
+        proactive_primary = [
+            "warning", "alert", "alerts", "early warning", "water watch", "water status",
+            "चेतावनी", "अलर्ट", "ಎಚ್ಚರಿಕೆ", "ಹೊಸ ಮಾಹಿತಿ", "எச்சரிக்கை", "హెచ్చరిక", "সতর্কতা", "ਖ਼ਬਰਦਾਰ", "وارننگ"
+        ]
+        proactive_modifiers = [
+            "is there any warning", "any warning for my farm", "anything i should know",
+            "what changed", "should i worry", "should i worry about water", "any water update",
+            "any alert in my area", "is water safe", "is there any risk", "water warning", "water alert"
+        ]
+        if any(w in clean for w in proactive_primary):
+            scores["PROACTIVE_STATUS"] += 0.9
+        if any(w in clean for w in proactive_modifiers):
+            scores["PROACTIVE_STATUS"] += 1.2
+        if "is there any warning" in clean or "anything i should know" in clean or "what changed" in clean or "should i worry" in clean or "any warning" in clean or "any alert" in clean:
+            scores["PROACTIVE_STATUS"] += 1.5
+
         # Find intent with maximum score
         max_intent = max(scores, key=scores.get)
         max_score = scores[max_intent]
@@ -513,6 +531,10 @@ class FarmerIntentRouter:
                 "dwlr": "DWLR_STATION",
                 "rainfall": "WEATHER_OR_RAINFALL",
                 "weather": "WEATHER_OR_RAINFALL",
+                "warning": "PROACTIVE_STATUS",
+                "alert": "PROACTIVE_STATUS",
+                "alerts": "PROACTIVE_STATUS",
+                "चेतावनी": "PROACTIVE_STATUS",
             }
             if clean in short_map:
                 matched_short_intent = short_map[clean]
@@ -529,6 +551,7 @@ class FarmerIntentRouter:
             "RECHARGE_ADVICE",
             "DWLR_STATION",
             "WEATHER_OR_RAINFALL",
+            "PROACTIVE_STATUS",
         }
 
         if target_intent:

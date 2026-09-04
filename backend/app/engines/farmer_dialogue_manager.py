@@ -525,7 +525,7 @@ class FarmerDialogueManager:
         location_required_intents = {
             "GROUNDWATER_LEVEL", "GROUNDWATER_FORECAST", "GROUNDWATER_RISK",
             "GROUNDWATER_ANOMALY", "CROP_RECOMMENDATION", "IRRIGATION_ADVICE",
-            "RECHARGE_ADVICE", "DWLR_STATION", "WEATHER_OR_RAINFALL"
+            "RECHARGE_ADVICE", "DWLR_STATION", "WEATHER_OR_RAINFALL", "PROACTIVE_STATUS"
         }
 
         active_loc = ctx.location if (ctx.location and ctx.location.is_resolved) else (intent_res.extracted_location if (intent_res.extracted_location and intent_res.extracted_location.is_resolved) else None)

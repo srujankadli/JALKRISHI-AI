@@ -1529,3 +1529,163 @@ class RegionComparisonResponse(BaseModel):
     confidence: str
     disclaimer: str
 
+
+
+# ==========================================
+# 18. Proactive Groundwater Intelligence & Early Warning Schemas
+# ==========================================
+
+class ProactiveRiskState(str, Enum):
+    STABLE = "STABLE"
+    EMERGING_RISK = "EMERGING_RISK"
+    ESCALATING_RISK = "ESCALATING_RISK"
+    CRITICAL_RISK = "CRITICAL_RISK"
+    RECOVERY_SIGNAL = "RECOVERY_SIGNAL"
+    DATA_QUALITY_WARNING = "DATA_QUALITY_WARNING"
+
+
+class ProactiveLifecycleStatus(str, Enum):
+    NEW = "NEW"
+    ACTIVE = "ACTIVE"
+    ESCALATING = "ESCALATING"
+    RECOVERING = "RECOVERING"
+    RESOLVED = "RESOLVED"
+
+
+class ProactiveSignalType(str, Enum):
+    GROUNDWATER_DECLINE = "GROUNDWATER_DECLINE"
+    GROUNDWATER_RISE = "GROUNDWATER_RISE"
+    ACCELERATING_DECLINE = "ACCELERATING_DECLINE"
+    FORECASTED_STRESS = "FORECASTED_STRESS"
+    ANOMALY_PERSISTENCE = "ANOMALY_PERSISTENCE"
+    RAINFALL_DEFICIT = "RAINFALL_DEFICIT"
+    RECHARGE_SIGNAL = "RECHARGE_SIGNAL"
+    SATELLITE_VEGETATION_STRESS = "SATELLITE_VEGETATION_STRESS"
+    SATELLITE_TEMPERATURE_STRESS = "SATELLITE_TEMPERATURE_STRESS"
+    WATER_STORAGE_STRESS = "WATER_STORAGE_STRESS"
+    DATA_QUALITY_DEGRADATION = "DATA_QUALITY_DEGRADATION"
+
+
+class TargetAudienceEnum(str, Enum):
+    FARMER = "FARMER"
+    OFFICIAL = "OFFICIAL"
+    HYDROLOGIST = "HYDROLOGIST"
+
+
+class EvidenceSignalSchema(BaseModel):
+    signal_type: ProactiveSignalType
+    label: str
+    value: str
+    direction: str  # DECLINING | RISING | STABLE | NEUTRAL
+    severity: str  # CRITICAL | HIGH | MODERATE | LOW | INFO
+    confidence: str  # HIGH | MODERATE | LOW
+    evidence_source: str
+    provenance: str = "JalKrishi Reference Simulation Dataset"
+    evaluation_period: str = "Current Reference Analysis"
+    timestamp: str
+
+
+class ExplainabilitySchema(BaseModel):
+    observation: str = Field(..., description="Direct measurable observation or retrieved data point")
+    signal: str = Field(..., description="Interpretation of the rate/direction of change")
+    risk: str = Field(..., description="Identified hydrological or agricultural stress level")
+    recommendation: str = Field(..., description="Tailored primary action")
+    confidence: str = Field(..., description="Confidence level: HIGH | MODERATE | LOW")
+    what_changed: str = Field(..., description="Concise human-readable explanation of what changed")
+    why_it_matters: str = Field(..., description="Concise explanation of agronomic or hydrological impact")
+    evidence_summary: str = Field(..., description="Summary of multi-signal supporting evidence")
+    what_to_do: str = Field(..., description="Clear actionable next steps")
+    technical_evidence: Optional[Dict[str, Any]] = Field(None, description="Detailed telemetry/model parameters for officials/hydrologists")
+
+
+class AudienceActionSchema(BaseModel):
+    target_audience: TargetAudienceEnum
+    action_title: str
+    action_description: str
+    priority: str  # IMMEDIATE | HIGH | MEDIUM | ROUTINE
+    category: str  # IRRIGATION | CROP | WELL_MONITORING | FIELD_VERIFICATION | TELEMETRY_CHECK
+
+
+class ProactiveAlertSchema(BaseModel):
+    alert_id: str
+    station_id: str
+    station_name: str
+    state: str
+    district: str
+    block: Optional[str] = ""
+    latitude: float
+    longitude: float
+    risk_state: ProactiveRiskState
+    lifecycle_status: ProactiveLifecycleStatus
+    priority_score: float = Field(..., description="Deterministic priority score 0.0 to 100.0")
+    confidence: str  # HIGH | MODERATE | LOW
+    multi_signal_confirmed: bool = Field(False, description="True if supported by >= 2 independent evidence sources")
+    signal_count: int = 1
+    persistence_cycles: int = 1
+    evidence_signals: List[EvidenceSignalSchema]
+    explainability: ExplainabilitySchema
+    audience_actions: List[AudienceActionSchema]
+    notification_candidate: bool = False
+    notification_priority: str = "MEDIUM"
+    notification_message: str = ""
+    first_detected_at: str
+    last_evaluated_at: str
+    data_mode: str = "DEMO_SIMULATION"
+    provenance: str = "JalKrishi Reference Simulation Dataset"
+
+
+class ProactiveOverviewResponse(BaseModel):
+    timestamp: str
+    data_mode: str = "DEMO_SIMULATION"
+    provenance: str = "JalKrishi Reference Simulation Dataset"
+    total_active_alerts: int
+    critical_risk_count: int
+    escalating_risk_count: int
+    emerging_risk_count: int
+    recovery_signal_count: int
+    data_quality_warning_count: int
+    stable_monitored_count: int
+    top_priority_alerts: List[ProactiveAlertSchema]
+    state_distribution: Dict[str, int]
+    category_distribution: Dict[str, int]
+    disclaimer: str = "JalKrishi Reference Simulation Dataset & Hydrogeological Decision Support Model."
+
+
+class ProactiveRegionSummary(BaseModel):
+    region_name: str
+    region_type: str  # STATE | DISTRICT
+    total_monitored_nodes: int
+    active_alerts_count: int
+    critical_count: int
+    escalating_count: int
+    emerging_count: int
+    recovery_count: int
+    data_quality_count: int
+    primary_risk_state: ProactiveRiskState
+    regional_stress_summary: str
+    top_recommended_action: str
+
+
+class ProactiveRegionSummaryResponse(BaseModel):
+    timestamp: str
+    total_regions: int
+    regions: List[ProactiveRegionSummary]
+    disclaimer: str
+
+
+class ProactiveStationEvaluationResponse(BaseModel):
+    station_id: str
+    station_name: str
+    state: str
+    district: str
+    block: str
+    latitude: float
+    longitude: float
+    current_water_level: float
+    trend_rate_m_per_month: float
+    forecast_trajectory_summary: str
+    proactive_alert: Optional[ProactiveAlertSchema]
+    is_alert_active: bool
+    evaluation_timestamp: str
+    data_mode: str = "DEMO_SIMULATION"
+    provenance: str = "JalKrishi Reference Simulation Dataset"
