@@ -85,12 +85,14 @@ export type TranslationKey =
   | 'understanding'
   | 'preparing_advice'
   | 'satellite_estimate'
-  | 'direct_dwlr';
+  | 'direct_dwlr'
+  | 'hero_description';
 
 const DICTIONARIES: Record<string, Record<string, string>> = {
   en: {
     app_title: 'JalKrishi AI',
     know_your_water: 'Know Your Water. Grow Smarter.',
+    hero_description: 'Monitor groundwater conditions, understand depletion risk, and make smarter crop decisions using groundwater, remote-sensing, weather, and hydro-agronomic intelligence.',
     groundwater_intelligence: 'Groundwater Intelligence',
     reference_simulation: 'DWLR Network • Reference Simulation',
     active_crop_canopy: 'Active Crop Canopy',
@@ -178,6 +180,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   hi: {
     app_title: 'जलकृषि एआई',
     know_your_water: 'अपने जल को जानें। समझदारी से खेती करें।',
+    hero_description: 'भूजल स्तर की निगरानी करें, जल संकट के जोखिम को समझें और रिमोट सेंसिंग, मौसम और कृषि-जल वैज्ञानिक सूचनाओं से बेहतर फसल निर्णय लें।',
     groundwater_intelligence: 'भूजल सूचना एवं विश्लेषण',
     reference_simulation: 'DWLR नेटवर्क • संदर्भ सिमुलेशन',
     active_crop_canopy: 'सक्रिय फसल क्षेत्र',
@@ -265,6 +268,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   bn: {
     app_title: 'জলকৃষি AI',
     know_your_water: 'আপনার জল জানুন। বুদ্ধিমানভাবে চাষ করুন।',
+    hero_description: 'ভূগর্ভস্থ জলের অবস্থা পর্যবেক্ষণ করুন, জল হ্রাসের ঝুঁকি বুঝুন এবং রিমোট সেন্সিং, আবহাওয়া ও কৃষি-জল সংক্রান্ত তথ্যের সাহায্যে স্মার্ট ফসল সিদ্ধান্ত নিন।',
     groundwater_intelligence: 'ভূগর্ভস্থ জল বিশ্লেষণ',
     reference_simulation: 'DWLR নেটওয়ার্ক • রেফারেন্স সিমুলেশন',
     active_crop_canopy: 'সক্রিয় শস্য এলাকা',
@@ -352,6 +356,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   te: {
     app_title: 'జల్​కృషి AI',
     know_your_water: 'మీ నీటిని తెలుసుకోండి. తెలివిగా పంటలు పండించండి.',
+    hero_description: 'భూగర్భ జలాల పరిస్థితిని పర్యవేక్షించండి, క్షీణత ప్రమాదాన్ని అర్థం చేసుకోండి మరియు రిమోట్ సెన్సింగ్, వాతావరణం మరియు వ్యవసాయ-జల సమాచారంతో తెలివైన పంట నిర్ణయాలు తీసుకోండి.',
     groundwater_intelligence: 'భూజల విశ్లేషణ',
     reference_simulation: 'DWLR నెట్‌వర్క్ • రిఫరెన్స్ సిమ్యులేషన్',
     active_crop_canopy: 'పంట విస్తీర్ణం',
@@ -439,6 +444,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   kn: {
     app_title: 'ಜಲಕೃಷಿ AI',
     know_your_water: 'ನಿಮ್ಮ ನೀರನ್ನು ತಿಳಿಯಿರಿ. ಬುದ್ಧಿವಂತಿಕೆಯಿಂದ ಬೆಳೆಯಿರಿ.',
+    hero_description: 'ಅಂತರ್ಜಲ ಪರಿಸ್ಥಿತಿಯನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಿ, ನೀರಿನ ಕೊರತೆಯ ಅಪಾಯವನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ ಮತ್ತು ಉಪಗ್ರಹ ಸಂವೇದನೆ, ಹವಾಮಾನ ಮತ್ತು ಕೃಷಿ-ಜಲ ಮಾಹಿತಿಯೊಂದಿಗೆ ಉತ್ತಮ ಬೆಳೆ ನಿರ್ಧಾರಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳಿ.',
     groundwater_intelligence: 'ಅಂತರ್ಜಲ ಮಾಹಿತಿ ಮತ್ತು ವಿಶ್ಲೇಷಣೆ',
     reference_simulation: 'DWLR ಜಾಲ • ಉಲ್ಲೇಖ ಸಿಮ್ಯುಲೇಶನ್',
     active_crop_canopy: 'ಸಕ್ರಿಯ ಬೆಳೆ ಪ್ರದೇಶ',
@@ -526,6 +532,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   mr: {
     app_title: 'जलकृषी AI',
     know_your_water: 'आपले पाणी जाणून घ्या. बुद्धिमत्तेने शेती करा.',
+    hero_description: 'भूजल स्थितीचे निरीक्षण करा, भूजल पातळी घसरण्याचा धोका समजून घ्या आणि उपग्रह संवेदन, हवामान व कृषी-जल बुद्धिमत्तेच्या सहाय्याने पिकांचे योग्य निर्णय घ्या.',
     groundwater_intelligence: 'भूजल बुद्धिमत्ता व विश्लेषण',
     reference_simulation: 'DWLR नेटवर्क • संदर्भ सिम्युलेशन',
     active_crop_canopy: 'सक्रिय पीक क्षेत्र',
@@ -613,6 +620,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   ta: {
     app_title: 'ஜல்​கிருஷி AI',
     know_your_water: 'உங்கள் நீரை அறியுங்கள். புத்திசாலித்தனமாக விவசாயம் செய்யுங்கள்.',
+    hero_description: 'நிலத்தடி நீர் நிலைகளை கண்காணிக்கவும், நீர் பற்றாக்குறை அபாயத்தை புரிந்து கொள்ளவும், செயற்கைக்கோள், வானிலை மற்றும் வேளாண் நீர் நுண்ணறிவு மூலம் சிறந்த பயிர் முடிவுகளை எடுக்கவும்.',
     groundwater_intelligence: 'நிலத்தடி நீர் தகவல் மற்றும் பகுப்பாய்வு',
     reference_simulation: 'DWLR நெட்வொர்க் • குறிப்பு உருவகப்படுத்துதல்',
     active_crop_canopy: 'செயலில் உள்ள பயிர் பகுதி',
@@ -700,6 +708,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   gu: {
     app_title: 'જલકૃષિ AI',
     know_your_water: 'તમારા પાણીને જાણો. સમજદારીથી ખેતી કરો.',
+    hero_description: 'ભૂગર્ભજળની સ્થિતિ પર નજર રાખો, જળ સ્તર ઘટવાના જોખમને સમજો અને રિમોટ સેન્સિંગ, હવામાન અને કૃષિ-જળ બુદ્ધિનો ઉપયોગ કરીને સ્માર્ટ પાક નિર્ણયો લો.',
     groundwater_intelligence: 'ભૂગર્ભજળ બુદ્ધિમત્તા અને વિશ્લેષણ',
     reference_simulation: 'DWLR નેટવર્ક • સંદર્ભ સિમ્યુલેશન',
     active_crop_canopy: 'સક્રિય પાક વિસ્તાર',
@@ -787,6 +796,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   pa: {
     app_title: 'ਜਲਕ੍ਰਿਸ਼ੀ AI',
     know_your_water: 'ਆਪਣੇ ਪਾਣੀ ਨੂੰ ਜਾਣੋ। ਸਮਝਦਾਰੀ ਨਾਲ ਖੇਤੀ ਕਰੋ।',
+    hero_description: 'ਧਰਤੀ ਹੇਠਲੇ ਪਾਣੀ ਦੀ ਸਥਿਤੀ ਦੀ ਨਿਗਰਾਨੀ ਕਰੋ, ਪਾਣੀ ਘਟਣ ਦੇ ਜੋਖਮ ਨੂੰ ਸਮਝੋ ਅਤੇ ਰਿਮੋਟ ਸੈਂਸਿੰਗ, ਮੌਸਮ ਅਤੇ ਖੇਤੀਬਾੜੀ-ਜਲ ਜਾਣਕਾਰੀ ਨਾਲ ਸਮਾਰਟ ਫਸਲ ਫੈਸਲੇ ਲਓ।',
     groundwater_intelligence: 'ਭੂਮੀਗਤ ਜਲ ਬੁੱਧੀਮਤਾ ਅਤੇ ਵਿਸ਼ਲੇਸ਼ਣ',
     reference_simulation: 'DWLR ਨੈੱਟਵਰਕ • ਰੈਫਰੈਂਸ ਸਿਮੂਲੇਸ਼ਨ',
     active_crop_canopy: 'ਸਰਗਰਮ ਫਸਲ ਖੇਤਰ',
@@ -874,6 +884,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   ml: {
     app_title: 'ജൽക്രിഷി AI',
     know_your_water: 'നിങ്ങളുടെ ജലം അറിയുക. സമർത്ഥമായി കൃഷി ചെയ്യുക.',
+    hero_description: 'ഭൂഗർഭജല നില നിരീക്ഷിക്കുക, ജലക്ഷാമ സാധ്യതകൾ മനസ്സിലാക്കുക, വിദൂര സംവേദനം, കാലാവസ്ഥ, കാർഷിക-ജല വിവരങ്ങൾ എന്നിവ ഉപയോഗിച്ച് മികച്ച വിള തീരുമാനങ്ങൾ എടുക്കുക.',
     groundwater_intelligence: 'ഭൂഗർഭജല വിവര ശേഖരണവും വിശകലനവും',
     reference_simulation: 'DWLR നെറ്റ്‌വർക്ക് • റെഫറൻസ് സിമുലേഷൻ',
     active_crop_canopy: 'സജീവ വിള പ്രദേശം',
@@ -961,6 +972,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   or: {
     app_title: 'ଜଳକୃଷି AI',
     know_your_water: 'ଆପଣଙ୍କ ଜଳ ବିଷୟରେ ଜାଣନ୍ତୁ। ବୁଦ୍ଧିମାନ ଭାବରେ ଚାଷ କରନ୍ତୁ।',
+    hero_description: 'ଭୂତଳ ଜଳ ସ୍ଥିତି ଉପରେ ନଜର ରଖନ୍ତୁ, ଜଳ ହ୍ରାସ ବିପଦ ବୁଝନ୍ତୁ ଏବଂ ରିମୋଟ୍ ସେନ୍ସିଂ, ପାଣିପାଗ ଓ କୃଷି-ଜଳ ସୂଚନା ସାହାଯ୍ୟରେ ସଠିକ୍ ଫସଲ ନିଷ୍ପତ୍ତି ନିଅନ୍ତୁ।',
     groundwater_intelligence: 'ଭୂତଳ ଜଳ ବିଶ୍ଳେଷଣ',
     reference_simulation: 'DWLR ନେଟୱାର୍କ • ରେଫରେନ୍ସ ସିମୁଲେସନ୍',
     active_crop_canopy: 'ସକ୍ରିୟ ଫସଲ ଅଞ୍ଚଳ',
@@ -1048,6 +1060,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   as: {
     app_title: 'জলকৃষি AI',
     know_your_water: 'আপোনাৰ পানী জানক। বুধিৰে খেতি কৰক।',
+    hero_description: 'ভূগৰ্ভস্থ পানীৰ অৱস্থা নিৰীক্ষণ কৰক, পানী হ্ৰাসৰ আশংকা বুজি লওক আৰু ৰিমোট চেন্সিং, বতৰ আৰু কৃষি-জল তথ্য ব্যৱহাৰ কৰি স্মাৰ্ট শস্য সিদ্ধান্ত লওক।',
     groundwater_intelligence: 'ভূগৰ্ভস্থ পানী বিশ্লেষণ',
     reference_simulation: 'DWLR নেটৱৰ্ক • ৰেফাৰেন্স অনুৰূপকৰণ',
     active_crop_canopy: 'সক্ৰিয় শস্য এলেকা',
@@ -1135,6 +1148,7 @@ const DICTIONARIES: Record<string, Record<string, string>> = {
   ur: {
     app_title: 'جل کرشی AI',
     know_your_water: 'اپنے پانی کو جانیں۔ دانشمندی سے کاشتکاری کریں۔',
+    hero_description: 'زیر زمین پانی کی صورتحال کی نگرانی کریں، پانی کی کمی کے خطرے کو سمجھیں، اور ریموٹ سینسنگ، موسم اور زرعی آبی معلومات سے بہتر فیصلے لیں۔',
     groundwater_intelligence: 'زیر زمین پانی کا تجزیہ اور معلومات',
     reference_simulation: 'DWLR نیٹ ورک • حوالہ سیمولیشن',
     active_crop_canopy: 'فعال فصل کا رقبہ',

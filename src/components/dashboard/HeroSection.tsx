@@ -44,7 +44,7 @@ export const HeroSection: React.FC = () => {
 
           {/* Supporting Description */}
           <p className="max-w-xl text-sm font-normal text-stone-600 sm:text-base leading-relaxed">
-            Monitor groundwater conditions, understand depletion risk, and make smarter crop decisions using groundwater, remote-sensing, weather, and hydro-agronomic intelligence.
+            {t('Monitor groundwater conditions, understand depletion risk, and make smarter crop decisions using groundwater, remote-sensing, weather, and hydro-agronomic intelligence.')}
           </p>
 
           {/* Action CTAs */}

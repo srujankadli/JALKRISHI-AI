@@ -123,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
           </div>
           <p className="text-[11px] font-medium text-stone-500 line-clamp-1">
-            {APP_CONFIG.tagline}
+            {t('know_your_water')}
           </p>
         </div>
       </div>

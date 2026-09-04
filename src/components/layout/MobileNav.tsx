@@ -114,7 +114,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 </div>
                 <div>
                   <h3 className="font-extrabold text-stone-900 text-base">{APP_CONFIG.appName}</h3>
-                  <p className="text-[11px] text-stone-500">{APP_CONFIG.tagline}</p>
+                  <p className="text-[11px] text-stone-500">{t('know_your_water')}</p>
                 </div>
               </div>
               <button

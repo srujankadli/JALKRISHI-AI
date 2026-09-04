@@ -132,7 +132,7 @@ export const LoginPage: React.FC = () => {
                 v2.6
               </span>
             </h1>
-            <p className="text-xs text-slate-400 font-medium">{t('Know Your Water. Grow Smarter.')}</p>
+            <p className="text-xs text-slate-400 font-medium">{t('know_your_water')}</p>
           </div>
         </div>
 
