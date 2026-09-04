@@ -13,6 +13,8 @@ import { HelpPage } from './pages/HelpPage';
 
 import { LanguageProvider } from './context/LanguageContext';
 
+import { OfficialCommandCenter } from './pages/official/OfficialCommandCenter';
+
 export function App() {
   return (
     <LanguageProvider>
@@ -25,6 +27,7 @@ export function App() {
             {/* Main Platform Shell Routes */}
             <Route element={<AppShell />}>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/official" element={<OfficialCommandCenter />} />
               <Route path="/map" element={<GroundwaterMapPage />} />
               <Route path="/forecast" element={<ForecastPage />} />
               <Route path="/anomalies" element={<AnomaliesPage />} />

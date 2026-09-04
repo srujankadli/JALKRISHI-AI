@@ -5,9 +5,11 @@ export interface UserProfile {
   name: string;
   email: string;
   role: string;
+  system_role?: string;
   organization: string;
   department: string;
   assigned_state?: string;
+  assigned_district?: string;
   avatar_initials: string;
 }
 

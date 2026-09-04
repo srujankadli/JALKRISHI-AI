@@ -1275,3 +1275,246 @@ class TTSResponse(BaseModel):
     audio_url: Optional[str] = Field(None, description="Audio URL if synthesized")
     status: str = Field("NOT_CONFIGURED", description="TTS provider status")
     message: str = Field(..., description="Status message")
+
+
+# ==========================================
+# 11. Official Command & Decision Center Schemas
+# ==========================================
+
+class OfficialOverviewKPI(BaseModel):
+    monitoring_stations: int
+    reporting_stations: int
+    data_coverage_pct: float
+    critical_stations: int
+    high_risk_areas: int
+    declining_zones: int
+    improving_zones: int
+    recharge_opportunity_zones: int
+    forecast_stress_areas: int
+    data_mode: str
+    disclaimer: str
+
+
+class OfficialOverviewResponse(BaseModel):
+    timestamp: str
+    user_role: str
+    assigned_scope: str
+    kpis: OfficialOverviewKPI
+    recent_anomalies_count: int
+    high_risk_districts: List[str]
+    disclaimer: str
+
+
+class OfficialMapFeature(BaseModel):
+    id: str
+    name: str
+    type: str
+    latitude: float
+    longitude: float
+    groundwater_level: Optional[float]
+    groundwater_condition: str
+    trend: str
+    risk_score: float
+    anomaly_status: str
+    rainfall_signal: str
+    recharge_opportunity: str
+    crop_demand_signal: str
+    forecast_stress: str
+    confidence: str
+    data_source: str
+
+
+class OfficialMapResponse(BaseModel):
+    timestamp: str
+    user_scope: str
+    features: List[OfficialMapFeature]
+    available_layers: List[str]
+    data_mode: str
+    disclaimer: str
+
+
+class StressContributor(BaseModel):
+    factor: str
+    weight_pct: int
+    description: str
+    evidence_type: str
+
+
+class ExplainStressResponse(BaseModel):
+    area_id: str
+    area_name: str
+    risk_level: str
+    risk_score: float
+    primary_contributors: List[StressContributor]
+    supporting_evidence: List[str]
+    confidence: str
+    data_mode: str
+    model_interpretation_note: str
+
+
+class OfficialAlert(BaseModel):
+    alert_id: str
+    severity: str
+    location_name: str
+    district: str
+    state: str
+    detected_signal: str
+    evidence: List[str]
+    trend: str
+    confidence: str
+    suggested_official_action: str
+    timestamp: str
+
+
+class OfficialAlertsResponse(BaseModel):
+    timestamp: str
+    user_scope: str
+    total_alerts: int
+    alerts: List[OfficialAlert]
+    disclaimer: str
+
+
+class RiskRankingComponent(BaseModel):
+    name: str
+    weight_pct: int
+    score: float
+    description: str
+
+
+class RiskRankingItem(BaseModel):
+    rank: int
+    region_name: str
+    parent_region: str
+    risk_score: float
+    risk_category: str
+    trend: str
+    components: List[RiskRankingComponent]
+    confidence: str
+    monitoring_gap_score: float
+    recharge_score: float
+
+
+class RiskRankingResponse(BaseModel):
+    timestamp: str
+    user_scope: str
+    methodology: str
+    rankings: List[RiskRankingItem]
+    disclaimer: str
+
+
+class NetworkStationItem(BaseModel):
+    station_id: str
+    station_name: str
+    district: str
+    state: str
+    latest_reading: Optional[float]
+    unit: str
+    timestamp: str
+    telemetry_status: str
+    data_quality_status: str
+    trend: str
+    risk_score: float
+    data_source: str
+
+
+class NetworkHealthResponse(BaseModel):
+    timestamp: str
+    user_scope: str
+    total_stations: int
+    online_stations: int
+    delayed_stations: int
+    offline_stations: int
+    reporting_pct: float
+    stations: List[NetworkStationItem]
+    disclaimer: str
+
+
+class InterventionOpportunity(BaseModel):
+    id: str
+    area_name: str
+    district: str
+    state: str
+    category: str
+    groundwater_condition: str
+    rainfall_signal: str
+    recharge_signal: str
+    trend: str
+    risk_level: str
+    confidence: str
+    potential_intervention: str
+    disclaimer: str
+
+
+class InterventionsResponse(BaseModel):
+    timestamp: str
+    user_scope: str
+    total_opportunities: int
+    opportunities: List[InterventionOpportunity]
+    disclaimer: str
+
+
+class ScenarioSimulationRequest(BaseModel):
+    rainfall_pct_change: float = Field(0.0, description="Hypothetical rainfall change (-20 to +20)")
+    crop_demand_pct_change: float = Field(0.0, description="Hypothetical agricultural demand change (-20 to +20)")
+    recharge_intervention_level: str = Field("None", description="None, Low, Medium, High")
+    target_region: Optional[str] = Field(None, description="Optional target state/district")
+
+
+class ScenarioSimulationResponse(BaseModel):
+    timestamp: str
+    target_region: str
+    inputs: Dict[str, Any]
+    simulated_stress_score: float
+    baseline_stress_score: float
+    delta_pct: float
+    simulated_forecast_trajectory: List[Dict[str, Any]]
+    recharge_opportunity_impact: str
+    water_pressure_category: str
+    disclaimer: str
+
+
+class OfficialAnalystRequest(BaseModel):
+    query: str = Field(..., description="Natural language question for AI Analyst")
+    language: str = Field("en", description="Target response language")
+    target_region: Optional[str] = Field(None, description="Optional filter region")
+
+
+class OfficialAnalystResponse(BaseModel):
+    query: str
+    answer: str
+    evidence: List[str]
+    confidence: str
+    data_source: str
+    data_mode: str
+    relevant_region: str
+    disclaimer: str
+
+
+class EvidenceProviderStatus(BaseModel):
+    provider_name: str
+    status: str
+    description: str
+    last_check: str
+    data_mode: str
+
+
+class EvidenceCenterResponse(BaseModel):
+    timestamp: str
+    active_data_mode: str
+    providers: List[EvidenceProviderStatus]
+    disclaimer: str
+
+
+class RegionComparisonRequest(BaseModel):
+    region_a: str = Field(..., description="First region name (State or District)")
+    region_b: str = Field(..., description="Second region name (State or District)")
+
+
+class RegionComparisonResponse(BaseModel):
+    timestamp: str
+    region_a: Dict[str, Any]
+    region_b: Dict[str, Any]
+    comparative_interpretation: str
+    confidence: str
+    disclaimer: str
+

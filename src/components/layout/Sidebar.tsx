@@ -11,6 +11,7 @@ import {
   Droplets,
   MessageSquare,
   LogIn,
+  Landmark,
 } from 'lucide-react';
 import { APP_CONFIG } from '../../utils/constants';
 
@@ -32,6 +33,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Dashboard',
       sublabel: 'मुख्य पृष्ठ',
       emoji: '🌾',
+    },
+    {
+      to: '/official',
+      icon: Landmark,
+      label: 'Official Command Center',
+      sublabel: 'कमांड एंड डिसीजन सेंटर',
+      badge: 'Command',
+      badgeColor: 'bg-amber-600 text-white',
+      emoji: '🏛️',
     },
     {
       to: '/map',
