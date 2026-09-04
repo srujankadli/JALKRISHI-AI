@@ -194,6 +194,12 @@ class ApiClient {
       clearTimeout(timer);
 
       if (!res.ok) {
+        if (res.status >= 500) {
+          this.setStatus('fallback');
+        } else {
+          // 4xx status confirms backend is reachable and responding
+          this.setStatus('connected');
+        }
         throw new ApiClientError({
           message: `HTTP ${res.status} ${res.statusText}`,
           statusCode: res.status,
@@ -211,7 +217,9 @@ class ApiClient {
       return data;
     } catch (err) {
       clearTimeout(timer);
-      this.setStatus('fallback');
+      if (!(err instanceof ApiClientError) || (err.statusCode && err.statusCode >= 500)) {
+        this.setStatus('fallback');
+      }
       throw normalizeError(err, cleanEndpoint);
     }
   }
@@ -246,6 +254,11 @@ class ApiClient {
       clearTimeout(timer);
 
       if (!res.ok) {
+        if (res.status >= 500) {
+          this.setStatus('fallback');
+        } else {
+          this.setStatus('connected');
+        }
         throw new ApiClientError({
           message: `HTTP ${res.status} ${res.statusText}`,
           statusCode: res.status,
@@ -258,7 +271,9 @@ class ApiClient {
       return data;
     } catch (err) {
       clearTimeout(timer);
-      this.setStatus('fallback');
+      if (!(err instanceof ApiClientError) || (err.statusCode && err.statusCode >= 500)) {
+        this.setStatus('fallback');
+      }
       throw normalizeError(err, cleanEndpoint);
     }
   }
