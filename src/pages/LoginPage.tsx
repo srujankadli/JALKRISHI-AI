@@ -46,7 +46,7 @@ export const LoginPage: React.FC = () => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSubmitted, setForgotSubmitted] = useState(false);
 
-  const fromPath = (location.state as any)?.from?.pathname || '/';
+  const fromPath = (location.state as any)?.from?.pathname;
 
   const handleOfficialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +69,8 @@ export const LoginPage: React.FC = () => {
     if (success) {
       setIsSuccess(true);
       setTimeout(() => {
-        navigate(fromPath, { replace: true });
+        const dest = fromPath && fromPath !== '/' && fromPath !== '/login' ? fromPath : '/official';
+        navigate(dest, { replace: true });
       }, 600);
     } else {
       setErrorMsg(t('Authentication failed. Please verify official credentials.'));
@@ -86,7 +87,8 @@ export const LoginPage: React.FC = () => {
     if (success) {
       setIsSuccess(true);
       setTimeout(() => {
-        navigate(fromPath, { replace: true });
+        const dest = fromPath && fromPath !== '/official' && fromPath !== '/login' ? fromPath : '/';
+        navigate(dest, { replace: true });
       }, 600);
     } else {
       setErrorMsg(t('Farmer login failed. Please try again.'));

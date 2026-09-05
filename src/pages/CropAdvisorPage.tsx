@@ -25,6 +25,7 @@ import { WaterSmartFarmingAdvice } from '../components/crops/WaterSmartFarmingAd
 import { CropMethodologyNote } from '../components/crops/CropMethodologyNote';
 import { useLanguage } from '../context/LanguageContext';
 import { useFarm } from '../context/FarmContext';
+import { useAuth } from '../context/AuthContext';
 
 interface OutletContextType {
   onSelectStation: (station: DWLRStation) => void;
@@ -34,6 +35,7 @@ export const CropAdvisorPage: React.FC = () => {
   const { t } = useLanguage();
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
+  const { isFarmer } = useAuth();
   const {
     location: farmLocation,
     profile: farmWaterProfile,
@@ -295,13 +297,25 @@ export const CropAdvisorPage: React.FC = () => {
 
       {/* 1. Page Header */}
       <PageHeader
-        title={t('Smart Crop Advisor')}
-        subtitle={t('Choose crops that match your soil, season, weather forecast, and available groundwater reserves to secure your harvest.')}
-        farmerNote={t('By checking water table trends before sowing, you can avoid high-water crops that risk drying out your tube-well before harvest.')}
+        title={
+          isFarmer
+            ? t('Smart Crop Advisor')
+            : t('Agricultural Hydrology & Crop Water Intensity Intelligence')
+        }
+        subtitle={
+          isFarmer
+            ? t('Choose crops that match your soil, season, weather forecast, and available groundwater reserves to secure your harvest.')
+            : t('Simulated agro-climatic water demand, crop water intensity matrix, and regional crop water balance analysis across Indian districts.')
+        }
+        farmerNote={
+          isFarmer
+            ? t('By checking water table trends before sowing, you can avoid high-water crops that risk drying out your tube-well before harvest.')
+            : undefined
+        }
         badge={
           <span className="rounded-full bg-agri-100 border border-agri-300 px-3 py-1 text-xs font-bold text-agri-900 flex items-center gap-1.5 shadow-xs">
             <Sprout className="h-3.5 w-3.5 text-agri-700" />
-            {t('Decision-Support v2.4')}
+            {isFarmer ? t('Decision-Support v2.4') : t('Regional Agronomy Model')}
           </span>
         }
       />
@@ -318,36 +332,38 @@ export const CropAdvisorPage: React.FC = () => {
         </div>
       )}
 
-      {/* The crop plan reads this same FarmContext used by Dashboard and Water Advisor. */}
-      <section className="rounded-2xl border border-agri-200 bg-agri-50/60 p-4 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex gap-3">
-            <div className="rounded-xl bg-white p-2 text-agri-700 shadow-sm"><MapPin className="h-5 w-5" /></div>
-            <div>
-              <h2 className="font-bold text-stone-900">{t('Your saved Farm Water Profile')}</h2>
-              {farmLocation ? (
-                <p className="mt-1 text-sm font-medium text-stone-700">
-                  {resolvedLocation?.name || farmLocation}
-                  {resolvedLocation?.state ? `, ${resolvedLocation.state}` : ''}
-                </p>
-              ) : (
-                <p className="mt-1 text-sm text-stone-600">{t('Add your farm location below to personalise crop advice.')}</p>
-              )}
-              {profileSummary.length ? (
-                <p className="mt-2 text-xs text-stone-600">{profileSummary.join(' • ')}</p>
-              ) : farmLocation ? (
-                <p className="mt-2 text-xs text-stone-600">{t('Water sources and reliability are not added yet. Complete the profile below for more relevant advice.')}</p>
-              ) : null}
+      {/* The crop plan reads this same FarmContext used by Dashboard and Water Advisor - Farmer Only */}
+      {isFarmer && (
+        <section className="rounded-2xl border border-agri-200 bg-agri-50/60 p-4 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex gap-3">
+              <div className="rounded-xl bg-white p-2 text-agri-700 shadow-sm"><MapPin className="h-5 w-5" /></div>
+              <div>
+                <h2 className="font-bold text-stone-900">{t('Your saved Farm Water Profile')}</h2>
+                {farmLocation ? (
+                  <p className="mt-1 text-sm font-medium text-stone-700">
+                    {resolvedLocation?.name || farmLocation}
+                    {resolvedLocation?.state ? `, ${resolvedLocation.state}` : ''}
+                  </p>
+                ) : (
+                  <p className="mt-1 text-sm text-stone-600">{t('Add your farm location below to personalise crop advice.')}</p>
+                )}
+                {profileSummary.length ? (
+                  <p className="mt-2 text-xs text-stone-600">{profileSummary.join(' • ')}</p>
+                ) : farmLocation ? (
+                  <p className="mt-2 text-xs text-stone-600">{t('Water sources and reliability are not added yet. Complete the profile below for more relevant advice.')}</p>
+                ) : null}
+              </div>
             </div>
+            {farmNearestStation && (
+              <div className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-medium text-stone-700 shadow-sm">
+                <Droplets className="h-3.5 w-3.5 text-water-700" />
+                {t('Farm-area water evidence is included')}
+              </div>
+            )}
           </div>
-          {farmNearestStation && (
-            <div className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-medium text-stone-700 shadow-sm">
-              <Droplets className="h-3.5 w-3.5 text-water-700" />
-              {t('Farm-area water evidence is included')}
-            </div>
-          )}
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 2. Interactive Farm Profile Input Form */}
       <FarmProfileForm
@@ -372,21 +388,23 @@ export const CropAdvisorPage: React.FC = () => {
         isGenerating={isGenerating}
       />
 
-      {/* 2b. Personalized Farm Water-Source & Irrigation Profile */}
-      <FarmWaterProfileSection
-        profile={farmWaterProfile}
-        onSaveProfile={handleSaveFarmWaterProfile}
-        jalkrishiGroundwaterStatus={
-          nearbyStation?.status === 'critical'
-            ? 'Critical Deficit'
-            : nearbyStation?.status === 'warning'
-            ? 'Declining'
-            : nearbyStation?.status === 'moderate'
-            ? 'Moderately Stressed'
-            : 'Stable'
-        }
-        isGenerating={isGenerating}
-      />
+      {/* 2b. Personalized Farm Water-Source & Irrigation Profile - Farmer Only */}
+      {isFarmer && (
+        <FarmWaterProfileSection
+          profile={farmWaterProfile}
+          onSaveProfile={handleSaveFarmWaterProfile}
+          jalkrishiGroundwaterStatus={
+            nearbyStation?.status === 'critical'
+              ? 'Critical Deficit'
+              : nearbyStation?.status === 'warning'
+              ? 'Declining'
+              : nearbyStation?.status === 'moderate'
+              ? 'Moderately Stressed'
+              : 'Stable'
+          }
+          isGenerating={isGenerating}
+        />
+      )}
 
       {/* 3. Top 3 Recommended Crops */}
       {recommendations && (

@@ -75,7 +75,12 @@ export interface FarmContextType {
 
 const FarmContext = createContext<FarmContextType | undefined>(undefined);
 
+import { useAuth } from './AuthContext';
+
 export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isOfficial } = useAuth();
+  const experienceMode: 'farmer' | 'official' = isOfficial ? 'official' : 'farmer';
+
   const [location, setLocation] = useState<string>(() => {
     try {
       return localStorage.getItem(FARMER_CONFIG.STORAGE_KEYS.FARM_LOCATION) || '';
@@ -95,15 +100,6 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('Could not parse stored farm water profile', e);
     }
     return DEFAULT_FARM_PROFILE;
-  });
-
-  const [experienceMode, setExperienceModeState] = useState<'farmer' | 'official'>(() => {
-    try {
-      const saved = localStorage.getItem(FARMER_CONFIG.STORAGE_KEYS.EXPERIENCE_MODE);
-      return saved === 'official' ? 'official' : 'farmer';
-    } catch {
-      return 'farmer';
-    }
   });
 
   const [resolvedLocation, setResolvedLocation] = useState<ResolvedFarmLocation | null>(null);
@@ -296,13 +292,8 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const setExperienceMode = (mode: 'farmer' | 'official') => {
-    setExperienceModeState(mode);
-    try {
-      localStorage.setItem(FARMER_CONFIG.STORAGE_KEYS.EXPERIENCE_MODE, mode);
-    } catch (e) {
-      console.warn('Could not persist experience mode to localStorage', e);
-    }
+  const setExperienceMode = (_mode: 'farmer' | 'official') => {
+    // Mode is strictly authoritative from authenticated session (useAuth)
   };
 
   const refreshFarmIntelligence = async () => {

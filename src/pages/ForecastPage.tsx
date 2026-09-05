@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import {
   Sparkles,
   Radio,
@@ -28,14 +28,19 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts';
-import type { LocationForecast } from '../types';
+import type { LocationForecast, DWLRStation } from '../types';
 import { forecastService } from '../services/forecastService';
 import { ChartCard } from '../components/common/ChartCard';
 import { useLanguage } from '../context/LanguageContext';
 import { useFarm } from '../context/FarmContext';
+import { useAuth } from '../context/AuthContext';
+import { OfficialForecastView } from '../components/forecast/OfficialForecastView';
 
 export const ForecastPage: React.FC = () => {
   const { t } = useLanguage();
+  const { isOfficial } = useAuth();
+  const outletCtx = useOutletContext<{ onSelectStation?: (station: DWLRStation) => void } | null>();
+
   const {
     location: farmLocation,
     resolvedLocation,
@@ -53,6 +58,11 @@ export const ForecastPage: React.FC = () => {
 
   // Active Request Counter to discard stale async responses during rapid location changes
   const activeRequestIdRef = useRef<number>(0);
+
+  // If authenticated as Official, render the official nationwide forecast view directly
+  if (isOfficial) {
+    return <OfficialForecastView onSelectStation={outletCtx?.onSelectStation} />;
+  }
 
   // Fetch forecast whenever farmLocation, resolvedLocation, profile, or horizonDays change
   useEffect(() => {

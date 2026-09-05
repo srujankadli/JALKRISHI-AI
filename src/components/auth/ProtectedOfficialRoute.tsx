@@ -1,23 +1,11 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { isOfficialUser } from '../../utils/roleUtils';
 
 interface ProtectedOfficialRouteProps {
   children: React.ReactNode;
 }
-
-const OFFICIAL_ROLES = [
-  'ADMIN',
-  'STATE_OFFICIAL',
-  'DISTRICT_OFFICIAL',
-  'HYDROLOGIST_ANALYST',
-  'READ_ONLY_OFFICIAL',
-  'admin',
-  'state_official',
-  'district_official',
-  'hydrologist_analyst',
-  'read_only_official',
-];
 
 export const ProtectedOfficialRoute: React.FC<ProtectedOfficialRouteProps> = ({ children }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -39,28 +27,8 @@ export const ProtectedOfficialRoute: React.FC<ProtectedOfficialRouteProps> = ({ 
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // 2. Check role authorization
-  const sysRole = (user.system_role || '').toUpperCase();
-  const roleTitle = (user.role || '').toUpperCase();
-  const userEmail = (user.email || '').toLowerCase();
-
-  const isFarmer =
-    sysRole === 'FARMER' ||
-    userEmail === 'farmer@jalkrishi.in' ||
-    (roleTitle.includes('FARMER') && !roleTitle.includes('OFFICIAL') && !roleTitle.includes('HYDROLOGIST'));
-
-  const isOfficial =
-    !isFarmer &&
-    (OFFICIAL_ROLES.includes(sysRole) ||
-      userEmail.includes('@jalkrishi.gov.in') ||
-      roleTitle.includes('HYDROLOGIST') ||
-      roleTitle.includes('OFFICER') ||
-      roleTitle.includes('SCIENTIST') ||
-      roleTitle.includes('OBSERVER') ||
-      roleTitle.includes('ADMIN'));
-
-  // 3. Forbidden for FARMER or non-officials -> redirect to Farmer Dashboard
-  if (isFarmer || !isOfficial) {
+  // 2. Check role authorization using centralized roleUtils
+  if (!isOfficialUser(user)) {
     return <Navigate to="/" replace />;
   }
 

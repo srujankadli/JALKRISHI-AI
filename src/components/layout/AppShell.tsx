@@ -6,11 +6,13 @@ import { MobileNav } from './MobileNav';
 import { FarmerSummaryBanner } from './FarmerBanner';
 import { StationDetailModal } from '../station/StationDetailModal';
 import type { DWLRStation } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 
 export const AppShell: React.FC = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [selectedStation, setSelectedStation] = useState<DWLRStation | null>(null);
   const navigate = useNavigate();
+  const { isFarmer } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-stone-50 text-stone-900">
@@ -23,12 +25,12 @@ export const AppShell: React.FC = () => {
         <TopBar
           onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
           isMobileNavOpen={isMobileNavOpen}
-          onOpenNotifications={() => navigate('/anomalies')}
+          onOpenNotifications={() => navigate(isFarmer ? '/anomalies' : '/official')}
           unreadAlertCount={4}
         />
 
-        {/* Farmer Top Banner */}
-        <FarmerSummaryBanner />
+        {/* Farmer Top Banner - strictly for farmers */}
+        {isFarmer && <FarmerSummaryBanner />}
 
         {/* Main Content Area with consistent container padding */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">

@@ -29,13 +29,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   anomalyCount = 4,
 }) => {
   const { t } = useLanguage();
-  const { user } = useAuth();
-
-  const isFarmer =
-    !user ||
-    user?.system_role === 'FARMER' ||
-    user?.email === 'farmer@jalkrishi.in' ||
-    (user?.role?.toUpperCase().includes('FARMER') && !user?.role?.toUpperCase().includes('OFFICIAL'));
+  const { isFarmer } = useAuth();
 
   interface MobileNavItem {
     to: string;

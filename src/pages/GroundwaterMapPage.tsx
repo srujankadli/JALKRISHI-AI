@@ -27,13 +27,7 @@ export const GroundwaterMapPage: React.FC = () => {
   const { onSelectStation } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
   const { location: farmLocation, resolvedLocation, nearestStation, nearbyStations } = useFarm();
-  const { user } = useAuth();
-
-  const isFarmer =
-    !user ||
-    user?.system_role === 'FARMER' ||
-    user?.email === 'farmer@jalkrishi.in' ||
-    (user?.role?.toUpperCase().includes('FARMER') && !user?.role?.toUpperCase().includes('OFFICIAL'));
+  const { isFarmer, isOfficial } = useAuth();
 
   // All 5,260 stations loaded into memory
   const [allStations, setAllStations] = useState<DWLRStation[]>([]);
@@ -233,11 +227,13 @@ export const GroundwaterMapPage: React.FC = () => {
         }
       />
 
-      {/* 2. Map Summary Stats Bar (Derived from filtered dataset) */}
-      <MapSummaryBar
-        filteredStations={filteredStations}
-        totalStationCount={allStations.length || 5260}
-      />
+      {/* 2. Map Summary Stats Bar - Official nationwide view only */}
+      {isOfficial && (
+        <MapSummaryBar
+          filteredStations={filteredStations}
+          totalStationCount={allStations.length || 5260}
+        />
+      )}
 
       {/* 3. Search and Multi-Criteria Filter Toolbar */}
       <div className="space-y-3">

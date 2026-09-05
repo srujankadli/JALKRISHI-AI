@@ -1,11 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService, type UserProfile } from '../services/authService';
 
+import { isOfficialUser, isFarmerUser, getExperienceScope } from '../utils/roleUtils';
+
 interface AuthContextType {
   user: UserProfile | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isOfficial: boolean;
+  isFarmer: boolean;
+  experienceScope: 'official' | 'farmer';
   login: (email: string, password: string, role?: string) => Promise<boolean>;
   quickLogin: (email: string) => Promise<boolean>;
   logout: () => void;
@@ -63,6 +68,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(null);
   };
 
+  const isOfficial = isOfficialUser(user);
+  const isFarmer = isFarmerUser(user);
+  const experienceScope = getExperienceScope(user);
+
   return (
     <AuthContext.Provider
       value={{
@@ -70,6 +79,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         token,
         isAuthenticated: !!user && !!token,
         isLoading,
+        isOfficial,
+        isFarmer,
+        experienceScope,
         login,
         quickLogin,
         logout,

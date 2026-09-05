@@ -42,7 +42,14 @@ export function App() {
               <Route path="/forecast" element={<ForecastPage />} />
               <Route path="/anomalies" element={<AnomaliesPage />} />
               <Route path="/crops" element={<CropAdvisorPage />} />
-              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route
+                path="/analytics"
+                element={
+                  <ProtectedOfficialRoute>
+                    <AnalyticsPage />
+                  </ProtectedOfficialRoute>
+                }
+              />
               <Route path="/whatsapp" element={<WhatsAppPage />} />
               <Route path="/help" element={<HelpPage />} />
               {/* Catch-all redirect */}

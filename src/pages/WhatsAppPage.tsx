@@ -13,21 +13,35 @@ import { WhatsAppSimulator } from '../components/whatsapp/WhatsAppSimulator';
 import { BackendStatusBadge } from '../components/common/BackendStatusBadge';
 import { useLanguage } from '../context/LanguageContext';
 import { useFarm } from '../context/FarmContext';
+import { useAuth } from '../context/AuthContext';
 
 export const WhatsAppPage: React.FC = () => {
   const { t } = useLanguage();
   const { location: farmLocation } = useFarm();
+  const { isOfficial, isFarmer } = useAuth();
   return (
     <div className="space-y-8 animate-fadeIn pb-10">
       {/* 1. Page Header */}
       <PageHeader
-        title={t('WhatsApp Farmer Interface')}
-        subtitle={t('Accessible, low-bandwidth conversational AI for Indian farmers. Delivers localized DWLR groundwater telemetry, forecasts, and crop advice in regional Indian languages.')}
-        farmerNote={t("Farmers don't need complex apps. A simple WhatsApp message like 'Kolar water' or 'crop advice' delivers actionable groundwater guidance in seconds.")}
+        title={
+          isOfficial
+            ? t('WhatsApp & SMS Alert Dispatcher (Official Console)')
+            : t('WhatsApp Farmer Interface')
+        }
+        subtitle={
+          isOfficial
+            ? t('Simulate and dispatch emergency groundwater alerts, rapid drawdown warnings, and localized crop advisories to registered farmers and field officers across districts.')
+            : t('Accessible, low-bandwidth conversational AI for Indian farmers. Delivers localized DWLR groundwater telemetry, forecasts, and crop advice in regional Indian languages.')
+        }
+        farmerNote={
+          isFarmer
+            ? t("Farmers don't need complex apps. A simple WhatsApp message like 'Kolar water' or 'crop advice' delivers actionable groundwater guidance in seconds.")
+            : undefined
+        }
         badge={
           <span className="rounded-full bg-emerald-700 px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 shadow-xs">
             <MessageSquare className="h-3.5 w-3.5 text-emerald-300" />
-            {t('Conversational Engine v2.6')}
+            {isOfficial ? t('Dispatch Engine v2.6') : t('Conversational Engine v2.6')}
           </span>
         }
       />
