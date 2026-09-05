@@ -62,8 +62,8 @@ export const TopBar: React.FC<TopBarProps> = ({
 
       {/* Right Side Header Controls */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Mobile status badge */}
-        <div className="lg:hidden">
+        {/* Mobile status badge (hidden on extra small mobile screens to prevent header overflow) */}
+        <div className="hidden sm:flex lg:hidden">
           <BackendStatusBadge />
         </div>
 

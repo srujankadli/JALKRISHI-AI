@@ -36,9 +36,10 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         aria-expanded={isOpen}
         aria-label="Select preferred language"
       >
-        <Globe className="h-3.5 w-3.5 text-teal-600" />
-        <span className="font-semibold">{selectedLang.nativeName}</span>
-        <span className="text-[10px] text-stone-600 uppercase font-mono">({selectedLang.code})</span>
+        <Globe className="h-3.5 w-3.5 text-teal-600 shrink-0" />
+        <span className="font-semibold hidden sm:inline">{selectedLang.nativeName}</span>
+        <span className="text-[10px] text-stone-600 uppercase font-mono sm:hidden font-bold">{selectedLang.code}</span>
+        <span className="text-[10px] text-stone-600 uppercase font-mono hidden sm:inline">({selectedLang.code})</span>
         <ChevronDown className={`h-3 w-3 text-stone-600 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 

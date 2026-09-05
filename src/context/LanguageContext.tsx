@@ -47,35 +47,50 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!key) return fallback || '';
     const strKey = String(key).trim();
 
-    // 1. Check UI_DICTIONARIES for currentLanguage
+    // 1. Primary: Look up directly in active language dictionary
     const targetUiDict = UI_DICTIONARIES[currentLanguage];
     if (targetUiDict && targetUiDict[strKey] && targetUiDict[strKey].trim()) {
       return targetUiDict[strKey];
     }
 
-    // 2. Check i18n t() resolver for standard TranslationKey FIRST (when clean localized value exists)
+    // 2. Secondary: Check i18n t() resolver for standard TranslationKey
     const i18nResult = tI18n(strKey as TranslationKey, currentLanguage);
     if (i18nResult && i18nResult !== strKey && !i18nResult.includes('_')) {
       return i18nResult;
     }
 
-    // 3. Fall back to English UI dictionary
-    const enVal = UI_DICTIONARIES['en']?.[strKey];
-    if (enVal && enVal.trim()) {
-      return enVal;
+    // 3. Diagnostic warning in development mode when key is absent in active language
+    if (import.meta.env?.DEV) {
+      console.warn(`[JalKrishi i18n] Missing translation for key: "${strKey}" in language: "${currentLanguage}"`);
     }
 
-    // 4. If an explicit fallback string was provided, use it!
+    // 4. If explicit user-facing fallback string was provided, check if active language translates it
     if (fallback && fallback.trim()) {
+      const fallbackLookup = targetUiDict?.[fallback.trim()];
+      if (fallbackLookup && fallbackLookup.trim()) {
+        return fallbackLookup;
+      }
       return fallback;
     }
 
     // 5. If strKey is an internal key (e.g. proactive_*, default_*, *_stable), humanize it cleanly
+    // and attempt active-language lookup so raw machine keys NEVER leak into production UI
     if (strKey.includes('_') || strKey.startsWith('default') || strKey.startsWith('proactive')) {
-      return strKey.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      const humanized = strKey.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      const humanizedLookup = targetUiDict?.[humanized];
+      if (humanizedLookup && humanizedLookup.trim()) {
+        return humanizedLookup;
+      }
+      return humanized;
     }
 
-    return strKey;
+    // 6. Final safety net: if active language is English, return English dictionary value or key
+    if (currentLanguage === 'en') {
+      return UI_DICTIONARIES['en']?.[strKey] || strKey;
+    }
+
+    // In non-English production runtime, return English dictionary value or raw string safely
+    return UI_DICTIONARIES['en']?.[strKey] || strKey;
   };
 
   return (
