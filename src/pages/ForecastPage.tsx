@@ -464,13 +464,13 @@ export const ForecastPage: React.FC = () => {
           }
         >
           <div className="space-y-3 pt-1">
-            <div className="h-88 w-full">
+            <div className="h-[380px] w-full min-h-[350px]">
               {isStationLoading ? (
                 <div className="h-full flex items-center justify-center text-xs font-semibold text-stone-400">
                   <span className="animate-pulse">{t('Recalculating forward groundwater trajectory...')}</span>
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={380} minHeight={350}>
                   <ComposedChart data={activePoints} margin={{ top: 15, right: 30, left: 0, bottom: 5 }}>
                     <defs>
                       <linearGradient id="colorUncertaintyStation" x1="0" y1="0" x2="0" y2="1">
@@ -1095,13 +1095,13 @@ export const ForecastPage: React.FC = () => {
         }
       >
         <div className="space-y-3 pt-1">
-          <div className="h-88 w-full">
+          <div className="h-[380px] w-full min-h-[350px]">
             {isLoading ? (
               <div className="h-full flex items-center justify-center text-xs font-semibold text-stone-400">
                 <span className="animate-pulse">{t('Recalculating forward groundwater trajectory...')}</span>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={380} minHeight={350}>
                 <ComposedChart data={activePoints} margin={{ top: 15, right: 30, left: 0, bottom: 5 }}>
                   <defs>
                     <linearGradient id="colorUncertaintyFarm" x1="0" y1="0" x2="0" y2="1">

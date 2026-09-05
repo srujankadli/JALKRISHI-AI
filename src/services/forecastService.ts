@@ -119,6 +119,10 @@ export const forecastService = {
           upperConfidence: p.upper_bound,
           lowerConfidence: p.lower_bound,
           expectedRainfallMm: p.expected_rainfall_mm,
+          dayOffset: p.day_offset,
+          day_offset: p.day_offset,
+          changeLabel: p.change_label,
+          change_label: p.change_label,
         }));
 
         const p30 =

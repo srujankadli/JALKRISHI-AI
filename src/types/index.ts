@@ -66,6 +66,8 @@ export interface ForecastPoint {
   expectedRainfallMm: number;
   changeLabel?: string;
   dayOffset?: number;
+  day_offset?: number;
+  change_label?: string;
 }
 
 export interface StationForecast {
