@@ -430,8 +430,14 @@ class ForecastPointResponse(BaseModel):
 class StationForecastResponse(BaseModel):
     station_id: str
     station_name: str
+    station_code: Optional[str] = None
     state: str
     district: str
+    block: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    soil_type: Optional[str] = None
+    aquifer_type: Optional[str] = None
     current_depth: float
     critical_threshold: float
     current_status: str
@@ -448,6 +454,11 @@ class StationForecastResponse(BaseModel):
     days_to_critical_urgency: str
     forecast_risk: str
     farmer_guidance: str
+    projected_depth_30d: Optional[float] = None
+    projected_depth_60d: Optional[float] = None
+    projected_depth_90d: Optional[float] = None
+    projected_depth_end: Optional[float] = None
+    historical_monthly_rainfall_mm: Optional[float] = None
     methodology: str
     data_mode: str
     disclaimer: str

@@ -154,7 +154,7 @@ export const OfficialForecastView: React.FC<OfficialForecastViewProps> = ({ onSe
         />
       </div>
 
-      {/* 6. Rainfall Outlook & Infiltration Response */}
+      {/* 6. Historical Rainfall Context & Infiltration Response */}
       <RainfallOutlookCard />
 
       {/* 7. Technical Methodology & Simulation Transparency Note */}

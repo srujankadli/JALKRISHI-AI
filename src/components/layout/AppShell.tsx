@@ -52,7 +52,7 @@ export const AppShell: React.FC = () => {
           station={selectedStation}
           onClose={() => setSelectedStation(null)}
           onNavigateToCropAdvisor={() => navigate('/crops')}
-          onNavigateToForecast={(_id) => navigate('/forecast')}
+          onNavigateToForecast={(id) => navigate(`/forecast?stationId=${encodeURIComponent(id)}`)}
         />
       )}
     </div>

@@ -64,18 +64,43 @@ export interface ForecastPoint {
   upperConfidence: number;
   lowerConfidence: number;
   expectedRainfallMm: number;
+  changeLabel?: string;
+  dayOffset?: number;
 }
 
 export interface StationForecast {
   stationId: string;
   stationName: string;
+  stationCode?: string;
+  block?: string;
   district: string;
   state: string;
+  latitude?: number;
+  longitude?: number;
+  soilType?: string;
+  aquiferType?: string;
   currentLevel: number;
+  criticalThreshold?: number;
+  currentStatus?: string;
+  currentTrend?: string;
+  riskScore?: number;
+  horizonDays?: number;
+  dailyChangeM?: number;
+  monthlyChangeM?: number;
+  historicalPointsUsed?: number;
   projectedLevel30d: number;
+  projectedLevel60d?: number;
+  projectedLevel90d?: number;
+  projectedLevelEnd?: number;
   projectedDaysToCritical: number | null;
+  daysToCriticalStatus?: string;
+  daysToCriticalUrgency?: string;
+  forecastRisk?: string;
   confidenceScore: number;
   farmerGuidance: string;
+  methodology?: string;
+  dataMode?: string;
+  disclaimer?: string;
   forecastPoints: ForecastPoint[];
 }
 

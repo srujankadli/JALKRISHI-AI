@@ -23,10 +23,58 @@ def test_forecasting_pipeline():
     assert f_data["station_id"] == "DWLR-PB-001"
     assert f_data["state"] == "Punjab"
     assert f_data["district"] == "Sangrur"
+    assert f_data["block"] is not None
+    assert f_data["station_code"] is not None
+    assert f_data["latitude"] is not None and f_data["longitude"] is not None
     assert f_data["horizon_days"] == 30
     assert len(f_data["forecast_points"]) == 5  # [0, 7, 15, 21, 30]
     assert f_data["data_mode"] == "DEMO_SIMULATION"
-    print("   [OK] 30-day forecast for DWLR-PB-001 returned 200 OK.")
+    assert f_data["projected_depth_30d"] is not None
+    print("   [OK] 30-day forecast for DWLR-PB-001 returned 200 OK with station metadata.")
+
+    # 1b. Distinct Station-Specific Forecast Contexts (PB-001 vs KA-004 vs MH-003)
+    print("1b. Testing Distinct Station Contexts (PB-001 vs KA-004 vs MH-003)...")
+    res_ka = client.get("/api/v1/forecast/DWLR-KA-004?days=30")
+    res_mh = client.get("/api/v1/forecast/DWLR-MH-003?days=30")
+    assert res_ka.status_code == 200 and res_mh.status_code == 200
+    ka_data = res_ka.json()
+    mh_data = res_mh.json()
+
+    # Verify distinct identities
+    assert f_data["station_id"] == "DWLR-PB-001" and f_data["district"] == "Sangrur" and f_data["state"] == "Punjab"
+    assert ka_data["station_id"] == "DWLR-KA-004" and ka_data["district"] == "Kolar" and ka_data["state"] == "Karnataka"
+    assert mh_data["station_id"] == "DWLR-MH-003" and mh_data["district"] == "Chhatrapati Sambhaji Nagar" and mh_data["state"] == "Maharashtra"
+
+    # Verify distinct critical thresholds (station-specific, not hardcoded 25m)
+    assert f_data["critical_threshold"] == 30.0
+    assert ka_data["critical_threshold"] == 35.0
+    assert mh_data["critical_threshold"] == 20.0
+
+    # Verify distinct current depths & projected levels
+    assert f_data["current_depth"] != ka_data["current_depth"]
+    assert f_data["projected_depth_30d"] != ka_data["projected_depth_30d"]
+    assert ka_data["projected_depth_30d"] != mh_data["projected_depth_30d"]
+
+    # Verify distinct soils and aquifers
+    assert f_data["soil_type"] != ka_data["soil_type"]
+    assert ka_data["aquifer_type"] is not None and f_data["aquifer_type"] is not None
+
+    print(f"   [OK] Verified distinct station contexts:")
+    print(f"        - {f_data['station_id']}: {f_data['district']} | Soil: {f_data['soil_type']} | Crit: {f_data['critical_threshold']}m | 30d: {f_data['projected_depth_30d']}m")
+    print(f"        - {ka_data['station_id']}: {ka_data['district']} | Soil: {ka_data['soil_type']} | Crit: {ka_data['critical_threshold']}m | 30d: {ka_data['projected_depth_30d']}m")
+    print(f"        - {mh_data['station_id']}: {mh_data['district']} | Soil: {mh_data['soil_type']} | Crit: {mh_data['critical_threshold']}m | 30d: {mh_data['projected_depth_30d']}m")
+
+    # 1c. Exact Uncertainty Envelope Formula Verification
+    print("1c. Testing Mathematical Invariant of Uncertainty Envelope Formula...")
+    import math
+    for pt in f_data["forecast_points"]:
+        t = pt["day_offset"]
+        expected_uncertainty = round(0.04 + 0.015 * math.sqrt(t) + 0.008 * t, 2) if t > 0 else 0.0
+        expected_lower = round(max(0.1, pt["predicted_depth"] - expected_uncertainty), 2)
+        expected_upper = round(pt["predicted_depth"] + expected_uncertainty, 2)
+        assert pt["lower_bound"] == expected_lower, f"Lower bound mismatch at t={t}: {pt['lower_bound']} != {expected_lower}"
+        assert pt["upper_bound"] == expected_upper, f"Upper bound mismatch at t={t}: {pt['upper_bound']} != {expected_upper}"
+    print("   [OK] Exact mathematical verification passed for formula: uncertainty = +(0.04 + 0.015*sqrt(t) + 0.008*t).")
 
     # 2. Multi-Horizon Support (7, 30, 60, 90 days)
     print("2. Testing Multi-Horizon Forecasts (7d, 30d, 60d, 90d)...")

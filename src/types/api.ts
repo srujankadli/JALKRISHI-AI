@@ -108,8 +108,14 @@ export interface ApiForecastPoint {
 export interface ApiStationForecastResponse {
   station_id: string;
   station_name: string;
+  station_code?: string;
   state: string;
   district: string;
+  block?: string;
+  latitude?: number;
+  longitude?: number;
+  soil_type?: string;
+  aquifer_type?: string;
   current_depth: number;
   critical_threshold: number;
   current_status: string;
@@ -126,6 +132,10 @@ export interface ApiStationForecastResponse {
   days_to_critical_urgency: string;
   forecast_risk: string;
   farmer_guidance: string;
+  projected_depth_30d?: number;
+  projected_depth_60d?: number;
+  projected_depth_90d?: number;
+  projected_depth_end?: number;
   methodology: string;
   data_mode: string;
   disclaimer: string;

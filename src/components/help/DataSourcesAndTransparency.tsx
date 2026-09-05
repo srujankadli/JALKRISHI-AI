@@ -70,7 +70,7 @@ export const DataSourcesAndTransparency: React.FC = () => {
         </div>
 
         <p className="text-xs text-stone-700 leading-relaxed font-medium">
-          The current JalKrishi AI interface utilizes <strong>5,260 deterministic simulated DWLR stations</strong> across 28 Indian states to demonstrate the complete product lifecycle: geospatial clustering, forecast confidence intervals, automated statistical anomaly triage, rule-based crop scoring, and client-side PDF/Excel export.
+          The current JalKrishi AI interface utilizes <strong>5,260 deterministic simulated DWLR stations</strong> across 28 Indian states to demonstrate the complete product lifecycle: geospatial clustering, model projection envelopes, automated statistical anomaly triage, rule-based crop scoring, and client-side PDF/Excel export.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-[11px] text-stone-600 border-t border-stone-200">

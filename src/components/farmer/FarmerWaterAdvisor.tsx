@@ -239,7 +239,7 @@ export const FarmerWaterAdvisor: React.FC<FarmerWaterAdvisorProps> = ({
       return { label: t('Irrigation Guidance'), variant: 'stable' };
     }
     if (category === 'weather') {
-      return { label: t('Weather & Rainfall Outlook'), variant: 'stable' };
+      return { label: t('Weather & Rainfall Context'), variant: 'stable' };
     }
     if (category === 'recharge') {
       return { label: t('Groundwater Recharge'), variant: 'stable' };

@@ -210,7 +210,7 @@ export const cropService = {
         }
       } else {
         score += 14;
-        dynamicBulletReasons.push('Normal rainfall outlook supports healthy vegetative growth.');
+        dynamicBulletReasons.push('Normal seasonal rainfall context supports healthy vegetative growth.');
       }
 
       // 5. Groundwater Depth & Trend (20 points)

@@ -122,19 +122,43 @@ export const forecastService = {
         }));
 
         const p30 =
+          apiRes.projected_depth_30d ??
           apiRes.forecast_points.find((p) => p.day_offset === 30)?.predicted_depth ??
           apiRes.forecast_points[apiRes.forecast_points.length - 1].predicted_depth;
 
         return {
           stationId: apiRes.station_id,
           stationName: apiRes.station_name,
+          stationCode: apiRes.station_code,
+          block: apiRes.block,
           district: apiRes.district,
           state: apiRes.state,
+          latitude: apiRes.latitude,
+          longitude: apiRes.longitude,
+          soilType: apiRes.soil_type,
+          aquiferType: apiRes.aquifer_type,
           currentLevel: apiRes.current_depth,
+          criticalThreshold: apiRes.critical_threshold,
+          currentStatus: apiRes.current_status,
+          currentTrend: apiRes.current_trend,
+          riskScore: apiRes.risk_score,
+          horizonDays: apiRes.horizon_days,
+          dailyChangeM: apiRes.daily_change_m,
+          monthlyChangeM: apiRes.monthly_change_m,
+          historicalPointsUsed: apiRes.historical_points_used,
           projectedLevel30d: p30,
+          projectedLevel60d: apiRes.projected_depth_60d,
+          projectedLevel90d: apiRes.projected_depth_90d,
+          projectedLevelEnd: apiRes.projected_depth_end ?? apiRes.forecast_points[apiRes.forecast_points.length - 1].predicted_depth,
           projectedDaysToCritical: apiRes.days_to_critical,
+          daysToCriticalStatus: apiRes.days_to_critical_status,
+          daysToCriticalUrgency: apiRes.days_to_critical_urgency,
+          forecastRisk: apiRes.forecast_risk,
           confidenceScore: apiRes.confidence,
           farmerGuidance: apiRes.farmer_guidance,
+          methodology: apiRes.methodology,
+          dataMode: apiRes.data_mode,
+          disclaimer: apiRes.disclaimer,
           forecastPoints: mappedPoints,
         };
       }
@@ -237,7 +261,7 @@ export const forecastService = {
   },
 
   /**
-   * Returns multi-period rainfall forecast and infiltration response data.
+   * Returns multi-period historical rainfall context and infiltration response data.
    */
   async getRainfallForecastSeries() {
     return [...mockRainfallForecastSeries];

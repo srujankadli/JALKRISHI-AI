@@ -440,7 +440,7 @@ export const MyFarmOverviewCard: React.FC<MyFarmOverviewCardProps> = ({ onOpenSt
                 className="inline-flex items-center gap-1.5 rounded-xl bg-agri-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-agri-800 shadow-xs transition-all"
               >
                 <Calendar className="h-3.5 w-3.5" />
-                <span>{t('Check Rainfall Outlook')}</span>
+                <span>{t('Check Groundwater Forecast')}</span>
               </Link>
               <Link
                 to="/crops"

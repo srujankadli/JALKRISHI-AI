@@ -174,6 +174,11 @@ class GroundwaterForecastingEngine:
         else:  # 90 days
             offsets = [0, 7, 15, 30, 60, 90]
 
+        # Derive station-specific historical monthly precipitation pattern
+        hist_rains = [h.rainfall for h in (station.historicalData or [])]
+        avg_monthly_rain = (sum(hist_rains) / len(hist_rains)) if hist_rains else 35.0
+        daily_rain_rate = max(0.2, avg_monthly_rain / 30.0)
+
         points: List[ForecastPointResponse] = []
         for t in offsets:
             date_label = "Today" if t == 0 else f"+{t} Days"
@@ -185,7 +190,7 @@ class GroundwaterForecastingEngine:
 
             chg_val = round(daily_change * t, 2)
             chg_label = "Baseline" if t == 0 else f"{'+' if chg_val > 0 else ''}{chg_val:.2f}m mbgl"
-            rain_est = round(min(120.0, 5.0 + 1.1 * t), 1)
+            rain_est = round(daily_rain_rate * t, 1) if t > 0 else 0.0
 
             points.append(
                 ForecastPointResponse(
@@ -201,6 +206,9 @@ class GroundwaterForecastingEngine:
             )
 
         end_proj = points[-1].predicted_depth
+        p30 = next((p.predicted_depth for p in points if p.day_offset == 30), end_proj)
+        p60 = next((p.predicted_depth for p in points if p.day_offset == 60), None)
+        p90 = next((p.predicted_depth for p in points if p.day_offset == 90), None)
         guidance = GroundwaterForecastingEngine.generate_farmer_guidance(station, risk_class, end_proj, days_crit)
 
         methodology_desc = (
@@ -211,8 +219,14 @@ class GroundwaterForecastingEngine:
         return StationForecastResponse(
             station_id=station.id,
             station_name=station.stationName,
+            station_code=station.stationCode,
             state=station.state,
             district=station.district,
+            block=station.block,
+            latitude=station.latitude,
+            longitude=station.longitude,
+            soil_type=station.soilType,
+            aquifer_type=station.aquiferType,
             current_depth=station.waterLevel,
             critical_threshold=station.criticalThreshold,
             current_status=station.status.value,
@@ -229,6 +243,11 @@ class GroundwaterForecastingEngine:
             days_to_critical_urgency=crit_urgency,
             forecast_risk=risk_class,
             farmer_guidance=guidance,
+            projected_depth_30d=p30,
+            projected_depth_60d=p60,
+            projected_depth_90d=p90,
+            projected_depth_end=end_proj,
+            historical_monthly_rainfall_mm=round(avg_monthly_rain, 1),
             methodology=methodology_desc,
             data_mode=settings.DATA_MODE,
             disclaimer=settings.DEMO_DISCLAIMER,
@@ -584,6 +603,11 @@ class GroundwaterForecastingEngine:
         else:  # 90 days
             offsets = [0, 7, 15, 30, 60, 90]
 
+        # Derive location/station specific historical rainfall pattern
+        loc_hist_rains = [h.rainfall for h in (st_obj.historicalData if st_obj and st_obj.historicalData else [])]
+        loc_avg_monthly_rain = (sum(loc_hist_rains) / len(loc_hist_rains)) if loc_hist_rains else (25.0 if "rajasthan" in st_name.lower() else 45.0)
+        loc_daily_rain_rate = max(0.2, loc_avg_monthly_rain / 30.0)
+
         points: List[ForecastPointResponse] = []
         for t in offsets:
             date_label = "Today" if t == 0 else f"+{t} Days"
@@ -594,7 +618,7 @@ class GroundwaterForecastingEngine:
 
             chg_val = round(daily_change * t, 2)
             chg_label = "Baseline" if t == 0 else f"{'+' if chg_val > 0 else ''}{chg_val:.2f}m mbgl"
-            rain_est = round(min(120.0, 5.0 + 1.1 * t), 1)
+            rain_est = round(loc_daily_rain_rate * t, 1) if t > 0 else 0.0
 
             points.append(
                 ForecastPointResponse(

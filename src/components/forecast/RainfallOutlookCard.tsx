@@ -28,8 +28,8 @@ export const RainfallOutlookCard: React.FC = () => {
 
   return (
     <ChartCard
-      title={t('Rainfall Outlook & Projected Aquifer Recharge Response')}
-      subtitle={t('30-day precipitation projections (mm) vs normal baseline and calculated infiltration recharge potential')}
+      title={t('Historical Rainfall Context & Infiltration Dynamics')}
+      subtitle={t('Historical precipitation context (mm) vs normal baseline and calculated infiltration recharge potential')}
       badge={
         <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-bold text-sky-800">
           <CloudRain className="h-3.5 w-3.5" />
@@ -41,7 +41,7 @@ export const RainfallOutlookCard: React.FC = () => {
       <div className="mb-4 rounded-xl border border-stone-200 bg-stone-50/80 p-3 text-xs">
         <div className="flex flex-wrap items-center justify-between gap-2 font-bold text-stone-700 text-center">
           <div className="flex-1 min-w-[100px] rounded-lg bg-sky-100/70 p-1.5 text-sky-900 border border-sky-200">
-            🌧️ {t('Rainfall Forecast')}
+            🌧️ {t('Historical Rainfall Context')}
           </div>
           <ArrowRight className="h-3.5 w-3.5 text-stone-400 shrink-0" />
           <div className="flex-1 min-w-[100px] rounded-lg bg-amber-100/70 p-1.5 text-amber-900 border border-amber-200">
@@ -72,7 +72,7 @@ export const RainfallOutlookCard: React.FC = () => {
                     <p className="font-bold text-stone-900">{t(item.period)}</p>
                     <div className="border-t border-stone-100 pt-1 space-y-0.5">
                       <p className="text-sky-700 font-bold">
-                        {t('Expected Rainfall')}: {item.expectedRainfall} mm
+                        {t('Historical Rainfall')}: {item.expectedRainfall} mm
                       </p>
                       <p className="text-stone-500">
                         {t('Historical Avg')}: {item.historicalAvg} mm
@@ -91,7 +91,7 @@ export const RainfallOutlookCard: React.FC = () => {
             }}
           />
           <Legend wrapperStyle={{ fontSize: 11, paddingTop: 6 }} />
-          <Bar dataKey="expectedRainfall" name={t('Forecast Rainfall (mm)')} fill="#0284c7" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="expectedRainfall" name={t('Reference Rainfall (mm)')} fill="#0284c7" radius={[4, 4, 0, 0]} />
           <Bar dataKey="historicalAvg" name={t('Historical Normal (mm)')} fill="#a8a29e" radius={[4, 4, 0, 0]} />
           <Bar dataKey="potentialRechargeIndex" name={t('Potential Recharge Index')} fill="#16a34a" radius={[4, 4, 0, 0]} />
         </BarChart>
@@ -103,7 +103,7 @@ export const RainfallOutlookCard: React.FC = () => {
           <Sprout className="h-4 w-4 text-agri-700 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
             <strong className="font-bold text-agri-950">{t('Rainfall Interpretation')}: </strong>
-            {t('Higher expected monsoon rainfall (62mm–95mm in Days 8–30) may support shallow aquifer recovery across central and eastern alluvial basins. However, infiltration in clay and hard-rock soils occurs with a 10–20 day lag. Farmers in deep sandstone zones should not rely on immediate water table rise.')}
+            {t('Rainfall can increase recharge potential, but groundwater response also depends on infiltration, aquifer characteristics, seasonal conditions and water use. Farmers in deep sandstone zones should not rely on immediate water table rise.')}
           </p>
         </div>
       </div>
