@@ -450,8 +450,12 @@ export const CropAdvisorPage: React.FC = () => {
             navigate('/map');
           }}
           onNavigateToForecast={() => {
-            if (nearbyStation) onSelectStation(nearbyStation);
-            navigate('/forecast');
+            if (nearbyStation) {
+              onSelectStation(nearbyStation);
+              navigate(`/forecast?stationId=${encodeURIComponent(nearbyStation.id)}`);
+            } else {
+              navigate('/forecast');
+            }
           }}
         />
       )}

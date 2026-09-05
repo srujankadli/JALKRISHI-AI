@@ -74,7 +74,6 @@ export const ForecastPage: React.FC = () => {
 
   // Effect: Load either Station-Specific Forecast OR Farm-Location Forecast
   useEffect(() => {
-    if (isOfficial) return;
     const requestId = ++activeRequestIdRef.current;
     setIsLoading(true);
 
@@ -92,7 +91,7 @@ export const ForecastPage: React.FC = () => {
             setIsLoading(false);
           }
         }
-      } else {
+      } else if (!isOfficial) {
         // Farm Location Mode: Load Location-Aware Forecast for Farmer
         try {
           const result = await forecastService.getForecastForLocation(
@@ -117,16 +116,13 @@ export const ForecastPage: React.FC = () => {
             setIsLoading(false);
           }
         }
+      } else {
+        setIsLoading(false);
       }
     }
 
     loadData();
   }, [stationIdParam, farmLocation, resolvedLocation, horizonDays, profile, isOfficial]);
-
-  // If authenticated as Official, render the official nationwide forecast view directly
-  if (isOfficial) {
-    return <OfficialForecastView onSelectStation={outletCtx?.onSelectStation} />;
-  }
 
   const handleLocationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,6 +167,37 @@ export const ForecastPage: React.FC = () => {
   // RENDER MODE A: STATION-SPECIFIC FORECAST MODE
   // =========================================================================
   if (stationIdParam) {
+    if (!isLoading && !stationForecast) {
+      return (
+        <div className="space-y-6 animate-fadeIn pb-8 select-none max-w-4xl mx-auto mt-6">
+          <div className="overflow-hidden rounded-3xl border-2 border-stone-200 bg-white p-8 shadow-sm text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-700 mb-4">
+              <Radio className="h-7 w-7" />
+            </div>
+            <h2 className="text-2xl font-black text-stone-900">
+              {t('Observation Station Not Found')}
+            </h2>
+            <p className="mt-2 text-sm text-stone-600 max-w-lg mx-auto leading-relaxed">
+              {t('No telemetry or forecast data was found for station ID:')}{' '}
+              <code className="font-mono font-bold text-stone-800 bg-stone-100 px-2 py-0.5 rounded">
+                {stationIdParam}
+              </code>
+              .{' '}{t('Please select a valid DWLR monitoring node from the network.')}
+            </p>
+            <div className="mt-6 flex justify-center gap-3">
+              <button
+                onClick={() => setSearchParams({})}
+                className="inline-flex items-center gap-2 rounded-xl bg-agri-700 px-5 py-2.5 text-xs font-bold text-white hover:bg-agri-800 transition-all cursor-pointer shadow-sm"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>{isOfficial ? t('Return to Nationwide Overview') : t('Return to My Farm Forecast')}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     const isStationLoading = isLoading || !stationForecast;
     const activePoints = stationForecast?.forecastPoints || [];
     const currentDepthVal = stationForecast?.currentLevel;
@@ -192,7 +219,7 @@ export const ForecastPage: React.FC = () => {
               className="inline-flex items-center gap-1.5 font-bold text-agri-700 hover:text-agri-800 hover:underline cursor-pointer"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              <span>{t('Back to My Farm Forecast')}</span>
+              <span>{isOfficial ? t('Back to Nationwide Forecast') : t('Back to My Farm Forecast')}</span>
             </button>
             <span className="text-stone-300">|</span>
             <span className="flex h-2 w-2 rounded-full bg-water-600 animate-pulse" />
@@ -402,7 +429,7 @@ export const ForecastPage: React.FC = () => {
                 onClick={() => setSearchParams({})}
                 className="text-xs font-bold text-agri-700 hover:text-agri-800 inline-flex items-center gap-1 cursor-pointer"
               >
-                <span>{t('Switch to My Farm Forecast')} &rarr;</span>
+                <span>{isOfficial ? t('Switch to Nationwide Overview') : t('Switch to My Farm Forecast')} &rarr;</span>
               </button>
             </div>
           </div>
@@ -714,7 +741,14 @@ export const ForecastPage: React.FC = () => {
   }
 
   // =========================================================================
-  // RENDER MODE B: LOCATION-AWARE FARM PROFILE FORECAST MODE
+  // RENDER MODE B: NATIONWIDE OFFICIAL FORECAST VIEW (For Officials when no stationId)
+  // =========================================================================
+  if (isOfficial) {
+    return <OfficialForecastView onSelectStation={outletCtx?.onSelectStation} />;
+  }
+
+  // =========================================================================
+  // RENDER MODE C: LOCATION-AWARE FARM PROFILE FORECAST MODE (For Farmers when no stationId)
   // =========================================================================
   const activePoints = farmForecast?.forecastPoints || [];
   const currentDepthVal = farmForecast?.currentLevel ?? (isDirectObservation ? nearestStation?.station.waterLevel : undefined);

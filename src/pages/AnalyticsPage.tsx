@@ -446,8 +446,12 @@ export const AnalyticsPage: React.FC = () => {
             const firstSt = allStations.find(
               (s) => s.district.toLowerCase() === selectedDistrictDetail.district.toLowerCase()
             );
-            if (firstSt) onSelectStation(firstSt);
-            navigate('/forecast');
+            if (firstSt) {
+              onSelectStation(firstSt);
+              navigate(`/forecast?stationId=${encodeURIComponent(firstSt.id)}`);
+            } else {
+              navigate('/forecast');
+            }
           }}
           onNavigateToAnomalies={() => navigate('/anomalies')}
           onNavigateToCrops={() => navigate('/crops')}

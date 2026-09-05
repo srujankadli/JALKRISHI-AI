@@ -109,7 +109,7 @@ export const AnomaliesPage: React.FC = () => {
     if (station) {
       onSelectStation(station);
     }
-    navigate('/forecast');
+    navigate(`/forecast?stationId=${encodeURIComponent(stationId)}`);
   };
 
   const severityChartData = [
