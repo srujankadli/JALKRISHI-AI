@@ -1,6 +1,7 @@
 import React from 'react';
 import type { StationStatus } from '../../types';
 import { getStatusTheme } from '../../utils/statusHelpers';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface StatusIndicatorProps {
   status: StationStatus;
@@ -15,6 +16,7 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   size = 'md',
   showPulse = false,
 }) => {
+  const { t } = useLanguage();
   const theme = getStatusTheme(status);
 
   const dotSizes = {
@@ -33,7 +35,7 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
         )}
         <span className={`relative inline-flex rounded-full ${dotSizes[size]} ${theme.dot}`} />
       </span>
-      {label && <span className="text-sm font-medium text-stone-700">{label}</span>}
+      {label && <span className="text-sm font-medium text-stone-700">{t(label)}</span>}
     </div>
   );
 };

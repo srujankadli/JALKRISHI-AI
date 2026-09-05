@@ -48,10 +48,10 @@ export const DataIssueForm: React.FC = () => {
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center space-y-2 animate-fadeIn">
             <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
             <h4 className="text-base font-black text-emerald-900">
-              Data Issue Logged
+              {t('Data Issue Logged')}
             </h4>
             <p className="text-xs text-emerald-800 font-medium">
-              Thank you. The station flag has been saved to your local session queue for quality control review.
+              {t('Thank you. The station flag has been saved to your local session queue for quality control review.')}
             </p>
           </div>
         ) : (
@@ -60,7 +60,7 @@ export const DataIssueForm: React.FC = () => {
               {/* Station Code / District */}
               <div>
                 <label className="text-[11px] font-bold text-stone-600 block mb-1">
-                  Station Code / Name / District:
+                  {t('Station Code / Name / District:')}
                 </label>
                 <input
                   type="text"
@@ -75,18 +75,18 @@ export const DataIssueForm: React.FC = () => {
               {/* Issue Type */}
               <div>
                 <label className="text-[11px] font-bold text-stone-600 block mb-1">
-                  Observed Issue Type:
+                  {t('Observed Issue Type:')}
                 </label>
                 <select
                   value={issueType}
                   onChange={(e) => setIssueType(e.target.value)}
                   className="w-full rounded-xl border border-stone-300 bg-stone-50/80 px-3 py-2.5 text-xs font-semibold text-stone-900 focus:border-rose-600 focus:bg-white focus:outline-none"
                 >
-                  <option value="Unexpected water reading">⚠️ Unexpected / Improbable Water Depth</option>
-                  <option value="Missing data packets">📡 Missing / Delayed Telemetry Packets</option>
-                  <option value="Incorrect GPS location">📍 Incorrect Map Pin or GPS Location</option>
-                  <option value="Sensor transducer fault">🔌 Potential Transducer / Battery Fault</option>
-                  <option value="Other discrepancy">💬 Other Data Discrepancy</option>
+                  <option value="Unexpected water reading">⚠️ {t('Unexpected / Improbable Water Depth')}</option>
+                  <option value="Missing data packets">📡 {t('Missing / Delayed Telemetry Packets')}</option>
+                  <option value="Incorrect GPS location">📍 {t('Incorrect Map Pin or GPS Location')}</option>
+                  <option value="Sensor transducer fault">🔌 {t('Potential Transducer / Battery Fault')}</option>
+                  <option value="Other discrepancy">💬 {t('Other Data Discrepancy')}</option>
                 </select>
               </div>
             </div>
@@ -94,7 +94,7 @@ export const DataIssueForm: React.FC = () => {
             {/* Description */}
             <div>
               <label className="text-[11px] font-bold text-stone-600 block mb-1">
-                Detailed Description:
+                {t('Detailed Description:')}
               </label>
               <textarea
                 rows={3}

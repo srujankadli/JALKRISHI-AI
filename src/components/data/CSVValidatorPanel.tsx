@@ -12,6 +12,7 @@ import {
   dataPipelineService,
   type CSVValidationResult,
 } from '../../services/dataPipelineService';
+import { useLanguage } from '../../context/LanguageContext';
 
 const SAMPLE_VALID_CSV = `station_id,station_name,state,district,latitude,longitude,water_depth_mbgl,status,trend,risk_score
 DWLR-PB-099,Jalandhar Agri Monitoring,Punjab,Jalandhar,31.3260,75.5762,21.4,moderate,falling,0.58
@@ -26,6 +27,7 @@ DWLR-BAD-001,Duplicate ID Row,Rajasthan,Jaipur,26.91,75.78,32.4,critical,falling
 ,Missing Station ID and Metadata,,,,,15.0,moderate,stable,0.5`;
 
 export const CSVValidatorPanel: React.FC = () => {
+  const { t } = useLanguage();
   const [csvText, setCsvText] = useState(SAMPLE_VALID_CSV);
   const [validationResult, setValidationResult] = useState<CSVValidationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
@@ -66,10 +68,10 @@ export const CSVValidatorPanel: React.FC = () => {
           </div>
           <div>
             <h3 className="text-lg font-black text-stone-900">
-              CSV Telemetry Ingestion & Quality Sandbox
+              {t('CSV Telemetry Ingestion & Quality Sandbox')}
             </h3>
             <p className="text-xs text-stone-500 font-medium">
-              Upload or paste batch DWLR telemetry to test schema normalization and quality rules
+              {t('Upload or paste batch DWLR telemetry to test schema normalization and quality rules')}
             </p>
           </div>
         </div>
@@ -80,17 +82,17 @@ export const CSVValidatorPanel: React.FC = () => {
             onClick={handleLoadValidSample}
             className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold transition-all cursor-pointer"
           >
-            Load Valid Sample
+            {t('Load Valid Sample')}
           </button>
           <button
             onClick={handleLoadInvalidSample}
             className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 text-xs font-bold transition-all cursor-pointer"
           >
-            Load Corrupted Sample
+            {t('Load Corrupted Sample')}
           </button>
           <button
             onClick={handleClear}
-            title="Clear Text"
+            title={t('Clear Text')}
             className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-all cursor-pointer"
           >
             <RotateCcw className="h-4 w-4" />
@@ -103,23 +105,23 @@ export const CSVValidatorPanel: React.FC = () => {
         <div className="flex items-center justify-between text-xs text-stone-500">
           <span className="font-semibold text-stone-700 flex items-center gap-1">
             <FileText className="h-3.5 w-3.5 text-stone-500" />
-            Raw CSV Telemetry Input:
+            {t('Raw CSV Telemetry Input:')}
           </span>
-          <span>Supports UTF-8 &bull; Comma Delimited</span>
+          <span>{t('Supports UTF-8 • Comma Delimited')}</span>
         </div>
 
         <textarea
           rows={6}
           value={csvText}
           onChange={(e) => setCsvText(e.target.value)}
-          placeholder="Paste CSV rows with headers (station_id, station_name, state, district, latitude, longitude, water_depth_mbgl)..."
+          placeholder={t('Paste CSV rows with headers (station_id, station_name, state, district, latitude, longitude, water_depth_mbgl)...')}
           className="w-full rounded-2xl bg-stone-50 border border-stone-200 p-3 font-mono text-xs text-stone-800 focus:bg-white focus:border-water-600 focus:outline-none shadow-2xs"
         />
 
         <div className="flex items-center justify-between pt-1">
           <span className="text-[11px] text-stone-400 flex items-center gap-1">
             <HelpCircle className="h-3 w-3" />
-            Columns auto-normalized (id, name, lat, lon, water_depth, state, district)
+            {t('Columns auto-normalized (id, name, lat, lon, water_depth, state, district)')}
           </span>
 
           <button
@@ -128,7 +130,7 @@ export const CSVValidatorPanel: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-water-700 hover:bg-water-800 text-white font-bold text-xs transition-all shadow-xs active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <Play className={`h-3.5 w-3.5 ${isValidating ? 'animate-spin' : ''}`} />
-            <span>{isValidating ? 'Validating...' : 'Validate CSV Schema'}</span>
+            <span>{isValidating ? t('Validating...') : t('Validate CSV Schema')}</span>
           </button>
         </div>
       </div>
@@ -145,7 +147,7 @@ export const CSVValidatorPanel: React.FC = () => {
                 <AlertTriangle className="h-5 w-5 text-rose-600" />
               )}
               <h4 className="font-extrabold text-sm text-stone-900">
-                Validation Status: {validationResult.success ? 'PASSED' : 'SCHEMA VIOLATIONS DETECTED'}
+                {t('Validation Status:')} {validationResult.success ? t('PASSED') : t('SCHEMA VIOLATIONS DETECTED')}
               </h4>
             </div>
 
@@ -156,26 +158,26 @@ export const CSVValidatorPanel: React.FC = () => {
                   : 'bg-rose-100 text-rose-800 border-rose-300'
               }`}
             >
-              Quality Score: {validationResult.quality_report.quality_score.toFixed(1)}%
+              {t('Quality Score:')} {validationResult.quality_report.quality_score.toFixed(1)}%
             </span>
           </div>
 
           {/* Counts Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div className="p-3 rounded-xl bg-white border border-stone-200">
-              <span className="text-stone-500 font-bold">Records Parsed</span>
+              <span className="text-stone-500 font-bold">{t('Records Parsed')}</span>
               <p className="text-base font-black text-stone-900">{validationResult.records_parsed}</p>
             </div>
             <div className="p-3 rounded-xl bg-white border border-stone-200">
-              <span className="text-emerald-700 font-bold">Valid Records</span>
+              <span className="text-emerald-700 font-bold">{t('Valid Records')}</span>
               <p className="text-base font-black text-emerald-800">{validationResult.valid_records}</p>
             </div>
             <div className="p-3 rounded-xl bg-white border border-stone-200">
-              <span className="text-rose-700 font-bold">Invalid Records</span>
+              <span className="text-rose-700 font-bold">{t('Invalid Records')}</span>
               <p className="text-base font-black text-rose-800">{validationResult.invalid_records}</p>
             </div>
             <div className="p-3 rounded-xl bg-white border border-stone-200">
-              <span className="text-amber-700 font-bold">Total Issues</span>
+              <span className="text-amber-700 font-bold">{t('Total Issues')}</span>
               <p className="text-base font-black text-amber-800">{validationResult.quality_report.errors_count + validationResult.quality_report.warnings_count}</p>
             </div>
           </div>
@@ -185,11 +187,11 @@ export const CSVValidatorPanel: React.FC = () => {
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 space-y-1.5">
               <span className="text-xs font-bold text-rose-900 flex items-center gap-1">
                 <AlertTriangle className="h-3.5 w-3.5 text-rose-700" />
-                Detected Quality Violations:
+                {t('Detected Quality Violations:')}
               </span>
               <ul className="list-disc list-inside text-[11px] text-rose-800 space-y-0.5 font-mono">
                 {validationResult.quality_report.issues_list.map((iss, i) => (
-                  <li key={i}>{iss}</li>
+                  <li key={i}>{t(iss)}</li>
                 ))}
               </ul>
             </div>
@@ -197,8 +199,8 @@ export const CSVValidatorPanel: React.FC = () => {
 
           {/* Sandbox Notice */}
           <div className="text-[11px] text-stone-500 pt-1 flex items-center justify-between border-t border-stone-200">
-            <span>🔒 Sandbox Preview Mode &mdash; Active 5,260-well dataset remains untouched.</span>
-            <span className="font-semibold text-stone-700">Source: CSV_IMPORT</span>
+            <span>🔒 {t('Sandbox Preview Mode — Active 5,260-well dataset remains untouched.')}</span>
+            <span className="font-semibold text-stone-700">{t('Source: CSV_IMPORT')}</span>
           </div>
         </div>
       )}

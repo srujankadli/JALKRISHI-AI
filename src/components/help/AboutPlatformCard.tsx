@@ -9,7 +9,7 @@ export const AboutPlatformCard: React.FC = () => {
   return (
     <div className="space-y-4">
       <SectionHeader
-        title={`About ${APP_CONFIG.appName} Platform`}
+        title={`${t('About')} ${APP_CONFIG.appName} ${t('Platform')}`}
         subtitle={t('National Environmental Intelligence Architecture for Groundwater Resource Evaluation')}
         icon={<Award className="h-5 w-5 text-teal-600" />}
       />
@@ -22,18 +22,18 @@ export const AboutPlatformCard: React.FC = () => {
                 {APP_CONFIG.version}
               </span>
               <span className="rounded-md bg-agri-100 px-2.5 py-0.5 text-xs font-bold text-agri-800">
-                Groundwater Intelligence Platform
+                {t('Groundwater Intelligence Platform')}
               </span>
             </div>
             <h3 className="mt-2 text-xl font-black text-stone-900">
-              Real-Time Groundwater Resource Evaluation Using DWLR Data
+              {t('Real-Time Groundwater Resource Evaluation Using DWLR Data')}
             </h3>
           </div>
 
           <div className="text-right">
             <span className="text-xs font-bold text-stone-400 block">{t('System Scope:')}</span>
             <span className="text-sm font-extrabold text-stone-900">
-              5,260 Monitored DWLR Stations &bull; 37 States &amp; UTs
+              {t('5,260 Monitored DWLR Stations • 37 States & UTs')}
             </span>
           </div>
         </div>
@@ -45,7 +45,7 @@ export const AboutPlatformCard: React.FC = () => {
               <span>{t('Core Mission')}</span>
             </div>
             <p className="text-stone-600 leading-relaxed font-medium">
-              Bridging the critical gap between complex hydrological sensor telemetry and everyday agricultural sowing decisions for Indian farmers.
+              {t('Bridging the critical gap between complex hydrological sensor telemetry and everyday agricultural sowing decisions for Indian farmers.')}
             </p>
           </div>
 
@@ -55,7 +55,7 @@ export const AboutPlatformCard: React.FC = () => {
               <span>{t('Target Stakeholders')}</span>
             </div>
             <p className="text-stone-600 leading-relaxed font-medium">
-              Farmers, Krishi Vigyan Kendra (KVK) agronomists, district water resource officers, policy planners, and groundwater researchers.
+              {t('Farmers, Krishi Vigyan Kendra (KVK) agronomists, district water resource officers, policy planners, and groundwater researchers.')}
             </p>
           </div>
 
@@ -65,7 +65,7 @@ export const AboutPlatformCard: React.FC = () => {
               <span>{t('Implementation Scope')}</span>
             </div>
             <p className="text-stone-600 leading-relaxed font-medium">
-              Complete, verified platform architecture with interactive mapping, 30-day forecasting, anomaly triage, crop advisory, and multi-format report exports.
+              {t('Complete, verified platform architecture with interactive mapping, 30-day forecasting, anomaly triage, crop advisory, and multi-format report exports.')}
             </p>
           </div>
         </div>

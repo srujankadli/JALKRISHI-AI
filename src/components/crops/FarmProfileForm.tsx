@@ -117,36 +117,36 @@ districts,
         <div>
           <span className="text-xs font-extrabold uppercase tracking-wider text-agri-700 flex items-center gap-1.5">
             <Sprout className="h-4 w-4 text-agri-600" />
-            Interactive Farm Conditions Input
+            {t('Interactive Farm Conditions Input')}
           </span>
           <h2 className="mt-1 text-xl sm:text-2xl font-black text-stone-900">
-            Tell us about your farm & available water
+            {t('Tell us about your farm & available water')}
           </h2>
           <p className="text-xs sm:text-sm text-stone-500 mt-0.5">
-            Configure your location, soil type, and groundwater availability to receive tailored crop recommendations.
+            {t('Configure your location, soil type, and groundwater availability to receive tailored crop recommendations.')}
           </p>
         </div>
 
         {/* Quick Demo Presets */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-stone-400">Try Scenario:</span>
+          <span className="text-xs font-bold text-stone-400">{t('Try Scenario:')}</span>
           <button
             onClick={() => onApplyPresetScenario('stressed')}
             className="rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-800 hover:bg-rose-100 transition-all cursor-pointer"
           >
-            ⚠️ Stressed Farm
+            ⚠️ {t('Stressed Farm')}
           </button>
           <button
             onClick={() => onApplyPresetScenario('normal')}
             className="rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition-all cursor-pointer"
           >
-            🌱 Normal Monsoon
+            🌱 {t('Normal Monsoon')}
           </button>
           <button
             onClick={() => onApplyPresetScenario('dryland')}
             className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800 hover:bg-amber-100 transition-all cursor-pointer"
           >
-            🏜️ Dryland / Arid
+            🏜️ {t('Dryland / Arid')}
           </button>
         </div>
       </div>
@@ -156,7 +156,7 @@ districts,
         <div className="flex flex-wrap items-center justify-between gap-2">
           <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5 text-agri-700" />
-            Step 1 &bull; Farm Location & Nearby Observation Well
+            {t('Step 1 • Farm Location & Nearby Observation Well')}
           </label>
           <button
             type="button"
@@ -170,7 +170,7 @@ districts,
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <span className="text-[11px] font-bold text-stone-500 block mb-1">State:</span>
+            <span className="text-[11px] font-bold text-stone-500 block mb-1">{t('State:')}</span>
             <select
               value={selectedState}
               onChange={(e) => onStateChange(e.target.value)}
@@ -185,7 +185,7 @@ districts,
           </div>
 
           <div>
-            <span className="text-[11px] font-bold text-stone-500 block mb-1">District:</span>
+            <span className="text-[11px] font-bold text-stone-500 block mb-1">{t('District:')}</span>
             <select
               value={selectedDistrict}
               onChange={(e) => onDistrictChange(e.target.value)}
@@ -209,13 +209,13 @@ districts,
               </div>
               <div>
                 <span className="text-[10px] font-bold text-agri-800 uppercase block">
-                  Groundwater Telemetry Context ({nearbyStation.stationName})
+                  {t('Groundwater Telemetry Context')} ({nearbyStation.stationName})
                 </span>
                 <p className="font-extrabold text-stone-900 text-xs sm:text-sm">
-                  Depth: {nearbyStation.waterLevel} mbgl &bull; Status:{' '}
-                  <span className="capitalize">{nearbyStation.status}</span> &bull; Trend:{' '}
+                  {t('Depth:')} {nearbyStation.waterLevel} {t('mbgl')} &bull; {t('Status:')}{' '}
+                  <span className="capitalize">{t(nearbyStation.status)}</span> &bull; {t('Trend:')}{' '}
                   <span className="font-bold text-rose-700">
-                    {nearbyStation.trend === 'falling' ? '↓ Falling' : '→ Stable'}
+                    {nearbyStation.trend === 'falling' ? `↓ ${t('Falling')}` : `→ ${t('Stable')}`}
                   </span>
                 </p>
               </div>
@@ -223,7 +223,7 @@ districts,
 
             {nearbyStation.daysToCritical && (
               <span className="rounded-lg bg-rose-100 border border-rose-200 px-2.5 py-1 text-xs font-bold text-rose-800">
-                ⏳ ~{nearbyStation.daysToCritical} Days to Critical
+                ⏳ ~{nearbyStation.daysToCritical} {t('Days to Critical')}
               </span>
             )}
           </div>
@@ -234,7 +234,7 @@ districts,
       <div className="space-y-2.5 pt-2 border-t border-stone-100">
         <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
           <Sprout className="h-3.5 w-3.5 text-amber-700" />
-          Step 2 &bull; Select Your Soil Type
+          {t('Step 2 • Select Your Soil Type')}
         </label>
 
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
@@ -258,7 +258,7 @@ districts,
                 </div>
                 {isSelected && (
                   <span className="mt-2 text-[10px] font-bold text-agri-700 flex items-center gap-0.5">
-                    <CheckCircle2 className="h-3 w-3" /> Selected
+                    <CheckCircle2 className="h-3 w-3" /> {t('Selected')}
                   </span>
                 )}
               </div>
@@ -273,15 +273,15 @@ districts,
         <div className="lg:col-span-4 space-y-2">
           <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
             <Sun className="h-3.5 w-3.5 text-amber-600" />
-            Step 3 &bull; Cropping Season
+            {t('Step 3 • Cropping Season')}
           </label>
 
           <div className="grid grid-cols-3 gap-2">
             {(
               [
-                { id: 'Kharif', label: 'Kharif', desc: 'Monsoon (Jun-Oct)' },
-                { id: 'Rabi', label: 'Rabi', desc: 'Winter (Nov-Apr)' },
-                { id: 'Zaid', label: 'Zaid', desc: 'Summer (Apr-Jun)' },
+                { id: 'Kharif', label: t('Kharif'), desc: t('Monsoon (Jun-Oct)') },
+                { id: 'Rabi', label: t('Rabi'), desc: t('Winter (Nov-Apr)') },
+                { id: 'Zaid', label: t('Zaid'), desc: t('Summer (Apr-Jun)') },
               ] as const
             ).map((s) => (
               <button
@@ -311,7 +311,7 @@ districts,
         <div className="lg:col-span-3 space-y-2">
           <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
             <CloudRain className="h-3.5 w-3.5 text-sky-600" />
-            Step 4A &bull; Rainfall
+            {t('Step 4A • Rainfall')}
           </label>
 
           <div className="grid grid-cols-3 gap-1.5">
@@ -326,7 +326,7 @@ districts,
                     : 'border-stone-200 bg-stone-50 text-stone-700 hover:bg-stone-100'
                 }`}
               >
-                {r} Rain
+                {t(r)} {t('Rain')}
               </button>
             ))}
           </div>
@@ -336,7 +336,7 @@ districts,
         <div className="lg:col-span-5 space-y-2">
           <label className="text-xs font-black uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
             <Droplets className="h-3.5 w-3.5 text-water-700" />
-            Step 4B &bull; Water Availability
+            {t('Step 4B • Water Availability')}
           </label>
 
           <div className="grid grid-cols-2 gap-2">
@@ -369,7 +369,7 @@ districts,
         <div className="flex items-center gap-2 text-xs text-stone-500">
           <HelpCircle className="h-4 w-4 text-stone-400 shrink-0" />
           <span>
-            Scoring evaluates soil compatibility, water stress margins, and seasonal crop thermal requirements.
+            {t('Scoring evaluates soil compatibility, water stress margins, and seasonal crop thermal requirements.')}
           </span>
         </div>
 
@@ -379,7 +379,7 @@ districts,
           className="inline-flex items-center justify-center gap-2 rounded-2xl bg-agri-700 px-8 py-3.5 text-sm font-black text-white shadow-elevated hover:bg-agri-800 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
         >
           <Sparkles className="h-4 w-4 text-amber-300" />
-          <span>{isGenerating ? 'Analyzing Crop Plan...' : 'Generate Crop Plan'}</span>
+          <span>{isGenerating ? t('Analyzing Crop Plan...') : t('Generate Crop Plan')}</span>
         </button>
       </div>
     </div>

@@ -1,38 +1,40 @@
 import React from 'react';
 import { Sprout, Droplets, TrendingDown, FileText } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface HelpQuickCardsProps {
   onScrollTo: (sectionId: string) => void;
 }
 
 export const HelpQuickCards: React.FC<HelpQuickCardsProps> = ({ onScrollTo }) => {
+  const { t } = useLanguage();
   
   const cards = [
     {
       id: 'farmer-guide',
-      title: 'For Farmers',
-      subtitle: 'How should I use JalKrishi AI on my farm?',
+      title: t('For Farmers'),
+      subtitle: t('How should I use JalKrishi AI on my farm?'),
       icon: Sprout,
       color: 'text-agri-700 bg-agri-50 border-agri-200 hover:border-agri-400',
     },
     {
       id: 'status-guide',
-      title: 'Groundwater Status',
-      subtitle: 'What do water depth & warning levels mean?',
+      title: t('Groundwater Status'),
+      subtitle: t('What do water depth & warning levels mean?'),
       icon: Droplets,
       color: 'text-water-700 bg-water-50 border-water-200 hover:border-water-400',
     },
     {
       id: 'forecast-guide',
-      title: 'Forecasts & Alerts',
-      subtitle: 'How are depletion & anomalies estimated?',
+      title: t('Forecasts & Alerts'),
+      subtitle: t('How are depletion & anomalies estimated?'),
       icon: TrendingDown,
       color: 'text-sky-700 bg-sky-50 border-sky-200 hover:border-sky-400',
     },
     {
       id: 'sources-transparency',
-      title: 'Sources & Reports',
-      subtitle: 'Where does data come from & how to export?',
+      title: t('Sources & Reports'),
+      subtitle: t('Where does data come from & how to export?'),
       icon: FileText,
       color: 'text-amber-700 bg-amber-50 border-amber-200 hover:border-amber-400',
     },

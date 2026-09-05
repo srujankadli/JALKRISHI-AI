@@ -10,7 +10,7 @@ export const GroundwaterCoverageLegend: React.FC = () => {
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-4 w-4 text-teal-700" />
           <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider">
-            Groundwater Intelligence Coverage Legend
+            {t('Groundwater Intelligence Coverage Legend')}
           </h4>
         </div>
         <span className="text-[10px] font-bold text-stone-500 font-mono">{t('Radius: 15.0 km')}</span>
@@ -24,10 +24,10 @@ export const GroundwaterCoverageLegend: React.FC = () => {
           </div>
           <div>
             <span className="font-extrabold text-slate-900 block leading-tight">
-              Direct Measurement
+              {t('Direct Measurement')}
             </span>
             <p className="text-[10px] text-slate-600 leading-snug mt-0.5">
-              DWLR observation well within 15.0 km. Hydrostatic pressure sensor telemetry.
+              {t('DWLR observation well within 15.0 km. Hydrostatic pressure sensor telemetry.')}
             </p>
           </div>
         </div>
@@ -39,10 +39,10 @@ export const GroundwaterCoverageLegend: React.FC = () => {
           </div>
           <div>
             <span className="font-extrabold text-teal-950 block leading-tight">
-              Satellite-Assisted Estimate
+              {t('Satellite-Assisted Estimate')}
             </span>
             <p className="text-[10px] text-teal-800 leading-snug mt-0.5">
-              Remote-sensing indicators, thermal stress, rainfall signals &amp; nearby DWLR trends.
+              {t('Remote-sensing indicators, thermal stress, rainfall signals & nearby DWLR trends.')}
             </p>
           </div>
         </div>
@@ -54,10 +54,10 @@ export const GroundwaterCoverageLegend: React.FC = () => {
           </div>
           <div>
             <span className="font-extrabold text-amber-950 block leading-tight">
-              Limited Confidence
+              {t('Limited Confidence')}
             </span>
             <p className="text-[10px] text-amber-900 leading-snug mt-0.5">
-              Distance &gt; 50 km from nearest DWLR well. Higher uncertainty envelope.
+              {t('Distance > 50 km from nearest DWLR well. Higher uncertainty envelope.')}
             </p>
           </div>
         </div>

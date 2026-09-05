@@ -36,7 +36,7 @@ export const MiniMapPreview: React.FC<MiniMapPreviewProps> = ({ onSelectStation 
             onClick={() => navigate('/map')}
             className="text-xs font-bold text-agri-700 hover:text-agri-900 inline-flex items-center gap-1"
           >
-            Explore Full Map ({stations.length} Stations) <ArrowRight className="h-3.5 w-3.5" />
+            {t('Explore Full Map')} ({stations.length} {t('Stations')}) <ArrowRight className="h-3.5 w-3.5" />
           </button>
         }
       />
@@ -47,10 +47,10 @@ export const MiniMapPreview: React.FC<MiniMapPreviewProps> = ({ onSelectStation 
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-water-50 border border-water-200 px-2.5 py-0.5 font-bold text-water-800">
               <Radio className="h-3 w-3 text-water-600 animate-pulse" />
-              DWLR Network • 5,260 Stations (Simulated Demo)
+              {t('DWLR Network')} • 5,260 {t('Stations (Simulated Demo)')}
             </span>
             <span className="text-stone-500 font-medium hidden sm:inline">
-              All India Representative Grid
+              {t('All India Representative Grid')}
             </span>
           </div>
 

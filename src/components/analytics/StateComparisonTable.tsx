@@ -59,7 +59,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                 : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
             }`}
           >
-            Risk Score
+            {t('Risk Score')}
           </button>
           <button
             onClick={() => handleSort('critical')}
@@ -69,7 +69,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                 : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
             }`}
           >
-            Critical %
+            {t('Critical %')}
           </button>
           <button
             onClick={() => handleSort('depth')}
@@ -79,7 +79,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                 : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
             }`}
           >
-            Depth
+            {t('Depth')}
           </button>
         </div>
       </div>
@@ -95,7 +95,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                   onClick={() => handleSort('stations')}
                 >
                   <span className="flex items-center gap-1">
-                    DWLR Wells <ArrowUpDown className="h-3 w-3" />
+                    {t('DWLR Wells')} <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
                 <th
@@ -103,17 +103,17 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                   onClick={() => handleSort('depth')}
                 >
                   <span className="flex items-center gap-1">
-                    Avg Depth (mbgl) <ArrowUpDown className="h-3 w-3" />
+                    {t('Avg Depth (mbgl)')} <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
-                <th className="px-4 py-3">Healthy %</th>
-                <th className="px-4 py-3">Warning %</th>
+                <th className="px-4 py-3">{t('Healthy %')}</th>
+                <th className="px-4 py-3">{t('Warning %')}</th>
                 <th
                   className="px-4 py-3 cursor-pointer hover:text-stone-900"
                   onClick={() => handleSort('critical')}
                 >
                   <span className="flex items-center gap-1">
-                    Critical % <ArrowUpDown className="h-3 w-3" />
+                    {t('Critical %')} <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
                 <th
@@ -121,7 +121,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                   onClick={() => handleSort('risk')}
                 >
                   <span className="flex items-center gap-1">
-                    Risk Index <ArrowUpDown className="h-3 w-3" />
+                    {t('Risk Index')} <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
                 <th className="px-4 py-3">{t('Trend')}</th>
@@ -140,7 +140,7 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                     }`}
                   >
                     <td className="px-4 py-3.5">
-                      <div className="font-extrabold text-stone-900">{row.state}</div>
+                      <div className="font-extrabold text-stone-900">{t(row.state)}</div>
                     </td>
 
                     <td className="px-4 py-3.5 font-mono text-stone-600">
@@ -194,10 +194,10 @@ export const StateComparisonTable: React.FC<StateComparisonTableProps> = ({
                         }`}
                       >
                         {row.trend === 'falling'
-                          ? '↓ Falling'
+                          ? `↓ ${t('Falling')}`
                           : row.trend === 'rising'
-                          ? '↑ Rising'
-                          : '→ Stable'}
+                          ? `↑ ${t('Rising')}`
+                          : `→ ${t('Stable')}`}
                       </span>
                     </td>
 

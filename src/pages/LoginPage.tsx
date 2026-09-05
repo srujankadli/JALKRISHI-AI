@@ -427,7 +427,7 @@ export const LoginPage: React.FC = () => {
             ) : (
               <form onSubmit={handleForgotPasswordSubmit} className="space-y-3">
                 <p className="text-xs text-slate-400">
-                  Enter your registered official email address to receive password reset instructions.
+                  {t('Enter your registered official email address to receive password reset instructions.')}
                 </p>
                 <input
                   type="email"
@@ -441,7 +441,7 @@ export const LoginPage: React.FC = () => {
                   type="submit"
                   className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs cursor-pointer"
                 >
-                  Send Reset Link
+                  {t('Send Reset Link')}
                 </button>
               </form>
             )}

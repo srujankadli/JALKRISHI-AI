@@ -12,6 +12,7 @@ import {
   Activity,
 } from 'lucide-react';
 import type { CropRecommendation } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface CropDetailModalProps {
   crop: CropRecommendation | null;
@@ -26,6 +27,7 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
   onNavigateToMap,
   onNavigateToForecast,
 }) => {
+  const { t } = useLanguage();
   if (!crop) return null;
 
   return (
@@ -50,16 +52,16 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
               }`}
             >
               <Sprout className="h-3.5 w-3.5" />
-              {crop.statusLabel}
+              {t(crop.statusLabel)}
             </span>
 
             <span className="font-mono text-xs font-bold text-stone-600">
-              {crop.cropCategory || 'Field Crop'}
+              {t(crop.cropCategory || 'Field Crop')}
             </span>
           </div>
 
           <h2 className="text-2xl font-black text-stone-900 pt-1">
-            {crop.name}
+            {t(crop.name)}
           </h2>
           {crop.hindiName && (
             <p className="text-sm font-semibold text-agri-700">{crop.hindiName}</p>
@@ -69,14 +71,14 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
         {/* Key Agronomic Metrics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 rounded-2xl bg-stone-50 p-4 border border-stone-200 text-xs">
           <div>
-            <span className="text-[10px] font-bold text-stone-500 uppercase block">Match Score</span>
+            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Match Score')}</span>
             <strong className="text-xl font-black text-agri-800 font-mono">
               {crop.suitabilityScore}%
             </strong>
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-500 uppercase block">Water Need</span>
+            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Water Need')}</span>
             <strong className="text-sm font-bold text-stone-900 flex items-center gap-1 mt-0.5">
               <Droplets className="h-3.5 w-3.5 text-water-700" />
               {crop.waterRequirementMm} mm
@@ -84,16 +86,16 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-500 uppercase block">Duration</span>
+            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Duration')}</span>
             <strong className="text-sm font-bold text-stone-900 font-mono mt-0.5 block">
-              {crop.durationDays || '90 - 110 days'}
+              {t(crop.durationDays || '90 - 110 days')}
             </strong>
           </div>
 
           <div>
-            <span className="text-[10px] font-bold text-stone-500 uppercase block">Root Depth</span>
+            <span className="text-[10px] font-bold text-stone-500 uppercase block">{t('Root Depth')}</span>
             <strong className="text-sm font-bold text-stone-900 mt-0.5 block">
-              {crop.rootDepth || '80 - 110 cm'}
+              {t(crop.rootDepth || '80 - 110 cm')}
             </strong>
           </div>
         </div>
@@ -107,7 +109,7 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
           }`}
         >
           <span className="font-extrabold uppercase text-[11px] block">
-            {crop.isRecommended ? '🌾 Why We Recommend This Crop:' : '⚠️ Why This Crop is Not Recommended:'}
+            {crop.isRecommended ? `🌾 ${t('Why We Recommend This Crop:')}` : `⚠️ ${t('Why This Crop is Not Recommended:')}`}
           </span>
           <ul className="space-y-1.5 font-medium leading-relaxed">
             {(crop.bulletReasons || [crop.reason]).map((r, i) => (
@@ -117,7 +119,7 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
                 ) : (
                   <AlertCircle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
                 )}
-                <span>{r}</span>
+                <span>{t(r)}</span>
               </li>
             ))}
           </ul>
@@ -127,14 +129,14 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
         <div className="rounded-2xl border border-stone-200 bg-white p-4 text-xs space-y-1.5 shadow-xs">
           <div className="flex items-center gap-1.5 font-bold text-stone-800">
             <Activity className="h-4 w-4 text-water-700" />
-            <span>Recommended Irrigation & Water-Saving Strategy:</span>
+            <span>{t('Recommended Irrigation & Water-Saving Strategy:')}</span>
           </div>
           <p className="text-stone-700 leading-relaxed font-medium">
-            {crop.irrigationStrategy}
+            {t(crop.irrigationStrategy)}
           </p>
           <div className="pt-1.5 flex items-center gap-1 text-[11px] font-bold text-agri-800">
             <ShieldCheck className="h-3.5 w-3.5 text-agri-600" />
-            <span>Aquifer Impact: {crop.groundwaterImpact}</span>
+            <span>{t('Aquifer Impact:')} {t(crop.groundwaterImpact)}</span>
           </div>
         </div>
 
@@ -142,13 +144,13 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
         {crop.warnings && crop.warnings.length > 0 && (
           <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 text-xs text-amber-950 space-y-1">
             <span className="font-extrabold uppercase text-[10px] text-amber-900 block">
-              🛡️ Agronomic Management & Things to Watch:
+              🛡️ {t('Agronomic Management & Things to Watch:')}
             </span>
             <ul className="space-y-1 font-medium text-[11px] text-stone-800">
               {crop.warnings.map((w, idx) => (
                 <li key={idx} className="flex items-start gap-1.5">
                   <span className="text-amber-600 font-bold">&bull;</span>
-                  <span>{w}</span>
+                  <span>{t(w)}</span>
                 </li>
               ))}
             </ul>
@@ -161,7 +163,7 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
             onClick={onClose}
             className="rounded-xl border border-stone-300 bg-white px-4 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50 cursor-pointer"
           >
-            Close
+            {t('Close')}
           </button>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -173,7 +175,7 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
               className="inline-flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-xs font-bold text-stone-800 hover:bg-stone-50 shadow-xs cursor-pointer"
             >
               <MapPin className="h-3.5 w-3.5 text-stone-600" />
-              <span>Check Groundwater Map</span>
+              <span>{t('Check Groundwater Map')}</span>
             </button>
 
             <button
@@ -184,7 +186,7 @@ export const CropDetailModal: React.FC<CropDetailModalProps> = ({
               className="inline-flex items-center gap-1.5 rounded-xl bg-agri-700 px-4 py-2 text-xs font-bold text-white hover:bg-agri-800 shadow-xs cursor-pointer"
             >
               <TrendingDown className="h-3.5 w-3.5" />
-              <span>View Water Forecast</span>
+              <span>{t('View Water Forecast')}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>

@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { ChartCard } from '../common/ChartCard';
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface GroundwaterTrendAnalyticsProps {
   timeframe: '7d' | '30d' | '90d';
@@ -22,6 +23,7 @@ export const GroundwaterTrendAnalytics: React.FC<GroundwaterTrendAnalyticsProps>
   selectedRegionLabel,
   avgDepth,
 }) => {
+  const { t } = useLanguage();
   
   // Generate realistic historical depth trajectory matching timeframe and current avgDepth
   const count = timeframe === '7d' ? 7 : timeframe === '30d' ? 15 : 24;
@@ -50,8 +52,8 @@ export const GroundwaterTrendAnalytics: React.FC<GroundwaterTrendAnalyticsProps>
 
   return (
     <ChartCard
-      title={`Groundwater Table Trajectory — ${selectedRegionLabel}`}
-      subtitle={`Depth below ground level (mbgl) over past ${timeframe === '7d' ? '7 Days' : timeframe === '30d' ? '30 Days' : '90 Days'}`}
+      title={`${t('Groundwater Table Trajectory')} — ${selectedRegionLabel}`}
+      subtitle={`${t('Depth below ground level (mbgl) over past')} ${timeframe === '7d' ? t('7 Days') : timeframe === '30d' ? t('30 Days') : t('90 Days')}`}
       actions={
         <div className="flex items-center gap-1.5 rounded-lg bg-stone-100 px-2.5 py-1 text-xs font-bold text-stone-700">
           {isDeclining ? (
@@ -63,10 +65,10 @@ export const GroundwaterTrendAnalytics: React.FC<GroundwaterTrendAnalyticsProps>
           )}
           <span>
             {isDeclining
-              ? `+${netChange}m Drawdown (Declining)`
+              ? `+${netChange}m ${t('Drawdown (Declining)')}`
               : netChange < 0
-              ? `${netChange}m Recharge (Rising)`
-              : 'Stable Baseline'}
+              ? `${netChange}m ${t('Recharge (Rising)')}`
+              : t('Stable Baseline')}
           </span>
         </div>
       }
@@ -104,10 +106,10 @@ export const GroundwaterTrendAnalytics: React.FC<GroundwaterTrendAnalyticsProps>
                     <div className="rounded-xl border border-stone-200 bg-white p-3 shadow-lg text-xs space-y-1">
                       <p className="font-bold text-stone-900">{label}</p>
                       <p className="text-sky-700 font-extrabold font-mono">
-                        Depth: {payload[0].value} mbgl
+                        {t('Depth:')} {payload[0].value} mbgl
                       </p>
                       <p className="text-[10px] text-stone-500">
-                        Seasonal Baseline: {payload[0].payload.baseline} mbgl
+                        {t('Seasonal Baseline:')} {payload[0].payload.baseline} mbgl
                       </p>
                     </div>
                   );
@@ -127,8 +129,8 @@ export const GroundwaterTrendAnalytics: React.FC<GroundwaterTrendAnalyticsProps>
       </div>
 
       <div className="mt-2 text-[11px] text-stone-500 flex items-center justify-between border-t border-stone-100 pt-2">
-        <span>* Y-axis is inverted: Lower position indicates deeper water table (hydrostatic drawdown).</span>
-        <span className="font-semibold text-stone-700">Baseline Target: {(avgDepth - 1.2).toFixed(1)}m</span>
+        <span>{t('* Y-axis is inverted: Lower position indicates deeper water table (hydrostatic drawdown).')}</span>
+        <span className="font-semibold text-stone-700">{t("Baseline Target:")} {(avgDepth - 1.2).toFixed(1)}m</span>
       </div>
     </ChartCard>
   );

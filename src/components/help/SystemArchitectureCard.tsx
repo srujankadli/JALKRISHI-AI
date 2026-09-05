@@ -19,13 +19,13 @@ export const SystemArchitectureCard: React.FC = () => {
           {/* Layer 1: Ingestion */}
           <div className="w-full rounded-2xl border border-sky-200 bg-sky-50/70 p-4 text-center space-y-1">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-sky-800">
-              Layer 1 &bull; Telemetry Ingestion & Piezometer Network
+              {t('Layer 1 • Telemetry Ingestion & Piezometer Network')}
             </span>
             <h4 className="text-sm font-black text-stone-900">
-              5,260 Digital Water Level Recorders (DWLR) &bull; GSM / GPRS Cellular Telemetry
+              {t('5,260 Digital Water Level Recorders (DWLR) • GSM / GPRS Cellular Telemetry')}
             </h4>
             <p className="text-[11px] text-stone-600">
-              Submersible hydrostatic pressure sensors record water table depth (mbgl) and transmission packets at scheduled intervals.
+              {t('Submersible hydrostatic pressure sensors record water table depth (mbgl) and transmission packets at scheduled intervals.')}
             </p>
           </div>
 
@@ -34,13 +34,13 @@ export const SystemArchitectureCard: React.FC = () => {
           {/* Layer 2: Processing & QC */}
           <div className="w-full rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-center space-y-1">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800">
-              Layer 2 &bull; Hydrogeological Processing &amp; Statistical QC
+              {t('Layer 2 • Hydrogeological Processing & Statistical QC')}
             </span>
             <h4 className="text-sm font-black text-stone-900">
-              Z-Score Anomaly Filtering &bull; Multi-Horizon Drawdown &amp; Recharge Lag Modeling
+              {t('Z-Score Anomaly Filtering • Multi-Horizon Drawdown & Recharge Lag Modeling')}
             </h4>
             <p className="text-[11px] text-stone-600">
-              Filters flatlines, impossible jumps, and battery noise while calculating 7d/30d/60d/90d depletion projections.
+              {t('Filters flatlines, impossible jumps, and battery noise while calculating 7d/30d/60d/90d depletion projections.')}
             </p>
           </div>
 
@@ -49,13 +49,13 @@ export const SystemArchitectureCard: React.FC = () => {
           {/* Layer 3: Decision Engine */}
           <div className="w-full rounded-2xl border border-agri-200 bg-agri-50/70 p-4 text-center space-y-1">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-agri-800">
-              Layer 3 &bull; Hydro-Agronomic Decision Engine
+              {t('Layer 3 • Hydro-Agronomic Decision Engine')}
             </span>
             <h4 className="text-sm font-black text-stone-900">
-              Multi-Factor Crop Sowing Scorer &bull; Days-to-Critical Depletion Calculator
+              {t('Multi-Factor Crop Sowing Scorer • Days-to-Critical Depletion Calculator')}
             </h4>
             <p className="text-[11px] text-stone-600">
-              Matches soil type, season, rainfall, and water stress to rank low-water crops and flag high-risk agricultural choices.
+              {t('Matches soil type, season, rainfall, and water stress to rank low-water crops and flag high-risk agricultural choices.')}
             </p>
           </div>
 
@@ -69,10 +69,10 @@ export const SystemArchitectureCard: React.FC = () => {
                 <span>{t('Web Platform (Implemented)')}</span>
               </div>
               <p className="text-[11px] text-stone-600 font-medium">
-                React 18 + TypeScript + Tailwind + Leaflet + Recharts + Client-Side XLSX/PDF Reporting.
+                {t('React 18 + TypeScript + Tailwind + Leaflet + Recharts + Client-Side XLSX/PDF Reporting.')}
               </p>
               <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
-                <ShieldCheck className="h-3 w-3" /> Fully Verified &amp; Active
+                <ShieldCheck className="h-3 w-3" /> {t('Fully Verified & Active')}
               </span>
             </div>
 
@@ -82,10 +82,10 @@ export const SystemArchitectureCard: React.FC = () => {
                 <span>{t('Farmer WhatsApp Bot (Planned)')}</span>
               </div>
               <p className="text-[11px] text-stone-600 font-medium">
-                Twilio / Meta Cloud API conversational bot for instant village-level water queries in regional languages.
+                {t('Twilio / Meta Cloud API conversational bot for instant village-level water queries in regional languages.')}
               </p>
               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-stone-500 bg-stone-200/80 px-2 py-0.5 rounded">
-                Planned Backend Integration
+                {t('Planned Backend Integration')}
               </span>
             </div>
           </div>

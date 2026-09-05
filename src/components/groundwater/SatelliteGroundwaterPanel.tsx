@@ -76,7 +76,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
       return (
         <span className="inline-flex items-center gap-1 rounded bg-rose-100 text-rose-800 border border-rose-200 px-2 py-0.5 text-xs font-bold">
           <TrendingDown className="h-3.5 w-3.5 text-rose-600" />
-          FALLING
+          {t('FALLING')}
         </span>
       );
     }
@@ -84,14 +84,14 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
       return (
         <span className="inline-flex items-center gap-1 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-xs font-bold">
           <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
-          RISING
+          {t('RISING')}
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1 rounded bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 text-xs font-bold">
         <Minus className="h-3.5 w-3.5 text-slate-600" />
-        STABLE
+        {t('STABLE')}
       </span>
     );
   };
@@ -109,10 +109,10 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-black text-white tracking-tight">
-                  Satellite-Assisted Groundwater Intelligence
+                  {t('Satellite-Assisted Groundwater Intelligence')}
                 </h3>
                 <span className="rounded bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 text-[10px] font-bold font-mono">
-                  SATELLITE_ESTIMATE
+                  {t('SATELLITE_ESTIMATE')}
                 </span>
               </div>
               <p className="text-xs text-slate-300 flex items-center gap-2 mt-0.5">
@@ -136,11 +136,11 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 text-amber-700 flex-shrink-0" />
             <span>
-              <strong>{t('Satellite-Assisted Estimate:')}</strong> This spatial estimate combines remote sensing signals, weather models, and nearby DWLR wells. It is <em>{t('not')}</em> a direct well-level measurement.
+              <strong>{t('Satellite-Assisted Estimate:')}</strong> {t('This spatial estimate combines remote sensing signals, weather models, and nearby DWLR wells. It is')} <em>{t('not')}</em> {t('a direct well-level measurement.')}
             </span>
           </div>
           <span className="hidden sm:inline-flex items-center gap-1 rounded bg-amber-200/80 px-2 py-0.5 text-[10px] font-bold text-amber-950 font-mono">
-            SIMULATED_DATA
+            {t('SIMULATED_DATA')}
           </span>
         </div>
 
@@ -167,7 +167,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
             }`}
           >
             <Layers className="h-3.5 w-3.5" />
-            <span>Remote Sensing Indicators ({estimate ? Object.keys(estimate.indicators).length : 0})</span>
+            <span>{t('Remote Sensing Indicators')} ({estimate ? Object.keys(estimate.indicators).length : 0})</span>
           </button>
 
           <button
@@ -179,7 +179,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
             }`}
           >
             <Radio className="h-3.5 w-3.5" />
-            <span>{t('Data Sources &amp; Providers')}</span>
+            <span>{t('Data Sources & Providers')}</span>
           </button>
         </div>
 
@@ -202,17 +202,17 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                     <div className="rounded-2xl border border-stone-200 bg-stone-50/80 p-4 space-y-2">
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-stone-500 uppercase tracking-wider text-[10px]">
-                          Coverage Classification
+                          {t('Coverage Classification')}
                         </span>
                         {estimate.dwlr_available ? (
                           <span className="inline-flex items-center gap-1 rounded bg-blue-100 text-blue-800 px-2 py-0.5 text-[10px] font-bold">
                             <Radio className="h-3 w-3 text-blue-600" />
-                            Direct DWLR Coverage
+                            {t('Direct DWLR Coverage')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 rounded bg-teal-100 text-teal-800 px-2 py-0.5 text-[10px] font-bold">
                             <Satellite className="h-3 w-3 text-teal-600" />
-                            Satellite-Assisted Coverage
+                            {t('Satellite-Assisted Coverage')}
                           </span>
                         )}
                       </div>
@@ -222,14 +222,14 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                           {estimate.nearest_station_distance_km} km
                         </span>
                         <span className="text-xs text-stone-500 font-medium">
-                          to nearest DWLR well ({estimate.nearest_station_id || 'N/A'})
+                          {t('to nearest DWLR well')} ({estimate.nearest_station_id || 'N/A'})
                         </span>
                       </div>
 
                       <p className="text-xs text-stone-600">
                         {estimate.dwlr_available
-                          ? 'This location is within the 15.0 km direct DWLR observation radius.'
-                          : 'No DWLR well exists within 15.0 km. Utilizing remote sensing & spatial estimation model.'}
+                          ? t('This location is within the 15.0 km direct DWLR observation radius.')
+                          : t('No DWLR well exists within 15.0 km. Utilizing remote sensing & spatial estimation model.')}
                       </p>
                     </div>
 
@@ -237,23 +237,23 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                     <div className={`rounded-2xl border p-4 space-y-2 ${getConditionColor(estimate.groundwater_condition)}`}>
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold uppercase tracking-wider text-[10px]">
-                          Groundwater Condition
+                          {t('Groundwater Condition')}
                         </span>
                         <span className="font-mono text-xs font-black">
-                          Score: {estimate.groundwater_stress_score} / 1.0
+                          {t('Score:')} {estimate.groundwater_stress_score} / 1.0
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-black tracking-tight">
-                          {estimate.groundwater_condition.replace('_', ' ')}
+                          {t(estimate.groundwater_condition.replace('_', ' '))}
                         </span>
                         {getTrendBadge(estimate.estimated_trend)}
                       </div>
 
                       <div className="flex items-center justify-between pt-1 text-xs border-t border-current/20">
-                        <span>{t('Model Confidence:')} <strong>{estimate.confidence}</strong> ({Math.round(estimate.confidence_score * 100)}%)</span>
-                        <span>{t('Recharge:')} <strong>{estimate.recharge_outlook}</strong></span>
+                        <span>{t('Model Confidence:')} <strong>{t(estimate.confidence)}</strong> ({Math.round(estimate.confidence_score * 100)}%)</span>
+                        <span>{t('Recharge:')} <strong>{t(estimate.recharge_outlook)}</strong></span>
                       </div>
                     </div>
 
@@ -263,33 +263,33 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <div className="p-3 rounded-2xl bg-white border border-stone-200 shadow-subtle space-y-1">
                       <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">{t('Estimated Trend')}</span>
-                      <span className="text-base font-black text-stone-900 block">{estimate.estimated_trend}</span>
+                      <span className="text-base font-black text-stone-900 block">{t(estimate.estimated_trend)}</span>
                       <span className="text-[10px] text-stone-500">{t('Hydrodynamic trajectory')}</span>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-white border border-stone-200 shadow-subtle space-y-1">
-                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">30d Rainfall Signal</span>
+                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">{t('30d Rainfall Signal')}</span>
                       <span className="text-base font-black text-stone-900 block">{estimate.rainfall_mm_estimate} mm</span>
-                      <span className="text-[10px] text-stone-500">Status: {estimate.rainfall_condition}</span>
+                      <span className="text-[10px] text-stone-500">{t('Status:')} {t(estimate.rainfall_condition)}</span>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-white border border-stone-200 shadow-subtle space-y-1">
                       <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">{t('Recharge Outlook')}</span>
-                      <span className="text-base font-black text-teal-700 block">{estimate.recharge_outlook}</span>
+                      <span className="text-base font-black text-teal-700 block">{t(estimate.recharge_outlook)}</span>
                       <span className="text-[10px] text-stone-500">{t('Infiltration potential')}</span>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-white border border-stone-200 shadow-subtle space-y-1">
                       <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">{t('Nearest Well')}</span>
                       <span className="text-base font-black text-stone-900 font-mono block truncate">{estimate.nearest_station_id || 'N/A'}</span>
-                      <span className="text-[10px] text-stone-500">{estimate.nearest_station_distance_km} km away</span>
+                      <span className="text-[10px] text-stone-500">{estimate.nearest_station_distance_km} km {t('away')}</span>
                     </div>
                   </div>
 
                   {/* Key Indicators Preview Grid */}
                   <div className="space-y-3">
                     <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider">
-                      Key Remote Sensing Indicators
+                      {t('Key Remote Sensing Indicators')}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {Object.entries(estimate.indicators)
@@ -306,10 +306,10 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider">
-                      All Environmental &amp; Remote Sensing Indicators
+                      {t('All Environmental & Remote Sensing Indicators')}
                     </h4>
                     <span className="text-xs text-stone-500">
-                      Evaluated for ({latitude.toFixed(3)}°, {longitude.toFixed(3)}°)
+                      {t('Evaluated for')} ({latitude.toFixed(3)}°, {longitude.toFixed(3)}°)
                     </span>
                   </div>
 
@@ -325,10 +325,10 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                 <div className="space-y-4 text-xs">
                   <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 space-y-2">
                     <h4 className="font-extrabold text-stone-900 text-sm">
-                      Data Sources &amp; Adapter Architecture Status
+                      {t('Data Sources & Adapter Architecture Status')}
                     </h4>
                     <p className="text-stone-600 leading-relaxed text-xs">
-                      The satellite-assisted engine uses an adapter architecture designed for live production integration. Unconfigured adapters honestly report <strong>{t('NOT_CONFIGURED')}</strong> status.
+                      {t('The satellite-assisted engine uses an adapter architecture designed for live production integration. Unconfigured adapters honestly report')} <strong>{t('NOT_CONFIGURED')}</strong> {t('status.')}
                     </p>
                   </div>
 
@@ -344,11 +344,11 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
                         </div>
                         {src.includes('NOT_CONFIGURED') ? (
                           <span className="rounded bg-stone-200 text-stone-700 px-2 py-0.5 text-[10px] font-bold font-mono">
-                            NOT_CONFIGURED
+                            {t('NOT_CONFIGURED')}
                           </span>
                         ) : (
                           <span className="rounded bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-bold">
-                            SIMULATED_FEED
+                            {t('SIMULATED_FEED')}
                           </span>
                         )}
                       </div>
@@ -367,7 +367,7 @@ export const SatelliteGroundwaterPanel: React.FC<SatelliteGroundwaterPanelProps>
             onClick={onClose}
             className="px-4 py-1.5 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl transition-all cursor-pointer"
           >
-            Close Panel
+            {t('Close Panel')}
           </button>
         </div>
 

@@ -58,7 +58,7 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                 : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
             }`}
           >
-            Risk Score
+            {t('Risk Score')}
           </button>
           <button
             onClick={() => handleSort('critical')}
@@ -68,7 +68,7 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                 : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
             }`}
           >
-            Critical Wells
+            {t('Critical Wells')}
           </button>
           <button
             onClick={() => handleSort('depth')}
@@ -78,7 +78,7 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                 : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
             }`}
           >
-            Depth
+            {t('Depth')}
           </button>
         </div>
       </div>
@@ -95,7 +95,7 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                   onClick={() => handleSort('stations')}
                 >
                   <span className="flex items-center gap-1">
-                    Wells <ArrowUpDown className="h-3 w-3" />
+                    {t('Wells')} <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
                 <th
@@ -103,7 +103,7 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                   onClick={() => handleSort('depth')}
                 >
                   <span className="flex items-center gap-1">
-                    Avg Depth (mbgl) <ArrowUpDown className="h-3 w-3" />
+                    {t('Avg Depth (mbgl)')} <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
                 <th
@@ -111,7 +111,7 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                   onClick={() => handleSort('risk')}
                 >
                   <span className="flex items-center gap-1">
-                    Risk Score <ArrowUpDown className="h-3 w-3" />
+                    {t('Risk Score')} <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
                 <th
@@ -119,7 +119,7 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                   onClick={() => handleSort('critical')}
                 >
                   <span className="flex items-center gap-1">
-                    Critical Wells <ArrowUpDown className="h-3 w-3" />
+                    {t('Critical Wells')} <ArrowUpDown className="h-3 w-3" />
                   </span>
                 </th>
                 <th className="px-4 py-3">{t('Trend')}</th>
@@ -139,11 +139,11 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                     }`}
                   >
                     <td className="px-4 py-3.5">
-                      <div className="font-extrabold text-stone-900">{row.district}</div>
+                      <div className="font-extrabold text-stone-900">{t(row.district)}</div>
                     </td>
 
                     <td className="px-4 py-3.5 text-stone-600 font-semibold">
-                      {row.state}
+                      {t(row.state)}
                     </td>
 
                     <td className="px-4 py-3.5 font-mono text-stone-600">
@@ -176,7 +176,7 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                             : 'bg-stone-50 text-stone-600'
                         }`}
                       >
-                        {row.criticalCount} wells
+                        {row.criticalCount} {t('wells')}
                       </span>
                     </td>
 
@@ -191,17 +191,17 @@ export const DistrictAnalysisTable: React.FC<DistrictAnalysisTableProps> = ({
                         }`}
                       >
                         {row.trend === 'falling'
-                          ? '↓ Falling'
+                          ? `↓ ${t('Falling')}`
                           : row.trend === 'rising'
-                          ? '↑ Rising'
-                          : '→ Stable'}
+                          ? `↑ ${t('Rising')}`
+                          : `→ ${t('Stable')}`}
                       </span>
                     </td>
 
                     <td className="px-4 py-3.5 font-mono text-stone-700">
                       {typeof row.avgDaysToCritical === 'number'
-                        ? `~${row.avgDaysToCritical} days`
-                        : row.avgDaysToCritical}
+                        ? `~${row.avgDaysToCritical} ${t('days')}`
+                        : t(String(row.avgDaysToCritical))}
                     </td>
 
                     <td className="px-4 py-3.5 text-right">

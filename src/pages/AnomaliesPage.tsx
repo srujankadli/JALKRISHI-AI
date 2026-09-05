@@ -171,7 +171,9 @@ export const AnomaliesPage: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-extrabold text-stone-900">
-              {t('Warnings in')} {farmerState || t('Your Region')} ({localAnomalies.length})
+              {farmerState
+                ? `${farmerState}: ${t('Warnings in Your Region')} (${localAnomalies.length})`
+                : `${t('Warnings in Your Region')} (${localAnomalies.length})`}
             </h3>
             <span className="text-xs text-stone-500">{t('Filtered to your agricultural zone')}</span>
           </div>

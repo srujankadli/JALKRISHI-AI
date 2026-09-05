@@ -85,33 +85,33 @@ export const WhatsAppPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-emerald-600" />
               <h3 className="font-extrabold text-stone-900 text-base">
-                Try These Farmer Queries
+                {t('Try These Farmer Queries')}
               </h3>
             </div>
 
             <div className="space-y-2.5 text-xs text-stone-700">
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
-                <span className="font-bold text-emerald-800">💧 Water Level & Risk:</span>
+                <span className="font-bold text-emerald-800">💧 {t('Water Level & Risk:')}</span>
                 <p className="text-stone-600 font-mono text-[11px]">“Nashik water” or “Water level status”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
-                <span className="font-bold text-water-800">🔮 30-Day Forward Forecast:</span>
+                <span className="font-bold text-water-800">🔮 {t('30-Day Forward Forecast:')}</span>
                 <p className="text-stone-600 font-mono text-[11px]">“Pune forecast” or “Future groundwater outlook”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
-                <span className="font-bold text-agri-800">🌱 Water-Smart Crop Advice:</span>
+                <span className="font-bold text-agri-800">🌱 {t('Water-Smart Crop Advice:')}</span>
                 <p className="text-stone-600 font-mono text-[11px]">“What crop should I grow?” or “Crop advice”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
-                <span className="font-bold text-rose-800">⚠️ Depletion & Critical Alerts:</span>
+                <span className="font-bold text-rose-800">⚠️ {t('Depletion & Critical Alerts:')}</span>
                 <p className="text-stone-600 font-mono text-[11px]">“Any warnings or alerts?” or “Critical alert check”</p>
               </div>
 
               <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-1">
-                <span className="font-bold text-stone-800">⚡ Single-Digit Shortcuts:</span>
+                <span className="font-bold text-stone-800">⚡ {t('Single-Digit Shortcuts:')}</span>
                 <p className="text-stone-600 text-[11px]">
                   Type <strong className="font-mono bg-stone-200 px-1 rounded text-stone-900">1</strong> for Water, <strong className="font-mono bg-stone-200 px-1 rounded text-stone-900">2</strong> for Forecast, <strong className="font-mono bg-stone-200 px-1 rounded text-stone-900">3</strong> for Crops, <strong className="font-mono bg-stone-200 px-1 rounded text-stone-900">4</strong> for Alerts.
                 </p>
@@ -124,26 +124,26 @@ export const WhatsAppPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <HelpCircle className="h-5 w-5 text-water-600" />
               <h3 className="font-extrabold text-stone-900 text-base">
-                Why WhatsApp First?
+                {t('Why WhatsApp First?')}
               </h3>
             </div>
 
             <ul className="space-y-2.5 text-xs text-stone-600">
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>{t('Zero App Installation:')}</strong> Works directly on existing farmer smartphones and 2G/3G connections.</span>
+                <span><strong>{t('Zero App Installation:')}</strong> {t('Works directly on existing farmer smartphones and 2G/3G connections.')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>{t('Native Multi-Lingual:')}</strong> Supports English and Devanagari Hindi text seamlessly with deterministic understanding.</span>
+                <span><strong>{t('Native Multi-Lingual:')}</strong> {t('Supports English and Devanagari Hindi text seamlessly with deterministic understanding.')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>{t('Powered by 5 Engines:')}</strong> Reuses the exact same DWLR station repository, forecasting hydrodynamic model, and crop scoring matrix.</span>
+                <span><strong>{t('Powered by 5 Engines:')}</strong> {t('Reuses the exact same DWLR station repository, forecasting hydrodynamic model, and crop scoring matrix.')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>{t('Explainable Recommendations:')}</strong> Never tells a farmer what not to do without explaining <em>{t('why')}</em> (e.g. low aquifer recharge vs root rot).</span>
+                <span><strong>{t('Explainable Recommendations:')}</strong> {t('Never tells a farmer what not to do without explaining why (e.g. low aquifer recharge vs root rot).')}</span>
               </li>
             </ul>
           </div>
@@ -154,7 +154,7 @@ export const WhatsAppPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <QrCode className="h-5 w-5 text-emerald-700" />
                 <h4 className="font-extrabold text-stone-900 text-sm">
-                  Production Deployment Architecture
+                  {t('Production Deployment Architecture')}
                 </h4>
               </div>
               <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full">

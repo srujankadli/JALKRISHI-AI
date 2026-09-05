@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface QuickReplyOption {
   label: string;
@@ -14,20 +15,21 @@ export const WhatsAppQuickReplies: React.FC<WhatsAppQuickRepliesProps> = ({
   onSelect,
   disabled = false,
 }) => {
+  const { t } = useLanguage();
   
   const options: QuickReplyOption[] = [
-    { label: '💧 Water Status', query: 'Kolar water' },
-    { label: '🔮 30d Forecast', query: 'Kolar forecast' },
-    { label: '🌱 Crop Advice', query: 'What crop should I grow?' },
-    { label: '⚠️ Depletion Alerts', query: 'Any warnings or alerts?' },
-    { label: '📍 Nearest Station', query: 'Nearest station' },
-    { label: '❓ Help & Commands', query: 'help' },
+    { label: t('💧 Water Status'), query: 'Kolar water' },
+    { label: t('🔮 30d Forecast'), query: 'Kolar forecast' },
+    { label: t('🌱 Crop Advice'), query: 'What crop should I grow?' },
+    { label: t('⚠️ Depletion Alerts'), query: 'Any warnings or alerts?' },
+    { label: t('📍 Nearest Station'), query: 'Nearest station' },
+    { label: t('❓ Help & Commands'), query: 'help' },
   ];
 
   return (
     <div className="flex items-center gap-1.5 overflow-x-auto py-2 px-3 no-scrollbar border-t border-stone-200/60 bg-stone-100/70">
       <span className="text-[11px] font-bold text-stone-500 whitespace-nowrap mr-1">
-        Quick Ask:
+        {t('Quick Ask:')}
       </span>
       {options.map((opt, i) => (
         <button

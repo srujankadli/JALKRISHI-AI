@@ -1,6 +1,7 @@
 import React from 'react';
 import { Radio, AlertTriangle, ShieldCheck, HelpCircle } from 'lucide-react';
 import type { IndicatorItem } from '../../services/satelliteGroundwaterService';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface SatelliteIndicatorCardProps {
   indicatorKey: string;
@@ -11,6 +12,7 @@ export const SatelliteIndicatorCard: React.FC<SatelliteIndicatorCardProps> = ({
   indicatorKey,
   indicator,
 }) => {
+  const { t } = useLanguage();
   const isNotConfigured = indicator.status.includes('NOT_CONFIGURED') || indicator.source.includes('NOT_CONFIGURED');
 
   const getStatusBadge = (status: string) => {
@@ -18,7 +20,7 @@ export const SatelliteIndicatorCard: React.FC<SatelliteIndicatorCardProps> = ({
       return (
         <span className="inline-flex items-center gap-1 rounded bg-stone-200 text-stone-700 px-2 py-0.5 text-[10px] font-bold font-mono">
           <HelpCircle className="h-3 w-3 text-stone-500" />
-          NOT_CONFIGURED (STUB)
+          {t('NOT_CONFIGURED (STUB)')}
         </span>
       );
     }
@@ -46,7 +48,7 @@ export const SatelliteIndicatorCard: React.FC<SatelliteIndicatorCardProps> = ({
             {indicatorKey}
           </span>
           <h4 className="text-xs font-black text-stone-900 leading-tight">
-            {indicator.name}
+            {t(indicator.name)}
           </h4>
         </div>
         {getStatusBadge(indicator.status)}

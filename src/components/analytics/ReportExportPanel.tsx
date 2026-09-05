@@ -70,26 +70,26 @@ export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({
         <div className="space-y-2 max-w-xl">
           <div className="flex items-center gap-2">
             <span className="rounded-md bg-stone-100 px-2 py-0.5 text-[10px] font-bold text-stone-600 uppercase tracking-wider">
-              Active Export Scope
+              {t('Active Export Scope')}
             </span>
             <span className="text-xs font-semibold text-stone-500 font-mono">
-              {exportData.summary.totalStations.toLocaleString('en-IN')} Monitored Wells
+              {exportData.summary.totalStations.toLocaleString('en-IN')} {t('Monitored Wells')}
             </span>
           </div>
 
           <h3 className="text-lg font-black text-stone-900">
-            Export Filtered Groundwater Intelligence
+            {t('Export Filtered Groundwater Intelligence')}
           </h3>
 
           <p className="text-xs text-stone-600 leading-relaxed">
-            Report includes complete state matrices, district vulnerability scores, critical well tallies, active anomaly flags, and timestamped hydrogeological baselines matching your active filters.
+            {t('Report includes complete state matrices, district vulnerability scores, critical well tallies, active anomaly flags, and timestamped hydrogeological baselines matching your active filters.')}
           </p>
 
           <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-stone-500 font-medium">
-            <span>&bull; State: <strong>{exportData.filters.state}</strong></span>
-            <span>&bull; District: <strong>{exportData.filters.district}</strong></span>
-            <span>&bull; Status: <strong>{exportData.filters.status}</strong></span>
-            <span>&bull; Horizon: <strong>{exportData.filters.timeframe}</strong></span>
+            <span>&bull; {t('State:')} <strong>{exportData.filters.state}</strong></span>
+            <span>&bull; {t('District:')} <strong>{exportData.filters.district}</strong></span>
+            <span>&bull; {t('Status:')} <strong>{exportData.filters.status}</strong></span>
+            <span>&bull; {t('Horizon:')} <strong>{exportData.filters.timeframe}</strong></span>
           </div>
         </div>
 
@@ -102,7 +102,7 @@ export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 px-5 py-3 text-xs font-black text-emerald-900 shadow-xs hover:bg-emerald-100 hover:border-emerald-400 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
           >
             <FileSpreadsheet className="h-4 w-4 text-emerald-700" />
-            <span>{isExportingXLSX ? 'Generating XLSX...' : 'Download XLSX (Excel)'}</span>
+            <span>{isExportingXLSX ? t('Generating XLSX...') : t('Download XLSX (Excel)')}</span>
           </button>
 
           {/* PDF Button */}
@@ -112,7 +112,7 @@ export const ReportExportPanel: React.FC<ReportExportPanelProps> = ({
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-stone-900 px-5 py-3 text-xs font-black text-white shadow-elevated hover:bg-stone-800 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
           >
             <FileText className="h-4 w-4 text-amber-300" />
-            <span>{isExportingPDF ? 'Generating PDF...' : 'Download PDF Report'}</span>
+            <span>{isExportingPDF ? t('Generating PDF...') : t('Download PDF Report')}</span>
           </button>
         </div>
       </div>

@@ -101,19 +101,19 @@ export const HeroSection: React.FC = () => {
                 {/* Ground Level Surface & Grass Layer */}
                 <rect y="45" width="320" height="8" fill="#15803d" />
                 <text x="12" y="40" fill="#166534" fontSize="10" fontWeight="bold">
-                  Surface Soil (Ground Level 0.0m)
+                  {t('Surface Soil (Ground Level 0.0m)')}
                 </text>
 
                 {/* Topsoil Layer (Sandy Loam) */}
                 <rect y="53" width="320" height="35" fill="#e7e5e4" />
                 <text x="12" y="74" fill="#78716c" fontSize="9" fontWeight="600">
-                  Alluvial Topsoil & Root Zone
+                  {t('Alluvial Topsoil & Root Zone')}
                 </text>
 
                 {/* Subsoil / Fractured Strata */}
                 <rect y="88" width="320" height="35" fill="#d6d3d1" />
                 <text x="12" y="108" fill="#57534e" fontSize="9" fontWeight="600">
-                  Semi-permeable Silt Strata
+                  {t('Semi-permeable Silt Strata')}
                 </text>
 
                 {/* Water Table Transition (Groundwater Table) */}
@@ -130,7 +130,7 @@ export const HeroSection: React.FC = () => {
                   strokeDasharray="4 4"
                 />
                 <text x="12" y="142" fill="#0369a1" fontSize="10" fontWeight="bold">
-                  Aquifer Water Table • 14.8m avg
+                  {t('Aquifer Water Table • 14.8m avg')}
                 </text>
 
                 {/* DWLR Monitoring Well Piezometer Pipe */}
@@ -141,7 +141,7 @@ export const HeroSection: React.FC = () => {
                 <circle cx="240" cy="22" r="8" fill="#15803d" stroke="#ffffff" strokeWidth="2" />
                 <circle cx="240" cy="22" r="3" fill="#ffffff" />
                 <text x="200" y="16" fill="#15803d" fontSize="8" fontWeight="bold">
-                  DWLR Probe
+                  {t('DWLR Probe')}
                 </text>
 
                 {/* Depth Indicator Line */}
@@ -149,7 +149,7 @@ export const HeroSection: React.FC = () => {
                 <circle cx="225" cy="45" r="2.5" fill="#e11d48" />
                 <circle cx="225" cy="123" r="2.5" fill="#e11d48" />
                 <text x="160" y="88" fill="#be123c" fontSize="9" fontWeight="bold">
-                  Depth: 14.8m
+                  {t('Depth:')} 14.8m
                 </text>
               </svg>
             </div>
@@ -158,9 +158,9 @@ export const HeroSection: React.FC = () => {
             <div className="mt-3 flex items-center justify-between text-[11px] text-stone-500">
               <span className="flex items-center gap-1">
                 <Droplets className="h-3.5 w-3.5 text-water-600" />
-                Hydrostatic Telemetry
+                {t('Hydrostatic Telemetry')}
               </span>
-              <span className="font-semibold text-agri-800">5,260 Reference Stations</span>
+              <span className="font-semibold text-agri-800">5,260 {t('Reference Stations')}</span>
             </div>
           </div>
         </div>

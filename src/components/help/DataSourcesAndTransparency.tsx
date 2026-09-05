@@ -65,26 +65,26 @@ export const DataSourcesAndTransparency: React.FC = () => {
             <ShieldCheck className="h-4 w-4" />
           </span>
           <h4 className="text-base font-black text-stone-900">
-            Simulation Data &amp; Telemetry Transparency
+            {t('Simulation Data & Telemetry Transparency')}
           </h4>
         </div>
 
         <p className="text-xs text-stone-700 leading-relaxed font-medium">
-          The current JalKrishi AI interface utilizes <strong>5,260 deterministic simulated DWLR stations</strong> across 28 Indian states to demonstrate the complete product lifecycle: geospatial clustering, model projection envelopes, automated statistical anomaly triage, rule-based crop scoring, and client-side PDF/Excel export.
+          {t('The current JalKrishi AI interface utilizes 5,260 deterministic simulated DWLR stations across 28 Indian states to demonstrate the complete product lifecycle: geospatial clustering, model projection envelopes, automated statistical anomaly triage, rule-based crop scoring, and client-side PDF/Excel export.')}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-[11px] text-stone-600 border-t border-stone-200">
           <div>
-            <strong className="text-stone-900 block font-bold">1. Station Geometry:</strong>
-            Modeled on real CGWB piezometer block densities across 28 states &amp; UTs.
+            <strong className="text-stone-900 block font-bold">1. {t('Station Geometry:')}</strong>
+            {t('Modeled on real CGWB piezometer block densities across 28 states & UTs.')}
           </div>
           <div>
-            <strong className="text-stone-900 block font-bold">2. Forecasting &amp; Anomalies:</strong>
-            Simulated hydrogeological algorithms for model validation.
+            <strong className="text-stone-900 block font-bold">2. {t('Forecasting & Anomalies:')}</strong>
+            {t('Simulated hydrogeological algorithms for model validation.')}
           </div>
           <div>
-            <strong className="text-stone-900 block font-bold">3. Production Path:</strong>
-            Seamless ingestion APIs will connect directly to India-WRIS live feeds in future deployment.
+            <strong className="text-stone-900 block font-bold">3. {t('Production Path:')}</strong>
+            {t('Seamless ingestion APIs will connect directly to India-WRIS live feeds in future deployment.')}
           </div>
         </div>
       </div>

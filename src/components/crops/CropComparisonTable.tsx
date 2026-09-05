@@ -11,7 +11,7 @@ interface CropComparisonTableProps {
 
 export const CropComparisonTable: React.FC<CropComparisonTableProps> = ({
   crops,
-onSelectCrop,
+  onSelectCrop,
 }) => {
   const { t } = useLanguage();
   return (
@@ -31,9 +31,9 @@ onSelectCrop,
                 <th className="px-4 py-3">{t('Match Score')}</th>
                 <th className="px-4 py-3">{t('Water Demand')}</th>
                 <th className="px-4 py-3">{t('Duration')}</th>
-                <th className="px-4 py-3">Expected Yield</th>
-                <th className="px-4 py-3">Groundwater Impact</th>
-                <th className="px-4 py-3 text-right">Details</th>
+                <th className="px-4 py-3">{t('Expected Yield')}</th>
+                <th className="px-4 py-3">{t('Groundwater Impact')}</th>
+                <th className="px-4 py-3 text-right">{t('Details')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 font-medium text-stone-800">
@@ -44,7 +44,7 @@ onSelectCrop,
                   onClick={() => onSelectCrop(c)}
                 >
                   <td className="px-4 py-3.5">
-                    <div className="font-extrabold text-stone-900">{c.name}</div>
+                    <div className="font-extrabold text-stone-900">{t(c.name)}</div>
                     {c.hindiName && (
                       <div className="text-xs text-agri-700">{c.hindiName}</div>
                     )}
@@ -64,21 +64,21 @@ onSelectCrop,
                           : 'bg-rose-100 text-rose-800'
                       }`}
                     >
-                      {c.waterRequirement} ({c.waterRequirementMm}mm)
+                      {t(c.waterRequirement)} ({c.waterRequirementMm}mm)
                     </span>
                   </td>
 
                   <td className="px-4 py-3.5 font-mono text-stone-600">
-                    {c.durationDays || '90 - 110 days'}
+                    {t(c.durationDays || '90 - 110 days')}
                   </td>
 
                   <td className="px-4 py-3.5 text-xs text-stone-700">
-                    {c.expectedYieldPotential}
+                    {t(c.expectedYieldPotential)}
                   </td>
 
                   <td className="px-4 py-3.5">
                     <span className="text-xs font-bold text-stone-700">
-                      {c.groundwaterImpact}
+                      {t(c.groundwaterImpact)}
                     </span>
                   </td>
 
@@ -90,7 +90,7 @@ onSelectCrop,
                       }}
                       className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-bold text-stone-700 hover:bg-stone-50 shadow-xs cursor-pointer"
                     >
-                      <span>View</span>
+                      <span>{t('View')}</span>
                       <ArrowRight className="h-3 w-3" />
                     </button>
                   </td>

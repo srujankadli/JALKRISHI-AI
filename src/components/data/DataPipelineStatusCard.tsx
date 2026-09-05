@@ -12,8 +12,10 @@ import {
   dataPipelineService,
   type DataPipelineStatusData,
 } from '../../services/dataPipelineService';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const DataPipelineStatusCard: React.FC = () => {
+  const { t } = useLanguage();
   const [dataStatus, setDataStatus] = useState<DataPipelineStatusData | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshSuccess, setRefreshSuccess] = useState(false);
@@ -65,15 +67,15 @@ export const DataPipelineStatusCard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-black text-stone-900">
-                Data Pipeline & Ingestion Layer
+                {t('Data Pipeline & Ingestion Layer')}
               </h3>
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
                 <CheckCircle2 className="h-3 w-3" />
-                Production Ready
+                {t('Production Ready')}
               </span>
             </div>
             <p className="text-xs text-stone-500 font-medium">
-              Normalized hydrogeological telemetry repository with continuous schema validation
+              {t('Normalized hydrogeological telemetry repository with continuous schema validation')}
             </p>
           </div>
         </div>
@@ -85,14 +87,14 @@ export const DataPipelineStatusCard: React.FC = () => {
           className="inline-flex items-center gap-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white px-4 py-2 text-xs font-bold transition-all shadow-xs active:scale-95 disabled:opacity-50 cursor-pointer"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span>{isRefreshing ? 'Reloading...' : 'Reload Deterministic Dataset'}</span>
+          <span>{isRefreshing ? t('Reloading...') : t('Reload Deterministic Dataset')}</span>
         </button>
       </div>
 
       {refreshSuccess && (
         <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2 animate-fadeIn">
           <Sparkles className="h-4 w-4 text-emerald-600 shrink-0" />
-          <span>Deterministic 5,260-well dataset successfully verified and reloaded. Values remain 100% consistent.</span>
+          <span>{t('Deterministic 5,260-well dataset successfully verified and reloaded. Values remain 100% consistent.')}</span>
         </div>
       )}
 
@@ -102,13 +104,13 @@ export const DataPipelineStatusCard: React.FC = () => {
         <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1">
           <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider flex items-center gap-1">
             <Radio className="h-3 w-3 text-emerald-600 animate-pulse" />
-            Active Source
+            {t('Active Source')}
           </span>
           <p className="text-sm font-extrabold text-stone-900">
-            {dataStatus.active_source.replace('_', ' ')}
+            {t(dataStatus.active_source.replace('_', ' '))}
           </p>
           <span className="text-[10px] text-stone-500 font-medium">
-            Deterministic Simulation
+            {t('Deterministic Simulation')}
           </span>
         </div>
 
@@ -116,13 +118,13 @@ export const DataPipelineStatusCard: React.FC = () => {
         <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1">
           <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider flex items-center gap-1">
             <Layers className="h-3 w-3 text-water-600" />
-            DWLR Network
+            {t('DWLR Network')}
           </span>
           <p className="text-sm font-extrabold text-stone-900">
-            {dataStatus.station_count.toLocaleString()} Wells
+            {dataStatus.station_count.toLocaleString()} {t('Wells')}
           </p>
           <span className="text-[10px] text-stone-500 font-medium">
-            {dataStatus.telemetry_record_count.toLocaleString()} Total Points
+            {dataStatus.telemetry_record_count.toLocaleString()} {t('Total Points')}
           </span>
         </div>
 
@@ -130,13 +132,13 @@ export const DataPipelineStatusCard: React.FC = () => {
         <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-1">
           <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
             <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-            Data Quality
+            {t('Data Quality')}
           </span>
           <p className="text-sm font-extrabold text-emerald-900">
-            {dataStatus.quality_score.toFixed(1)}% Pass
+            {dataStatus.quality_score.toFixed(1)}% {t('Pass')}
           </p>
           <span className="text-[10px] text-emerald-700 font-medium">
-            0 Duplicates &bull; 0 Bad Coords
+            {t('0 Duplicates • 0 Bad Coords')}
           </span>
         </div>
 
@@ -144,13 +146,13 @@ export const DataPipelineStatusCard: React.FC = () => {
         <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1">
           <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider flex items-center gap-1">
             <Clock className="h-3 w-3 text-stone-400" />
-            Last Verified
+            {t('Last Verified')}
           </span>
           <p className="text-sm font-extrabold text-stone-900">
             {new Date(dataStatus.last_refresh).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </p>
           <span className="text-[10px] text-stone-500 font-medium">
-            ISO UTC Sync
+            {t('ISO UTC Sync')}
           </span>
         </div>
       </div>
@@ -159,10 +161,10 @@ export const DataPipelineStatusCard: React.FC = () => {
       <div className="rounded-2xl bg-stone-50/80 border border-stone-200 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider">
-            Government Ingestion Adapter Readiness
+            {t('Government Ingestion Adapter Readiness')}
           </h4>
           <span className="text-[11px] text-stone-500 font-medium">
-            Plug-and-play adapter contracts
+            {t('Plug-and-play adapter contracts')}
           </span>
         </div>
 
@@ -172,11 +174,11 @@ export const DataPipelineStatusCard: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-stone-900">India-WRIS</span>
               <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">
-                Not Configured
+                {t('Not Configured')}
               </span>
             </div>
             <p className="text-[11px] text-stone-500">
-              National water telemetry REST interface
+              {t('National water telemetry REST interface')}
             </p>
           </div>
 
@@ -185,11 +187,11 @@ export const DataPipelineStatusCard: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-stone-900">CGWB Network</span>
               <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">
-                Not Configured
+                {t('Not Configured')}
               </span>
             </div>
             <p className="text-[11px] text-stone-500">
-              Central Ground Water Board well portal
+              {t('Central Ground Water Board well portal')}
             </p>
           </div>
 
@@ -198,11 +200,11 @@ export const DataPipelineStatusCard: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-stone-900">IMD Rainfall</span>
               <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">
-                Not Configured
+                {t('Not Configured')}
               </span>
             </div>
             <p className="text-[11px] text-stone-500">
-              Gridded precipitation telemetry feed
+              {t('Gridded precipitation telemetry feed')}
             </p>
           </div>
         </div>

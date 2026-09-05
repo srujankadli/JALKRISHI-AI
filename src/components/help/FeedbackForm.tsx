@@ -53,10 +53,10 @@ export const FeedbackForm: React.FC = () => {
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center space-y-2 animate-fadeIn">
             <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
             <h4 className="text-base font-black text-emerald-900">
-              Thank you for your valuable feedback!
+              {t('Thank you for your valuable feedback!')}
             </h4>
             <p className="text-xs text-emerald-800 font-medium">
-              Your feedback has been recorded locally. (Demo feedback form &mdash; server submission will be connected during backend deployment).
+              {t('Your feedback has been recorded locally. (Demo feedback form — server submission will be connected during backend deployment).')}
             </p>
           </div>
         ) : (
@@ -65,7 +65,7 @@ export const FeedbackForm: React.FC = () => {
               {/* Name */}
               <div>
                 <label className="text-[11px] font-bold text-stone-600 block mb-1">
-                  Your Name / Organization (Optional):
+                  {t('Your Name / Organization (Optional):')}
                 </label>
                 <input
                   type="text"
@@ -79,18 +79,18 @@ export const FeedbackForm: React.FC = () => {
               {/* Role */}
               <div>
                 <label className="text-[11px] font-bold text-stone-600 block mb-1">
-                  Your Stakeholder Role:
+                  {t('Your Stakeholder Role:')}
                 </label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value as any)}
                   className="w-full rounded-xl border border-stone-300 bg-stone-50/80 px-3 py-2.5 text-xs font-semibold text-stone-900 focus:border-agri-600 focus:bg-white focus:outline-none"
                 >
-                  <option value="Farmer">🌾 Farmer / Landholder</option>
-                  <option value="Student">🎓 Student / Academic</option>
-                  <option value="Researcher">🔬 Hydrogeology Researcher</option>
-                  <option value="Administrator">🏛️ Policy / Water Administrator</option>
-                  <option value="Other">💼 Other</option>
+                  <option value="Farmer">🌾 {t('Farmer / Landholder')}</option>
+                  <option value="Student">🎓 {t('Student / Academic')}</option>
+                  <option value="Researcher">🔬 {t('Hydrogeology Researcher')}</option>
+                  <option value="Administrator">🏛️ {t('Policy / Water Administrator')}</option>
+                  <option value="Other">💼 {t('Other')}</option>
                 </select>
               </div>
             </div>
@@ -99,25 +99,25 @@ export const FeedbackForm: React.FC = () => {
               {/* Feedback Type */}
               <div>
                 <label className="text-[11px] font-bold text-stone-600 block mb-1">
-                  Feedback Category:
+                  {t('Feedback Category:')}
                 </label>
                 <select
                   value={feedbackType}
                   onChange={(e) => setFeedbackType(e.target.value as any)}
                   className="w-full rounded-xl border border-stone-300 bg-stone-50/80 px-3 py-2.5 text-xs font-semibold text-stone-900 focus:border-agri-600 focus:bg-white focus:outline-none"
                 >
-                  <option value="Suggestion">💡 Feature Suggestion</option>
-                  <option value="Bug">🐞 Bug Report</option>
-                  <option value="Data Issue">📊 Data Discrepancy</option>
-                  <option value="Usability">📱 Usability / Mobile Experience</option>
-                  <option value="Other">💬 General Inquiry</option>
+                  <option value="Suggestion">💡 {t('Feature Suggestion')}</option>
+                  <option value="Bug">🐞 {t('Bug Report')}</option>
+                  <option value="Data Issue">📊 {t('Data Discrepancy')}</option>
+                  <option value="Usability">📱 {t('Usability / Mobile Experience')}</option>
+                  <option value="Other">💬 {t('General Inquiry')}</option>
                 </select>
               </div>
 
               {/* 5-Star Rating */}
               <div>
                 <label className="text-[11px] font-bold text-stone-600 block mb-1">
-                  Platform Rating:
+                  {t('Platform Rating:')}
                 </label>
                 <div className="flex items-center gap-1.5 pt-1">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -137,7 +137,7 @@ export const FeedbackForm: React.FC = () => {
                     </button>
                   ))}
                   <span className="text-xs font-bold text-stone-700 ml-2 font-mono">
-                    {rating} / 5 Stars
+                    {rating} / 5 {t('Stars')}
                   </span>
                 </div>
               </div>
@@ -146,7 +146,7 @@ export const FeedbackForm: React.FC = () => {
             {/* Message */}
             <div>
               <label className="text-[11px] font-bold text-stone-600 block mb-1">
-                Your Feedback or Suggestions:
+                {t('Your Feedback or Suggestions:')}
               </label>
               <textarea
                 rows={4}
@@ -161,7 +161,7 @@ export const FeedbackForm: React.FC = () => {
             {/* Action Bar */}
             <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <span className="text-[11px] text-stone-500 font-medium">
-                * Stored in demo mode &bull; Server link planned
+                {t('* Stored in demo mode • Server link planned')}
               </span>
 
               <button
