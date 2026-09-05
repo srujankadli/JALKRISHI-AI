@@ -166,10 +166,19 @@ def test_forecasting_pipeline():
     assert any("borewell" in n.lower() or "grapes" in n.lower() for n in bw_data["personalized_profile_notes"])
     print("   [OK] Farm profile personalization validated in location forecast output.")
 
+    # 13. Strict Invalid Location Rejection (400)
+    print("13. Testing Strict Invalid Location Rejection (400)...")
+    invalid_locations = ["gbtrshy", "abcdef", "xyz123", "randomtown999", "randomvillage999"]
+    for inv in invalid_locations:
+        res_inv = client.get(f"/api/v1/forecast/location?location={inv}&days=30")
+        assert res_inv.status_code == 400, f"Expected 400 for {inv}, got {res_inv.status_code}"
+        assert "couldn't verify that location" in res_inv.json()["detail"].lower() or "not recognized" in res_inv.json()["detail"].lower()
+    print("   [OK] Unresolvable locations strictly rejected with HTTP 400 (no fake forecast fallback).")
+
     print("\n==================================================")
     print("ALL PHASE D & LOCATION FORECASTING TESTS PASSED (100%)")
     print("==================================================")
 
 
 if __name__ == "__main__":
-    run_tests()
+    test_forecasting_pipeline()

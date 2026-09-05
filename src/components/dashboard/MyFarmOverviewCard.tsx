@@ -39,7 +39,7 @@ export const MyFarmOverviewCard: React.FC<MyFarmOverviewCardProps> = ({ onOpenSt
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [newLocationInput, setNewLocationInput] = useState(location);
 
-  if (!location) {
+  if (!location || !resolvedLocation || !resolvedLocation.is_resolved) {
     return null;
   }
 

@@ -65,25 +65,11 @@ export const JalKrishiWaterWatchCard: React.FC<JalKrishiWaterWatchCardProps> = (
         );
 
         if (isMounted) {
-          if (res) {
+          if (res && res.status !== 'UNRESOLVED' && res.status !== 'LOCATION_REQUIRED') {
             setData(res);
           } else {
-            // Local fallback structure if API returns null
-            setData({
-              location: effectiveLocation || 'Your Area',
-              status: 'STABLE',
-              has_warning: false,
-              risk_state: 'STABLE',
-              station_id: targetStationId || '',
-              station_name: selectedStation?.stationName || '',
-              summary: 'Groundwater conditions appear relatively stable in the available reference simulation data.',
-              what_changed: 'Groundwater conditions are currently stable in this area.',
-              why_it_matters: 'Aquifer storage remains within normal seasonal baseline range.',
-              recommended_action: 'Continue efficient water use and monitor groundwater conditions.',
-              what_to_do: 'Continue efficient water use and monitor groundwater conditions.',
-              confidence: 'MODERATE',
-              provenance: 'JalKrishi Reference Simulation Dataset',
-            });
+            setData(null);
+            setError(true);
           }
         }
       } catch (err) {
@@ -106,7 +92,10 @@ export const JalKrishiWaterWatchCard: React.FC<JalKrishiWaterWatchCardProps> = (
   }, [effectiveLocation, targetStationId, selectedStation?.latitude, selectedStation?.longitude]);
 
   // Risk state mapping
-  const riskState: ProactiveRiskState = data?.risk_state || data?.status || 'STABLE';
+  const rawState = data?.risk_state || data?.status || 'STABLE';
+  const riskState: ProactiveRiskState = ['CRITICAL_RISK', 'ESCALATING_RISK', 'EMERGING_RISK', 'RECOVERY_SIGNAL', 'DATA_QUALITY_WARNING'].includes(rawState)
+    ? (rawState as ProactiveRiskState)
+    : 'STABLE';
 
   const getStatusBadge = (state: ProactiveRiskState) => {
     switch (state) {

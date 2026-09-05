@@ -129,12 +129,51 @@ export const ForecastPage: React.FC = () => {
   };
 
   const activePoints = forecast?.forecastPoints || [];
-  const currentDepthVal = forecast?.currentLevel ?? (isDirectObservation ? nearestStation?.station.waterLevel : 14.5);
-  const endDepthVal = forecast?.projectedLevelEnd ?? forecast?.projectedLevel30d ?? (currentDepthVal ? currentDepthVal + 0.3 : 14.8);
+  const currentDepthVal = forecast?.currentLevel ?? (isDirectObservation ? nearestStation?.station.waterLevel : undefined);
+  const endDepthVal = forecast?.projectedLevelEnd ?? forecast?.projectedLevel30d ?? (currentDepthVal !== undefined ? currentDepthVal + 0.3 : undefined);
   const netChange = currentDepthVal !== undefined && endDepthVal !== undefined ? endDepthVal - currentDepthVal : 0;
   const isFalling = netChange > 0.05;
   const isRising = netChange < -0.05;
   const urgencyStyle = getUrgencyBadge(forecast?.daysToCriticalUrgency || 'Safe');
+
+  if (!farmLocation || !resolvedLocation || !resolvedLocation.is_resolved) {
+    return (
+      <div className="space-y-6 animate-fadeIn pb-8 select-none max-w-4xl mx-auto mt-6">
+        <div className="overflow-hidden rounded-3xl border-2 border-agri-200 bg-gradient-to-br from-agri-50/80 via-white to-water-50/50 p-8 shadow-sm text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-agri-100 text-agri-700 mb-4">
+            <MapPin className="h-7 w-7" />
+          </div>
+          <h2 className="text-2xl font-black text-stone-900">
+            {t('Enter your farm location to view forward groundwater forecasts')}
+          </h2>
+          <p className="mt-2 text-sm text-stone-600 max-w-lg mx-auto leading-relaxed">
+            {t("We couldn't verify that location. Please enter a valid village, town, city, district, state, or 6-digit PIN code.")}
+          </p>
+
+          <form onSubmit={handleLocationSubmit} className="mt-6 flex flex-col sm:flex-row items-stretch justify-center gap-2.5 max-w-md mx-auto">
+            <div className="relative flex-1">
+              <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-400" />
+              <input
+                type="text"
+                value={locationInput}
+                onChange={(e) => setLocationInput(e.target.value)}
+                placeholder={t('e.g. Nashik, Pune, Kochi, Jaipur, Ballari...')}
+                className="w-full rounded-xl border border-stone-300 bg-white py-3 pl-11 pr-4 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:border-agri-600 focus:outline-none focus:ring-2 focus:ring-agri-500/20 shadow-sm"
+                autoFocus
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-agri-700 px-6 py-3 text-sm font-bold text-white hover:bg-agri-800 active:scale-98 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+            >
+              {isLoading ? t('Locating...') : t('View Forecast')}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fadeIn pb-8 select-none">

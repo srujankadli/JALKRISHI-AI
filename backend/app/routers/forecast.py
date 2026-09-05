@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Query, HTTPException, Path, Depends
+from fastapi import APIRouter, Query, HTTPException, Path, Depends, status
 from app.models.schemas import (
     StationForecastResponse,
     LocationForecastResponse,
@@ -10,6 +10,7 @@ from app.models.schemas import (
     UserRoleEnum,
 )
 from app.engines.forecasting import forecasting_engine, SUPPORTED_HORIZONS
+from app.pipeline.location_resolver import resolve_location
 from app.routers.auth import require_roles
 
 router = APIRouter(prefix="/api/v1/forecast", tags=["Groundwater Forecasting"])
@@ -39,6 +40,30 @@ def get_location_forecast(
     groundwater_dependence: Optional[str] = Query(None, description="Groundwater reliance level (High, Moderate, Low)"),
     water_reliability: Optional[str] = Query(None, description="Water reliability (e.g. Perennial, Seasonal, Deficit)"),
 ) -> LocationForecastResponse:
+    if days not in SUPPORTED_HORIZONS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Horizon 'days' must be one of {SUPPORTED_HORIZONS}. Received: {days}",
+        )
+
+    if not ((location and location.strip()) or (lat is not None and lon is not None)):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Coordinates or a verified location query are required. Please provide a valid location.",
+        )
+
+    resolved = resolve_location(
+        location_query=location,
+        latitude=lat,
+        longitude=lon,
+    )
+
+    if not resolved.is_resolved or resolved.latitude is None or resolved.longitude is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=resolved.error_message or "We couldn't verify that location. Please enter a valid village, town, city, district, state, or 6-digit PIN code.",
+        )
+
     return forecasting_engine.forecast_location(
         location_query=location,
         latitude=lat,

@@ -127,9 +127,9 @@ export interface ProactiveFilterParams {
 
 export interface FarmerProactiveStatus {
   location: string;
-  status: ProactiveRiskState;
+  status: ProactiveRiskState | 'UNRESOLVED' | 'LOCATION_REQUIRED' | 'UNSUPPORTED';
   has_warning: boolean;
-  risk_state: ProactiveRiskState;
+  risk_state: ProactiveRiskState | 'UNRESOLVED' | 'LOCATION_REQUIRED' | 'UNSUPPORTED';
   station_id?: string;
   station_name?: string;
   summary: string;

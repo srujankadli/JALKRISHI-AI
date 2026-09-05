@@ -31,7 +31,7 @@ export const forecastService = {
       groundwaterDependence?: string;
       waterReliability?: string;
     }
-  ): Promise<LocationForecast> {
+  ): Promise<LocationForecast | null> {
     const validHorizon = [7, 30, 60, 90].includes(horizonDays) ? horizonDays : 30;
 
     try {
@@ -94,36 +94,10 @@ export const forecastService = {
         };
       }
     } catch {
-      // Backend offline -> fallback
+      // Backend rejected unverified location or network error
     }
 
-    // Fallback location forecast
-    const farmLat = lat ?? 0.0;
-    const farmLon = lon ?? 0.0;
-    return {
-      locationName: locationQuery || (farmLat !== 0.0 ? `Farm (${farmLat.toFixed(2)}N, ${farmLon.toFixed(2)}E)` : 'My Farm'),
-      latitude: farmLat,
-      longitude: farmLon,
-      evidenceMode: farmLat !== 0.0 ? 'REGIONAL_NEARBY_EVIDENCE' : 'LOCATION_REQUIRED',
-      criticalThreshold: 25.0,
-      currentLevel: 14.2,
-      projectedLevel30d: 14.5,
-      projectedDaysToCritical: 45,
-      daysToCriticalUrgency: '31–60 Days: Watch Zone',
-      forecastRisk: 'worsening',
-      horizonDays: validHorizon,
-      dailyChangeM: 0.005,
-      confidenceScore: farmLat !== 0.0 ? 0.85 : 0.0,
-      farmerGuidance: 'Projected seasonal groundwater table variation. Adopt micro-irrigation schedules.',
-      provenanceLabel: 'Regional groundwater forecast based on nearby evidence',
-      forecastPoints: [
-        { date: 'Today', predictedLevel: 14.2, upperConfidence: 14.2, lowerConfidence: 14.2, expectedRainfallMm: 5.0 },
-        { date: '+7 Days', predictedLevel: 14.24, upperConfidence: 14.38, lowerConfidence: 14.10, expectedRainfallMm: 12.0 },
-        { date: '+15 Days', predictedLevel: 14.32, upperConfidence: 14.54, lowerConfidence: 14.10, expectedRainfallMm: 21.0 },
-        { date: '+21 Days', predictedLevel: 14.38, upperConfidence: 14.65, lowerConfidence: 14.11, expectedRainfallMm: 28.0 },
-        { date: '+30 Days', predictedLevel: 14.50, upperConfidence: 14.85, lowerConfidence: 14.15, expectedRainfallMm: 38.0 },
-      ],
-    };
+    return null;
   },
   /**
    * Returns a 7-to-90 day forecast model for a specific observation well.

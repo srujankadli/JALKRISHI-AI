@@ -269,3 +269,21 @@ def test_farmer_dialogue_proactive_flow():
     assert res2.location is not None
     assert "Sangrur" in res2.location.name or "Sangrur" in res2.text_response
     assert len(res2.text_response) > 20
+
+
+def test_proactive_overview_location_validation():
+    """Verify GET /api/v1/proactive/overview returns 200 for valid and 400 for invalid locations."""
+    # Valid locations -> 200
+    for valid_loc in ["Ballari", "Kochi", "Jaipur", "Nashik", "Bengaluru"]:
+        resp = client.get(f"/api/v1/proactive/overview?location={valid_loc}")
+        assert resp.status_code == 200, f"Expected 200 for {valid_loc}, got {resp.status_code}"
+        data = resp.json()
+        assert data["location"] is not None
+        assert data["status"] is not None
+
+    # Invalid locations -> 400
+    for inv_loc in ["gbtrshy", "abcdef", "xyz123", "randomtown999", "randomvillage999"]:
+        resp_inv = client.get(f"/api/v1/proactive/overview?location={inv_loc}")
+        assert resp_inv.status_code == 400, f"Expected 400 for {inv_loc}, got {resp_inv.status_code}"
+        assert "couldn't verify that location" in resp_inv.json()["detail"].lower() or "not recognized" in resp_inv.json()["detail"].lower()
+

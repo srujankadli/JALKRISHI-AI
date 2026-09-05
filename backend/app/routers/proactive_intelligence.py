@@ -23,6 +23,9 @@ from app.engines.proactive_intelligence import proactive_intelligence_engine
 from app.routers.auth import get_current_user
 
 from typing import Optional, List, Any, Union
+from fastapi import status
+from app.pipeline.dwlr_ingest import station_repo
+from app.pipeline.location_resolver import resolve_location
 
 router = APIRouter(prefix="/proactive", tags=["Proactive Groundwater Intelligence"])
 
@@ -38,13 +41,36 @@ def get_proactive_overview(
     longitude: Optional[float] = Query(None, description="Farm longitude coordinate"),
     station_id: Optional[str] = Query(None, description="DWLR Station ID"),
 ) -> Any:
-    if (location and location.strip()) or (latitude is not None and longitude is not None) or (station_id and station_id.strip()):
-        return proactive_intelligence_engine.get_farmer_proactive_brief(
-            lat=latitude,
-            lon=longitude,
-            station_id=station_id,
-            location_name=location,
+    # 1. Station ID evaluation
+    if station_id and station_id.strip():
+        st = station_repo.get_by_id(station_id.strip())
+        if not st:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Station '{station_id}' not found.",
+            )
+        return proactive_intelligence_engine.get_farmer_proactive_brief(station_id=station_id.strip())
+
+    # 2. Location string or coordinates resolution
+    if (location and location.strip()) or (latitude is not None and longitude is not None):
+        loc_res = resolve_location(
+            location_query=location.strip() if location else None,
+            latitude=latitude,
+            longitude=longitude,
         )
+        if not loc_res.is_resolved or loc_res.latitude is None or loc_res.longitude is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=loc_res.error_message or "We couldn't verify that location. Please enter a valid village, town, city, district, state, or 6-digit PIN code.",
+            )
+        return proactive_intelligence_engine.get_farmer_proactive_brief(
+            lat=loc_res.latitude,
+            lon=loc_res.longitude,
+            station_id=loc_res.matched_station_id,
+            location_name=loc_res.name or location,
+        )
+
+    # 3. Default network-wide overview for unparameterized requests
     return proactive_intelligence_engine.get_overview()
 
 
